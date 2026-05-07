@@ -1,11 +1,12 @@
 //  import type { Metadata } from "next";
+
 // import "./globals.css";
-// import QueryProvider from "@/providers/query-provider";
-// import { Toaster } from "react-hot-toast";
+
+// import Providers from "@/providers/theme-provider";
 
 // export const metadata: Metadata = {
 //   title: "After Sales CRM",
-//   description: "Enterprise After Sales Service CRM",
+//   description: "Enterprise CRM",
 // };
 
 // export default function RootLayout({
@@ -14,17 +15,20 @@
 //   children: React.ReactNode;
 // }>) {
 //   return (
-//     <html lang="en">
+//     <html
+//       lang="en"
+//       suppressHydrationWarning
+//     >
 //       <body>
-//         <QueryProvider>
+//         <Providers>
 //           {children}
-//           <Toaster position="top-right" />
-//         </QueryProvider>
+//         </Providers>
 //       </body>
 //     </html>
 //   );
 // }
 
+import "./globals.css";
 
 import Providers from "@/providers/theme-provider";
 
@@ -34,9 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
