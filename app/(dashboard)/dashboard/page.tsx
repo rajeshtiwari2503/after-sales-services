@@ -1,4 +1,5 @@
 import StatsCard from "@/components/dashboard/stats-card";
+import TicketsChart from "@/components/dashboard/tickets-chart";
 
 export default function DashboardPage() {
   return (
@@ -14,6 +15,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="mt-10">
+  <TicketsChart />
+</div>
         <StatsCard
           title="Total Tickets"
           value="1,248"
