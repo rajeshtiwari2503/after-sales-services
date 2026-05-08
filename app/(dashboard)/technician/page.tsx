@@ -2,27 +2,27 @@
 
 import { useEffect, useState } from "react";
 
-import ServiceCenterCard from "@/components/service-centers/ServiceCenterCard";
+import TechnicianCard from "@/components/technicians/TechnicianCard";
 
-export default function ServiceCentersPage() {
-  const [centers, setCenters] =
+export default function TechniciansPage() {
+  const [technicians, setTechnicians] =
     useState([]);
 
   useEffect(() => {
-    fetchCenters();
+    fetchTechnicians();
   }, []);
 
-  const fetchCenters =
+  const fetchTechnicians =
     async () => {
       try {
         const res = await fetch(
-          "/api/service-centers"
+          "/api/technicians"
         );
 
         const data =
           await res.json();
 
-        setCenters(data);
+        setTechnicians(data);
       } catch (error) {
         console.log(error);
       }
@@ -32,21 +32,25 @@ export default function ServiceCentersPage() {
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-4xl font-black">
-          Service Centers
+          Technicians
         </h1>
 
         <button className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
-          Add Center
+          Add Technician
         </button>
       </div>
 
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {centers.map((item: any) => (
-          <ServiceCenterCard
-            key={item._id}
-            item={item}
-          />
-        ))}
+        {technicians.map(
+          (technician: any) => (
+            <TechnicianCard
+              key={technician._id}
+              technician={
+                technician
+              }
+            />
+          )
+        )}
       </div>
     </div>
   );

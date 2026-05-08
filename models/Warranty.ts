@@ -39,3 +39,35 @@ const Warranty =
   );
 
 export default Warranty;
+
+// import mongoose, {
+//   Schema,
+//   model,
+//   models,
+// } from "mongoose";
+
+// const warrantySchema = new Schema(
+//   {
+//     productName: String,
+
+//     serialNumber: String,
+
+//     purchaseDate: Date,
+
+//     expiryDate: Date,
+
+//     customerId: String,
+
+//     status: String,
+//   },
+//   {
+//     timestamps: true,
+//   }
+// );
+
+// export default
+//   models.Warranty ||
+//   model(
+//     "Warranty",
+//     warrantySchema
+//   );

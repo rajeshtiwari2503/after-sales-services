@@ -2,27 +2,27 @@
 
 import { useEffect, useState } from "react";
 
-import ServiceCenterCard from "@/components/service-centers/ServiceCenterCard";
+import FeedbackCard from "@/components/feedback/FeedbackCard";
 
-export default function ServiceCentersPage() {
-  const [centers, setCenters] =
+export default function FeedbackPage() {
+  const [feedbacks, setFeedbacks] =
     useState([]);
 
   useEffect(() => {
-    fetchCenters();
+    fetchFeedbacks();
   }, []);
 
-  const fetchCenters =
+  const fetchFeedbacks =
     async () => {
       try {
         const res = await fetch(
-          "/api/service-centers"
+          "/api/feedback"
         );
 
         const data =
           await res.json();
 
-        setCenters(data);
+        setFeedbacks(data);
       } catch (error) {
         console.log(error);
       }
@@ -32,21 +32,19 @@ export default function ServiceCentersPage() {
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-4xl font-black">
-          Service Centers
+          Customer Feedback
         </h1>
-
-        <button className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
-          Add Center
-        </button>
       </div>
 
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {centers.map((item: any) => (
-          <ServiceCenterCard
-            key={item._id}
-            item={item}
-          />
-        ))}
+        {feedbacks.map(
+          (feedback: any) => (
+            <FeedbackCard
+              key={feedback._id}
+              feedback={feedback}
+            />
+          )
+        )}
       </div>
     </div>
   );

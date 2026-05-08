@@ -1,29 +1,65 @@
-import OpenAI from "openai";
+// import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
-export async function classifyTicket(
+// export async function classifyTicket(
+//   text: string
+// ) {
+//   const response =
+//     await openai.chat.completions.create({
+//       model: "gpt-4.1-mini",
+
+//       messages: [
+//         {
+//           role: "system",
+//           content:
+//             "Classify support ticket into categories.",
+//         },
+
+//         {
+//           role: "user",
+//           content: text,
+//         },
+//       ],
+//     });
+
+//   return response.choices[0].message.content;
+// }
+
+export function classifyTicket(
   text: string
 ) {
-  const response =
-    await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+  const lower =
+    text.toLowerCase();
 
-      messages: [
-        {
-          role: "system",
-          content:
-            "Classify support ticket into categories.",
-        },
+  if (
+    lower.includes("not working")
+  ) {
+    return {
+      category:
+        "TECHNICAL",
 
-        {
-          role: "user",
-          content: text,
-        },
-      ],
-    });
+      priority:
+        "HIGH",
+    };
+  }
 
-  return response.choices[0].message.content;
+  if (
+    lower.includes("refund")
+  ) {
+    return {
+      category:
+        "BILLING",
+
+      priority:
+        "MEDIUM",
+    };
+  }
+
+  return {
+    category: "GENERAL",
+    priority: "LOW",
+  };
 }
