@@ -1,132 +1,143 @@
-import TicketDetailsCard from "@/components/tickets/TicketDetailsCard";
+ "use client";
+
+import { useEffect, useState } from "react";
+
+import TicketHeader from "@/components/tickets/TicketHeader";
+
+import TicketCustomerInfo from "@/components/tickets/TicketCustomerInfo";
 
 import TicketTimeline from "@/components/tickets/TicketTimeline";
 
-import AssignTechnicianDialog from "@/components/tickets/AssignTechnicianDialog";
+import TicketNotes from "@/components/tickets/TicketNotes";
 
-import { connectDB } from "@/lib/db";
+import TicketAttachments from "@/components/tickets/TicketAttachments";
 
-import Ticket from "@/models/Ticket";
+import TicketAssignment from "@/components/tickets/TicketAssignment";
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
+import TicketStatusWorkflow from "@/components/tickets/TicketStatusWorkflow";
 
-export default async function TicketDetailsPage({
+import TicketSLA from "@/components/tickets/TicketSLA";
+
+import RealtimeTimeline from "@/components/tickets/RealtimeTimeline";
+
+export default function TicketDetailsPage({
   params,
-}: Props) {
-  await connectDB();
+}: any) {
+  const [ticket, setTicket] =
+    useState<any>(null);
 
-  const ticket =
-    await Ticket.findById(
-      params.id
-    ).lean();
+  const [technicians, setTechnicians] =
+    useState([]);
+
+  useEffect(() => {
+    fetchTicket();
+
+    fetchTechnicians();
+  }, []);
+
+  const fetchTicket =
+    async () => {
+      const res = await fetch(
+        `/api/tickets/${params.id}`
+      );
+
+      const data =
+        await res.json();
+
+      setTicket(data);
+    };
+
+  const fetchTechnicians =
+    async () => {
+      const res = await fetch(
+        "/api/technicians"
+      );
+
+      const data =
+        await res.json();
+
+      setTechnicians(data);
+    };
+
+  if (!ticket) {
+    return (
+      <div className="p-10">
+        Loading...
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 bg-slate-50 min-h-screen space-y-6">
+      <TicketHeader
+        ticket={ticket}
+      />
+
       <div className="grid xl:grid-cols-3 gap-6">
-        {/* Left */}
         <div className="xl:col-span-2 space-y-6">
-          <TicketDetailsCard
-            ticket={JSON.parse(
-              JSON.stringify(
-                ticket
-              )
-            )}
+          <TicketStatusWorkflow
+            ticketId={
+              ticket._id
+            }
+            currentStatus={
+              ticket.status
+            }
           />
 
           <TicketTimeline
-            timeline={
-              ticket.timeline ||
-              []
+            activities={
+              ticket.activities
+            }
+          />
+
+          <RealtimeTimeline />
+
+          <TicketNotes
+            ticketId={
+              ticket._id
+            }
+            notes={
+              ticket.notes
+            }
+          />
+
+          <TicketAttachments
+            attachments={
+              ticket.attachments
             }
           />
         </div>
 
-        {/* Right */}
         <div className="space-y-6">
-          <AssignTechnicianDialog
-            ticketId={
-              ticket._id.toString()
+          <TicketCustomerInfo
+            customer={
+              ticket.customer
             }
           />
 
-          {/* SLA */}
-          <div className="bg-white border border-sky-100 rounded-[30px] p-6">
-            <h2 className="text-xl font-black mb-5">
-              SLA Details
-            </h2>
+          <TicketAssignment
+            ticketId={
+              ticket._id
+            }
+            technicians={
+              technicians
+            }
+            assignedTo={
+              ticket.assignedTo
+            }
+          />
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-slate-500">
-                  SLA Status
-                </p>
+          <TicketSLA
+            sla={{
+              status:
+                ticket.slaStatus,
 
-                <p className="font-bold text-lg">
-                  {
-                    ticket.slaStatus
-                  }
-                </p>
-              </div>
+              deadline:
+                ticket.slaDeadline,
 
-              <div>
-                <p className="text-sm text-slate-500">
-                  Due Date
-                </p>
-
-                <p className="font-bold text-lg">
-                  {ticket.dueDate
-                    ? new Date(
-                        ticket.dueDate
-                      ).toLocaleDateString()
-                    : "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="bg-white border border-sky-100 rounded-[30px] p-6">
-            <h2 className="text-xl font-black mb-5">
-              Internal Notes
-            </h2>
-
-            <div className="space-y-4">
-              {ticket.internalNotes
-                ?.length ? (
-                ticket.internalNotes.map(
-                  (
-                    note: any,
-                    index: number
-                  ) => (
-                    <div
-                      key={index}
-                      className="p-4 rounded-2xl bg-sky-50"
-                    >
-                      <p className="text-slate-700">
-                        {
-                          note.note
-                        }
-                      </p>
-
-                      <p className="text-xs text-slate-500 mt-2">
-                        {
-                          note.createdBy
-                        }
-                      </p>
-                    </div>
-                  )
-                )
-              ) : (
-                <p className="text-slate-500">
-                  No notes added
-                </p>
-              )}
-            </div>
-          </div>
+              progress: 70,
+            }}
+          />
         </div>
       </div>
     </div>
