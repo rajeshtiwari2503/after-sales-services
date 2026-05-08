@@ -1,12 +1,11 @@
 "use client";
 
 import BillingPlans from "@/components/billing/BillingPlans";
-
 import InvoicesTable from "@/components/billing/InvoicesTable";
-
+import PaymentHistory from "@/components/billing/PaymentHistory";
 import SubscriptionCard from "@/components/billing/SubscriptionCard";
 
-import PaymentHistory from "@/components/billing/PaymentHistory";
+ 
 
 export default function BillingPage() {
   return (

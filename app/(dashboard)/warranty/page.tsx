@@ -58,11 +58,11 @@
 
 "use client";
 
+import WarrantyExpiryAlert from "@/components/warranty/WarrantyExpiryAlert";
+import WarrantyStats from "@/components/warranty/WarrantyStats";
 import WarrantyTable from "@/components/warranty/WarrantyTable";
 
-import WarrantyStats from "@/components/warranty/WarrantyStats";
-
-import WarrantyExpiryAlert from "@/components/warranty/WarrantyExpiryAlert";
+ 
 
 export default function WarrantyPage() {
   return (
