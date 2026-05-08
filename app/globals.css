@@ -1,3 +1,5 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -127,4 +129,27 @@
   html {
     @apply font-sans;
   }
+}
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+
+  box-shadow:
+    0 10px 40px rgba(37, 99, 235, 0.08);
+}
+
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    #2563eb,
+    #06b6d4,
+    #4f46e5
+  );
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
 }
