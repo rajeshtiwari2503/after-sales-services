@@ -38,29 +38,64 @@
 //     return errorResponse("Failed to create ticket");
 //   }
 // }
+ 
 
-import { producer } from "@/shared/kafka";
 
-export async function POST(req: Request) {
-  const body = await req.json();
+import { NextRequest, NextResponse } from "next/server";
 
-  const ticket = {
-    title: body.title,
-  };
+import { connectDB } from "@/lib/db";
 
-  await producer.connect();
+import Ticket from "@/models/Ticket";
 
-  await producer.send({
-    topic: "ticket-created",
+export async function GET() {
+  try {
+    await connectDB();
 
-    messages: [
-      {
-        value: JSON.stringify(ticket),
-      },
-    ],
-  });
+    const tickets = await Ticket.find()
+      .sort({ createdAt: -1 })
+      .populate("assignedTo")
+      .populate("customer");
 
-  return Response.json({
-    success: true,
-  });
+    return NextResponse.json(tickets);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch tickets" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  req: NextRequest
+) {
+  try {
+    await connectDB();
+
+    const body = await req.json();
+
+    const ticket = await Ticket.create({
+      ...body,
+
+      status: "OPEN",
+
+      slaStatus: "ACTIVE",
+
+      activities: [
+        {
+          action:
+            "Ticket Created",
+
+          createdAt:
+            new Date(),
+        },
+      ],
+    });
+
+    return NextResponse.json(ticket);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create ticket" },
+      { status: 500 }
+    );
+  }
 }
