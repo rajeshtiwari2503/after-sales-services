@@ -6,6 +6,7 @@ import { z } from "zod";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 const LoginPage = () => {
     const router = useRouter();
     const {
@@ -64,6 +65,18 @@ rounded-xl py-3 font-semibold"
                 >
                     {isSubmitting ? "Loading..." : "Login"}
                 </button>
+                <div className="text-center mt-6">
+  <p className="text-slate-500">
+    Don&apos;t have an account?
+  </p>
+
+  <Link
+    href="/register"
+    className="inline-flex items-center justify-center mt-4 h-12 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 transition font-bold text-slate-700"
+  >
+    Create Account
+  </Link>
+</div>
             </form>
         </div>
     </div>

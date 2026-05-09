@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -9,6 +9,7 @@ import {
   MessageSquare, Upload, Settings, MapPin, Award, Play,
   ChevronDown,
 } from "lucide-react";
+import Image from "next/image";
 
 // ─── Animated Counter ────────────────────────────────────────────
 function AnimatedCounter({ end, suffix = "", duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
@@ -78,22 +79,114 @@ function Header() {
   ];
 
   return (
+    // <header
+    //   className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+    //     ? "bg-[#030712]/95 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_40px_rgba(0,0,0,0.4)]"
+    //     : "bg-transparent"
+    //     }`}
+    // >
+    //   <div className="max-w-7xl mx-auto px-5 sm:px-8 h-[72px] flex items-center justify-between">
+    //     {/* Logo */}
+    //     <Link
+    //       href="/"
+    //       className="flex items-center gap-3 group"
+    //     >
+    //       <div className="relative">
+    //         <Image
+    //           src="/logo1.png"
+    //           alt="SaaS Techify Logo"
+    //           width={150}
+    //           height={150}
+    //           className="object-contain transition-transform duration-300 group-hover:scale-105"
+    //           priority
+    //         />
+    //       </div>
+    //     </Link>
+
+    //     {/* Desktop Nav */}
+    //     <nav className="hidden lg:flex items-center gap-1">
+    //       {navLinks.map((link) => (
+    //         <a
+    //           key={link.href}
+    //           href={link.href}
+    //           className="text-slate-400 hover:text-white px-4 py-2 rounded-lg hover:bg-white/[0.06] transition-all text-sm font-medium"
+    //         >
+    //           {link.label}
+    //         </a>
+    //       ))}
+    //     </nav>
+
+    //     {/* Desktop CTA */}
+    //     <div className="hidden lg:flex items-center gap-3">
+    //       <Link
+    //         href="/login"
+    //         className="text-slate-300 hover:text-white px-4 py-2 text-sm font-semibold transition-colors"
+    //       >
+    //         Sign in
+    //       </Link>
+    //       <Link
+    //         href="/register"
+    //         className="relative group bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 hover:scale-[1.02] transition-all"
+    //       >
+    //         Start Free Trial
+    //         <span className="ml-1.5">→</span>
+    //       </Link>
+    //     </div>
+
+    //     {/* Mobile Button */}
+    //     <button
+    //       onClick={() => setOpen(!open)}
+    //       className="lg:hidden w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-300 hover:bg-white/[0.08] transition"
+    //     >
+    //       {open ? <X size={18} /> : <Menu size={18} />}
+    //     </button>
+    //   </div>
+
+    //   {/* Mobile Menu */}
+    //   {open && (
+    //     <div className="lg:hidden bg-[#0a0d18]/98 backdrop-blur-2xl border-t border-white/[0.06]">
+    //       <div className="px-6 py-6 flex flex-col gap-2">
+    //         {navLinks.map((link) => (
+    //           <a
+    //             key={link.href}
+    //             href={link.href}
+    //             className="text-slate-300 font-medium py-3 border-b border-white/[0.05] flex items-center justify-between"
+    //             onClick={() => setOpen(false)}
+    //           >
+    //             {link.label}
+    //             <ChevronRight size={14} className="text-slate-600" />
+    //           </a>
+    //         ))}
+    //         <div className="flex flex-col gap-3 pt-5">
+    //           <Link href="/login" className="border border-white/10 py-3 rounded-xl text-center text-sm font-semibold text-slate-300">Sign in</Link>
+    //           <Link href="/register" className="bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] py-3 rounded-xl text-center text-sm font-semibold text-white">Start Free Trial →</Link>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   )}
+    // </header>
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-[#030712]/95 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_40px_rgba(0,0,0,0.4)]"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
+        ? "bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm"
+        : "bg-transparent"
+        }`}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-[72px] flex items-center justify-between">
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0ea5e9] to-[#6366f1] flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:shadow-sky-500/40 transition-shadow">
-            <Wrench size={18} className="text-white" />
-          </div>
-          <div>
-            <p className="text-white font-black text-[17px] tracking-tight leading-none">SaaS Techify</p>
-            <p className="text-slate-400 text-[10px] tracking-widest uppercase leading-none mt-0.5">After-Sales CRM</p>
+        <Link
+          href="/"
+          className="flex items-center gap-3 group"
+        >
+          <div className="relative">
+            <Image
+              src="/logo.png"
+              alt="SaaS Techify Logo"
+              width={250}
+              height={150}
+              className="object-contain transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
           </div>
         </Link>
 
@@ -103,7 +196,10 @@ function Header() {
             <a
               key={link.href}
               href={link.href}
-              className="text-slate-400 hover:text-white px-4 py-2 rounded-lg hover:bg-white/[0.06] transition-all text-sm font-medium"
+              className={`px-4 py-2 rounded-xl transition-all text-sm font-semibold ${scrolled
+                ? "text-slate-700 hover:text-blue-600 hover:bg-slate-100"
+                : "text-slate-200 hover:text-white hover:bg-white/10"
+                }`}
             >
               {link.label}
             </a>
@@ -114,46 +210,93 @@ function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
-            className="text-slate-300 hover:text-white px-4 py-2 text-sm font-semibold transition-colors"
+            className={`px-4 py-2 text-sm font-semibold transition-colors ${scrolled
+              ? "text-slate-700 hover:text-blue-600"
+              : "text-slate-200 hover:text-white"
+              }`}
           >
             Sign in
           </Link>
+
           <Link
             href="/register"
-            className="relative group bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 hover:scale-[1.02] transition-all"
+            className={`relative group px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${scrolled
+              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+              : "bg-white text-slate-900 hover:bg-slate-100"
+              }`}
           >
             Start Free Trial
             <span className="ml-1.5">→</span>
           </Link>
         </div>
 
-        {/* Mobile Button */}
+        {/* Mobile Menu Button */}
         <button
           onClick={() => setOpen(!open)}
-          className="lg:hidden w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-300 hover:bg-white/[0.08] transition"
+          className={`lg:hidden w-10 h-10 rounded-xl border flex items-center justify-center transition ${scrolled
+            ? "border-slate-200 text-slate-700 hover:bg-slate-100"
+            : "border-white/10 text-slate-200 hover:bg-white/10"
+            }`}
         >
-          {open ? <X size={18} /> : <Menu size={18} />}
+          {open ? (
+            <X size={18} />
+          ) : (
+            <Menu size={18} />
+          )}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {open && (
-        <div className="lg:hidden bg-[#0a0d18]/98 backdrop-blur-2xl border-t border-white/[0.06]">
+        <div
+          className={`lg:hidden border-t backdrop-blur-2xl ${scrolled
+            ? "bg-white border-slate-200"
+            : "bg-[#0a0d18]/95 border-white/10"
+            }`}
+        >
           <div className="px-6 py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-slate-300 font-medium py-3 border-b border-white/[0.05] flex items-center justify-between"
-                onClick={() => setOpen(false)}
+                onClick={() =>
+                  setOpen(false)
+                }
+                className={`font-medium py-3 flex items-center justify-between border-b transition ${scrolled
+                  ? "text-slate-700 border-slate-100 hover:text-blue-600"
+                  : "text-slate-200 border-white/5 hover:text-white"
+                  }`}
               >
                 {link.label}
-                <ChevronRight size={14} className="text-slate-600" />
+
+                <ChevronRight
+                  size={14}
+                  className={
+                    scrolled
+                      ? "text-slate-400"
+                      : "text-slate-600"
+                  }
+                />
               </a>
             ))}
+
             <div className="flex flex-col gap-3 pt-5">
-              <Link href="/login" className="border border-white/10 py-3 rounded-xl text-center text-sm font-semibold text-slate-300">Sign in</Link>
-              <Link href="/register" className="bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] py-3 rounded-xl text-center text-sm font-semibold text-white">Start Free Trial →</Link>
+              <Link
+                href="/login"
+                className={`py-3 rounded-xl text-center text-sm font-semibold border transition ${scrolled
+                  ? "border-slate-200 text-slate-700 hover:bg-slate-100"
+                  : "border-white/10 text-slate-200 hover:bg-white/10"
+                  }`}
+              >
+                Sign in
+              </Link>
+
+              <Link
+                href="/register"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl text-center text-sm font-semibold text-white shadow-lg shadow-blue-500/20"
+              >
+                Start Free Trial →
+              </Link>
             </div>
           </div>
         </div>
@@ -173,7 +316,7 @@ function Hero() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNMzYgMzRjMCAxLjEtLjkgMi0yIDJzLTItLjktMi0yIC45LTIgMi0yIDIgLjkgMiAyeiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvZz48L3N2Zz4=')] opacity-50" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-20 w-full">
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-8 mt-5 py-15 w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left */}
           <div className="max-w-xl">
@@ -274,11 +417,10 @@ function Hero() {
                         <span className="text-slate-300 text-sm">{ticket.issue}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          ticket.status === "IN_PROGRESS" ? "bg-violet-500/15 text-violet-400" :
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${ticket.status === "IN_PROGRESS" ? "bg-violet-500/15 text-violet-400" :
                           ticket.status === "ASSIGNED" ? "bg-sky-500/15 text-sky-400" :
-                          "bg-amber-500/15 text-amber-400"
-                        }`}>
+                            "bg-amber-500/15 text-amber-400"
+                          }`}>
                           {ticket.status.replace("_", " ")}
                         </span>
                         <span className="text-slate-600 text-xs">{ticket.time}</span>
@@ -301,7 +443,7 @@ function Hero() {
             </div>
 
             {/* Floating badges */}
-            <div className="absolute -left-12 top-1/4">
+            {/* <div className="absolute -left-12 top-1/4">
               <FloatingBadge icon={<CheckCircle size={16} className="text-white" />} label="Resolved today" value="248 Tickets" color="bg-emerald-500/80" delay={0} />
             </div>
             <div className="absolute -right-10 top-1/2">
@@ -309,6 +451,51 @@ function Hero() {
             </div>
             <div className="absolute -left-6 bottom-16">
               <FloatingBadge icon={<Star size={16} className="text-white" />} label="Avg Rating" value="4.9 / 5.0" color="bg-amber-500/80" delay={2} />
+            </div> */}
+
+            <div className="absolute left-0 top-[12%] -translate-x-1/2 z-20 hidden xl:block">
+              <FloatingBadge
+                icon={
+                  <CheckCircle
+                    size={16}
+                    className="text-white"
+                  />
+                }
+                label="Resolved Today"
+                value="248 Tickets"
+                color="bg-emerald-500/90"
+                delay={0}
+              />
+            </div>
+
+            <div className="absolute left-50 top-1/2 translate-x-1/2 -translate-y-1/2 z-20 hidden xl:block">
+              <FloatingBadge
+                icon={
+                  <Zap
+                    size={16}
+                    className="text-white"
+                  />
+                }
+                label="AI Auto Assigned"
+                value="3 Tickets"
+                color="bg-violet-500/90"
+                delay={1}
+              />
+            </div>
+
+            <div className="absolute left-0 bottom-[12%] -translate-x-1/2 z-20 hidden xl:block">
+              <FloatingBadge
+                icon={
+                  <Star
+                    size={16}
+                    className="text-white"
+                  />
+                }
+                label="Average Rating"
+                value="4.9 / 5.0"
+                color="bg-amber-500/90"
+                delay={2}
+              />
             </div>
           </div>
         </div>
@@ -533,17 +720,15 @@ function Modules() {
                 <span className="text-slate-200 text-sm font-medium">{t.title}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  t.priority === "CRITICAL" ? "bg-red-500/15 text-red-400" :
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${t.priority === "CRITICAL" ? "bg-red-500/15 text-red-400" :
                   t.priority === "HIGH" ? "bg-orange-500/15 text-orange-400" :
-                  "bg-amber-500/15 text-amber-400"
-                }`}>{t.priority}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  t.status === "IN_PROGRESS" ? "bg-violet-500/15 text-violet-400" :
+                    "bg-amber-500/15 text-amber-400"
+                  }`}>{t.priority}</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${t.status === "IN_PROGRESS" ? "bg-violet-500/15 text-violet-400" :
                   t.status === "COMPLETED" ? "bg-emerald-500/15 text-emerald-400" :
-                  t.status === "ASSIGNED" ? "bg-sky-500/15 text-sky-400" :
-                  "bg-amber-500/15 text-amber-400"
-                }`}>{t.status.replace("_", " ")}</span>
+                    t.status === "ASSIGNED" ? "bg-sky-500/15 text-sky-400" :
+                      "bg-amber-500/15 text-amber-400"
+                  }`}>{t.status.replace("_", " ")}</span>
               </div>
             </div>
           ))}
@@ -687,11 +872,10 @@ function Modules() {
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-left whitespace-nowrap lg:whitespace-normal transition-all shrink-0 lg:shrink ${
-                  active === i
-                    ? "bg-white/[0.07] border border-white/[0.1] text-white"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-left whitespace-nowrap lg:whitespace-normal transition-all shrink-0 lg:shrink ${active === i
+                  ? "bg-white/[0.07] border border-white/[0.1] text-white"
+                  : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]"
+                  }`}
               >
                 <span className={active === i ? "text-sky-400" : "text-slate-600"}>{mod.icon}</span>
                 <span className="font-semibold text-sm">{mod.title}</span>
@@ -865,11 +1049,10 @@ function Pricing() {
           {plans.map((plan, i) => (
             <div
               key={i}
-              className={`relative rounded-2xl p-8 border transition-all hover:-translate-y-1 ${
-                plan.highlight
-                  ? "bg-gradient-to-b from-sky-500/10 to-indigo-500/10 border-sky-500/30 shadow-2xl shadow-sky-500/10"
-                  : "bg-[#0d1117] border-white/[0.07]"
-              }`}
+              className={`relative rounded-2xl p-8 border transition-all hover:-translate-y-1 ${plan.highlight
+                ? "bg-gradient-to-b from-sky-500/10 to-indigo-500/10 border-sky-500/30 shadow-2xl shadow-sky-500/10"
+                : "bg-[#0d1117] border-white/[0.07]"
+                }`}
             >
               {plan.highlight && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
@@ -910,11 +1093,10 @@ function Pricing() {
               </ul>
 
               <button
-                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${
-                  plan.highlight
-                    ? "bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:shadow-lg hover:shadow-sky-500/30 hover:scale-[1.02]"
-                    : "border border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-white"
-                }`}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${plan.highlight
+                  ? "bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:shadow-lg hover:shadow-sky-500/30 hover:scale-[1.02]"
+                  : "border border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-white"
+                  }`}
               >
                 {plan.monthly ? "Start Free Trial" : "Contact Sales"}
               </button>
@@ -1017,11 +1199,12 @@ function CTA() {
 function Footer() {
   return (
     <footer className="border-t border-white/[0.05] bg-[#050810]">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16">
+        <div className="grid grid-cols-2 justify-items-center md:grid-cols-4 xl:grid-cols-5 gap-10">
           {/* Brand col */}
-          <div className="col-span-2 md:col-span-4 xl:col-span-2">
-            <div className="flex items-center gap-3 mb-5">
+          {/* <div className="col-span-2 md:col-span-4 xl:col-span-2"> */}
+          <div className="col-span-2 md:col-span-4 xl:col-span-2 ">
+            {/* <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg">
                 <Wrench size={18} className="text-white" />
               </div>
@@ -1029,17 +1212,25 @@ function Footer() {
                 <p className="text-white font-black text-[17px] leading-none">SaaS Techify</p>
                 <p className="text-slate-600 text-[10px] tracking-widest uppercase leading-none mt-0.5">After-Sales CRM</p>
               </div>
-            </div>
-            <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
-              Enterprise-grade after-sales CRM platform with AI automation, real-time infrastructure, and advanced analytics.
-            </p>
-            <div className="flex items-center gap-3 mt-6">
-              {["privacy", "terms", "security"].map((l) => (
-                <span key={l} className="text-slate-600 hover:text-slate-400 text-xs capitalize cursor-pointer transition-colors">{l}</span>
-              ))}
-            </div>
-          </div>
+            </div> */}
+            <Link
+              href="/"
+              className="flex items-center gap-3 group"
+            >
+              <div className="relative">
+                <Image
+                  src="/logo.png"
+                  alt="SaaS Techify Logo"
+                  width={400}
+                  height={150}
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  priority
+                />
+              </div>
+            </Link>
 
+          </div>
+         
           {/* Links */}
           {[
             { title: "Product", links: ["Ticket Management", "AI Automation", "Live Tracking", "Analytics", "Wallet System"] },
@@ -1058,8 +1249,19 @@ function Footer() {
             </div>
           ))}
         </div>
-
-        <div className="border-t border-white/[0.04] mt-14 pt-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+         <div className="border-t border-white/[0.04]   pt-8 pb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div>
+              <p className="text-slate-500 text-sm leading-relaxed  ">
+              Enterprise-grade after-sales CRM platform with AI automation, real-time infrastructure, and advanced analytics.
+            </p>
+            </div>
+            <div className="flex items-center gap-3  ">
+              {["privacy", "terms", "security"].map((l) => (
+                <span key={l} className="text-slate-600 hover:text-slate-400 text-xs capitalize cursor-pointer transition-colors">{l}</span>
+              ))}
+            </div>
+          </div>
+        <div className="border-t border-white/[0.04]  pt-8 flex flex-col md:flex-row gap-4 items-center justify-between">
           <p className="text-slate-600 text-sm">© 2026 SaaS Techify. All rights reserved. Made in Lucknow 🇮🇳</p>
           <p className="text-slate-700 text-xs">Next.js · TypeScript · MongoDB · AWS · Socket.IO</p>
         </div>
