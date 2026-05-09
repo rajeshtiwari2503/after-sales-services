@@ -1,40 +1,65 @@
-import mongoose, {
+ 
+     
+   import mongoose, {
   Schema,
-  model,
-  models,
 } from "mongoose";
 
-const notificationSchema = new Schema(
-  {
-    title: String,
+const NotificationSchema =
+  new Schema(
+    {
+      userId: {
+        type: String,
+        required: true,
+      },
 
-    message: String,
+      title: {
+        type: String,
+        required: true,
+      },
 
-    userId: String,
+      message: {
+        type: String,
+        required: true,
+      },
 
-    type: {
-      type: String,
-      enum: [
-        "SUCCESS",
+      type: {
+        type: String,
+        enum: [
+          "ticket",
+          "chat",
+          "sla",
+          "system",
+          "inventory",
+          "billing",
+             "SUCCESS",
         "WARNING",
         "ERROR",
         "INFO",
-      ],
-    },
+        ],
+        default: "system",
+      },
 
-    isRead: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+      isRead: {
+        type: Boolean,
+        default: false,
+      },
 
-export default
-  models.Notification ||
-  model(
+      actionUrl: {
+        type: String,
+      },
+
+      metadata: {
+        type: Object,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+export default mongoose.models
+  .Notification ||
+  mongoose.model(
     "Notification",
-    notificationSchema
+    NotificationSchema
   );

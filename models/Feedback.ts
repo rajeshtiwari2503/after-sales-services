@@ -1,29 +1,68 @@
-import mongoose, {
+ import mongoose, {
   Schema,
-  model,
-  models,
 } from "mongoose";
 
-const feedbackSchema = new Schema(
-  {
-    ticketId: String,
+const FeedbackSchema =
+  new Schema(
+    {
+      ticketId: {
+        type: String,
+        required: true,
+      },
 
-    rating: Number,
+      customerId: {
+        type: String,
+        required: true,
+      },
 
-    review: String,
+      customerName: {
+        type: String,
+        required: true,
+      },
 
-    customerId: String,
+      rating: {
+        type: Number,
+        required: true,
+      },
 
-    technicianId: String,
-  },
-  {
-    timestamps: true,
-  }
-);
+      serviceQuality: {
+        type: Number,
+      },
 
-export default
-  models.Feedback ||
-  model(
+      technicianBehavior: {
+        type: Number,
+      },
+
+      responseTime: {
+        type: Number,
+      },
+
+      recommendationLikelihood:
+        {
+          type: Number,
+        },
+
+      feedbackMessage: {
+        type: String,
+      },
+
+      suggestions: {
+        type: String,
+      },
+
+      resolved: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+export default mongoose.models
+  .Feedback ||
+  mongoose.model(
     "Feedback",
-    feedbackSchema
+    FeedbackSchema
   );
