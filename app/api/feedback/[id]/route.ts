@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+ import { NextResponse } from "next/server";
 
 import { connectDB } from "@/lib/db";
 
@@ -9,18 +9,18 @@ export async function GET(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
     await connectDB();
 
+    const { id } = await params;
+
     const feedback =
-      await Feedback.findById(
-        params.id
-      );
+      await Feedback.findById(id);
 
     if (!feedback) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function GET(
       success: true,
       data: feedback,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log(
       "FEEDBACK GET ERROR:",
       error
@@ -59,20 +59,22 @@ export async function PUT(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
     await connectDB();
+
+    const { id } = await params;
 
     const body =
       await req.json();
 
     const updated =
       await Feedback.findByIdAndUpdate(
-        params.id,
+        id,
         body,
         {
           new: true,
@@ -83,7 +85,7 @@ export async function PUT(
       success: true,
       data: updated,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log(
       "FEEDBACK UPDATE ERROR:",
       error
@@ -105,16 +107,18 @@ export async function DELETE(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
     await connectDB();
 
+    const { id } = await params;
+
     await Feedback.findByIdAndDelete(
-      params.id
+      id
     );
 
     return NextResponse.json({
@@ -122,7 +126,7 @@ export async function DELETE(
       message:
         "Feedback deleted",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log(
       "FEEDBACK DELETE ERROR:",
       error
