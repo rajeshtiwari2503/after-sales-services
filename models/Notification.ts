@@ -1,97 +1,65 @@
- 
-     
-//    import mongoose, {
-//   Schema,
-// } from "mongoose";
+ import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Notification as NotificationType } from '@/types/notification';
 
-// const NotificationSchema =
-//   new Schema(
-//     {
-//       userId: {
-//         type: String,
-//         required: true,
-//       },
-
-//       title: {
-//         type: String,
-//         required: true,
-//       },
-
-//       message: {
-//         type: String,
-//         required: true,
-//       },
-
-//       type: {
-//         type: String,
-//         enum: [
-//           "ticket",
-//           "chat",
-//           "sla",
-//           "system",
-//           "inventory",
-//           "billing",
-//              "SUCCESS",
-//         "WARNING",
-//         "ERROR",
-//         "INFO",
-//         ],
-//         default: "system",
-//       },
-
-//       isRead: {
-//         type: Boolean,
-//         default: false,
-//       },
-
-//       actionUrl: {
-//         type: String,
-//       },
-
-//       metadata: {
-//         type: Object,
-//       },
-//     },
-//     {
-//       timestamps: true,
-//     }
-//   );
-
-// export default mongoose.models
-//   .Notification ||
-//   mongoose.model(
-//     "Notification",
-//     NotificationSchema
-//   );
-
-
-import mongoose, { Document, Schema } from 'mongoose'
-import type { Notification as INotification } from '@/types/notification'
-
-export interface NotificationDocument extends Omit<INotification, '_id'>, Document {}
+export interface NotificationDocument extends Omit<NotificationType, '_id'>, Document {}
 
 const NotificationSchema = new Schema<NotificationDocument>(
   {
-    userId:         { type: String, required: true, index: true },
-    title:          { type: String, required: true },
-    message:        { type: String, required: true },
-    type:           { type: String, required: true },
-    priority:       { type: String, enum: ['low','medium','high','critical'], default: 'medium' },
-    status:         { type: String, enum: ['unread','read','archived'], default: 'unread' },
-    channels:       [{ type: String }],
-    referenceId:    { type: String },
-    referenceType:  { type: String },
-    actionUrl:      { type: String },
-    metadata:       { type: Schema.Types.Mixed },
-    readAt:         { type: Date },
-    expiresAt:      { type: Date },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    tenantId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    type: {
+      type: String,
+      enum: [
+        'ticket_created',
+        'ticket_assigned',
+        'ticket_updated',
+        'ticket_resolved',
+        'sla_warning',
+        'sla_breach',
+        'feedback_received',
+        'low_stock',
+        'warranty_expiry',
+        'system',
+      ],
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    data: {
+      type: Schema.Types.Mixed,
+    },
+    channels: [{
+      type: String,
+      enum: ['in_app', 'email', 'push', 'whatsapp', 'sms'],
+    }],
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+    readAt: Date,
   },
-  { timestamps: true }
-)
+  {
+    timestamps: true,
+  }
+);
 
-NotificationSchema.index({ userId: 1, status: 1, createdAt: -1 })
-NotificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
 
-export const NotificationModel =
-  mongoose.models.Notification ||
-  mongoose.model<NotificationDocument>('Notification', NotificationSchema)
+const Notification: Model<NotificationDocument> =
+  mongoose.models.Notification || mongoose.model<NotificationDocument>('Notification', NotificationSchema);
+
+export default Notification;

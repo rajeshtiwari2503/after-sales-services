@@ -1,101 +1,140 @@
- import { FeedbackModel } from '@/models/Feedback'
-import type { FeedbackCreateInput, FeedbackUpdateInput, FeedbackFilter, PaginatedFeedback, Feedback } from '@/types/feedback'
-import { analyzeSentiment } from '@/lib/ai/sentiment-analysis'
-import { connectDB } from '@/lib/db'
+//  import Feedback from '@/models/Feedback';
+import { CreateFeedbackInput } from '@/schemas/feedback.schema';
+import { SentimentService } from './sentiment.service';
+import connectDB from '@/lib/db';
 
 export class FeedbackService {
-  static async create(input: FeedbackCreateInput): Promise<Feedback> {
-    await connectDB()
-    const sentiment = analyzeSentiment(input.comment)
-    const doc = await FeedbackModel.create({
-      ...input,
-      sentiment:      sentiment.label,
-      sentimentScore: sentiment.score,
-      isPublic:       input.isPublic ?? false,
-    })
-    return doc.toObject()
-  }
+  static async createFeedback(data: CreateFeedbackInput, customerId: string, tenantId: string) {
+    await connectDB();
 
-  static async findById(id: string): Promise<Feedback | null> {
-    await connectDB()
-    const doc = await FeedbackModel.findById(id).lean()
-    return doc as Feedback | null
-  }
-
-  static async list(filter: FeedbackFilter): Promise<PaginatedFeedback> {
-    await connectDB()
-    const {
-      page = 1, limit = 20, status, type, sentiment,
-      minRating, maxRating, technicianId, clientId,
-      startDate, endDate, isPublic, search,
-    } = filter
-
-    const query: Record<string, unknown> = {}
-    if (status)       query.status       = status
-    if (type)         query.type         = type
-    if (sentiment)    query.sentiment    = sentiment
-    if (technicianId) query.technicianId = technicianId
-    if (clientId)     query.clientId     = clientId
-    if (isPublic !== undefined) query.isPublic = isPublic
-    if (minRating || maxRating) {
-      query.rating = {}
-      if (minRating) (query.rating as any).$gte = minRating
-      if (maxRating) (query.rating as any).$lte = maxRating
+    let sentiment;
+    if (data.comment) {
+      sentiment = await SentimentService.analyze(data.comment);
     }
+
+    const feedback = await Feedback.create({
+      ...data,
+      customerId,
+      tenantId,
+      sentiment,
+    });
+
+    return feedback;
+  }
+
+  static async getFeedback(tenantId: string, options: {
+    page?: number;
+    limit?: number;
+    rating?: number;
+    technicianId?: string;
+    startDate?: string;
+    endDate?: string;
+  }) {
+    await connectDB();
+
+    const { page = 1, limit = 10, rating, technicianId, startDate, endDate } = options;
+    const query: Record<string, any> = { tenantId };
+
+    if (rating) query.rating = rating;
+    if (technicianId) query.technicianId = technicianId;
     if (startDate || endDate) {
-      query.createdAt = {}
-      if (startDate) (query.createdAt as any).$gte = new Date(startDate)
-      if (endDate)   (query.createdAt as any).$lte = new Date(endDate)
-    }
-    if (search) {
-      query.$or = [
-        { clientName: { $regex: search, $options: 'i' } },
-        { comment:    { $regex: search, $options: 'i' } },
-        { technicianName: { $regex: search, $options: 'i' } },
-      ]
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    const [data, total] = await Promise.all([
-      FeedbackModel.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
-      FeedbackModel.countDocuments(query),
-    ])
+    const skip = (page - 1) * limit;
+    const [feedback, total] = await Promise.all([
+      Feedback.find(query)
+        .populate('customerId', 'name email')
+        .populate('ticketId', 'ticketNumber title')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Feedback.countDocuments(query),
+    ]);
 
-    return { data: data as Feedback[], total, page, limit, totalPages: Math.ceil(total / limit) }
+    return { feedback, total, page, limit };
   }
 
-  static async update(id: string, input: FeedbackUpdateInput): Promise<Feedback | null> {
-    await connectDB()
-    const update: Record<string, unknown> = { ...input }
-    if (input.response) update.respondedAt = new Date()
-    const doc = await FeedbackModel.findByIdAndUpdate(id, update, { new: true }).lean()
-    return doc as Feedback | null
+  static async getAnalytics(tenantId: string, period?: { start: Date; end: Date }) {
+    await connectDB();
+
+    const matchStage: Record<string, any> = { tenantId };
+    if (period) {
+      matchStage.createdAt = { $gte: period.start, $lte: period.end };
+    }
+
+    const [stats, sentimentBreakdown, trendData] = await Promise.all([
+      Feedback.aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: null,
+            averageRating: { $avg: '$rating' },
+            totalFeedback: { $sum: 1 },
+            averageNPS: { $avg: '$npsScore' },
+          },
+        },
+      ]),
+      Feedback.aggregate([
+        { $match: { ...matchStage, 'sentiment.label': { $exists: true } } },
+        {
+          $group: {
+            _id: '$sentiment.label',
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      Feedback.aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            rating: { $avg: '$rating' },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+        { $limit: 30 },
+      ]),
+    ]);
+
+    const sentiment = {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    };
+    sentimentBreakdown.forEach((item: any) => {
+      sentiment[item._id as keyof typeof sentiment] = item.count;
+    });
+
+    return {
+      averageRating: stats[0]?.averageRating || 0,
+      totalFeedback: stats[0]?.totalFeedback || 0,
+      npsScore: stats[0]?.averageNPS || 0,
+      sentimentBreakdown: sentiment,
+      trendData: trendData.map((item: any) => ({
+        date: item._id,
+        rating: item.rating,
+        count: item.count,
+      })),
+    };
   }
 
-  static async delete(id: string): Promise<boolean> {
-    await connectDB()
-    const res = await FeedbackModel.findByIdAndDelete(id)
-    return !!res
-  }
+  static async respondToFeedback(feedbackId: string, content: string, respondedBy: string, tenantId: string) {
+    await connectDB();
 
-  static async getAll(): Promise<Feedback[]> {
-    await connectDB()
-    return FeedbackModel.find().lean() as Promise<Feedback[]>
-  }
-
-  static async getPublicReviews(limit = 10): Promise<Feedback[]> {
-    await connectDB()
-    return FeedbackModel.find({ isPublic: true, status: { $ne: 'escalated' } })
-      .sort({ rating: -1, createdAt: -1 }).limit(limit).lean() as Promise<Feedback[]>
-  }
-
-  static async exportCSV(filter: FeedbackFilter): Promise<string> {
-    const { data } = await this.list({ ...filter, limit: 10000, page: 1 })
-    const headers  = ['ID','Client','Email','Rating','NPS','Type','Status','Sentiment','Comment','Technician','Created']
-    const rows     = data.map(f => [
-      f._id, f.clientName, f.clientEmail, f.rating, f.npsScore ?? '',
-      f.type, f.status, f.sentiment ?? '', `"${f.comment.replace(/"/g, '""')}"`,
-      f.technicianName ?? '', new Date(f.createdAt).toLocaleDateString(),
-    ])
-    return [headers, ...rows].map(r => r.join(',')).join('\n')
+    return Feedback.findOneAndUpdate(
+      { _id: feedbackId, tenantId },
+      {
+        response: {
+          content,
+          respondedBy,
+          respondedAt: new Date(),
+        },
+      },
+      { new: true }
+    );
   }
 }

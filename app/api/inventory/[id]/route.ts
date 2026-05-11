@@ -1,103 +1,108 @@
-// import {
-//   NextRequest,
-//   NextResponse,
-// } from "next/server";
+ import { NextRequest } from 'next/server';
+import { updateInventorySchema } from '@/schemas/inventory.schema';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+import Inventory from '@/models/Inventory';
+import connectDB from '@/lib/db';
 
-// import SparePart from "@/models/SparePart";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-// import { connectDB } from "@/lib/db";
-
-// export async function PUT(
-//   req: NextRequest,
-//   { params }: any
-// ) {
-//   await connectDB();
-
-//   const body =
-//     await req.json();
-
-//   const updated =
-//     await SparePart.findByIdAndUpdate(
-//       params.id,
-//       body,
-//       {
-//         new: true,
-//       }
-//     );
-
-//   return NextResponse.json(
-//     updated
-//   );
-// }
-
-// export async function DELETE(
-//   req: NextRequest,
-//   { params }: any
-// ) {
-//   await connectDB();
-
-//   await SparePart.findByIdAndDelete(
-//     params.id
-//   );
-
-//   return NextResponse.json({
-//     success: true,
-//   });
-// }
-
-import { NextRequest, NextResponse } from "next/server";
-
-import { connectDB } from "@/lib/db";
-
-import Inventory from "@/models/Inventory";
-
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
     await connectDB();
+    const { id } = await params;
 
-    const items =
-      await Inventory.find().sort({
-        createdAt: -1,
-      });
+    const item = await Inventory.findOne({ _id: id, tenantId: user.tenantId });
 
-    return NextResponse.json(
-      items
-    );
+    if (!item) {
+      return errorResponse('Item not found', 404);
+    }
+
+    return successResponse(item);
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          "Failed to fetch inventory",
-      },
-      { status: 500 }
-    );
+    console.error('Get inventory item error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }
 
-export async function POST(
-  req: NextRequest
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    if (!['admin', 'manager'].includes(user.role)) {
+      return errorResponse('Forbidden', 403);
+    }
+
+    const body = await request.json();
+    const validation = updateInventorySchema.safeParse(body);
+    if (!validation.success) {
+      return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
+    }
+
     await connectDB();
+    const { id } = await params;
 
-    const body =
-      await req.json();
-
-    const item =
-      await Inventory.create(
-        body
-      );
-
-    return NextResponse.json(
-      item
+    const item = await Inventory.findOneAndUpdate(
+      { _id: id, tenantId: user.tenantId },
+      validation.data,
+      { new: true }
     );
+
+    if (!item) {
+      return errorResponse('Item not found', 404);
+    }
+
+    return successResponse(item, 'Item updated successfully');
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          "Failed to create inventory",
-      },
-      { status: 500 }
-    );
+    console.error('Update inventory error:', error);
+    return errorResponse('An error occurred', 500);
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    if (!['admin', 'manager'].includes(user.role)) {
+      return errorResponse('Forbidden', 403);
+    }
+
+    await connectDB();
+    const { id } = await params;
+
+    const item = await Inventory.findOneAndDelete({ _id: id, tenantId: user.tenantId });
+
+    if (!item) {
+      return errorResponse('Item not found', 404);
+    }
+
+    return successResponse(null, 'Item deleted successfully');
+  } catch (error) {
+    console.error('Delete inventory error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

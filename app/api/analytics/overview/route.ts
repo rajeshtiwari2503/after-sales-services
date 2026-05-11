@@ -1,71 +1,34 @@
-// import { NextResponse } from "next/server";
+ import { NextRequest } from 'next/server';
+import { AnalyticsService } from '@/services/analytics.service';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-// import Ticket from "@/models/Ticket";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-// import { connectDB } from "@/lib/db";
+export async function GET(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-// export async function GET() {
-//   await connectDB();
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
 
-//   const totalTickets =
-//     await Ticket.countDocuments();
+    const period = startDate && endDate
+      ? { start: new Date(startDate), end: new Date(endDate) }
+      : undefined;
 
-//   const resolvedTickets =
-//     await Ticket.countDocuments({
-//       status: "RESOLVED",
-//     });
+    const overview = await AnalyticsService.getOverview(user.tenantId, period);
 
-//   const openTickets =
-//     await Ticket.countDocuments({
-//       status: "OPEN",
-//     });
-
-//   const breached =
-//     await Ticket.countDocuments({
-//       slaStatus:
-//         "BREACHED",
-//     });
-
-//   return NextResponse.json({
-//     totalTickets,
-//     resolvedTickets,
-//     openTickets,
-//     breached,
-//   });
-// }
-
-
-import { NextResponse } from "next/server";
-
-import Ticket from "@/models/Ticket";
-
-import { connectDB } from "@/lib/db";
-
-export async function GET() {
-  await connectDB();
-
-  const totalTickets =
-    await Ticket.countDocuments();
-
-  const resolvedTickets =
-    await Ticket.countDocuments({
-      status: "RESOLVED",
-    });
-
-  const openTickets =
-    await Ticket.countDocuments({
-      status: "OPEN",
-    });
-
-  const breached =
-    await Ticket.countDocuments({
-      slaStatus: "BREACHED",
-    });
-
-  return NextResponse.json({
-    totalTickets,
-    resolvedTickets,
-    openTickets,
-    breached,
-  });
+    return successResponse(overview);
+  } catch (error) {
+    console.error('Get overview error:', error);
+    return errorResponse('An error occurred', 500);
+  }
 }

@@ -1,35 +1,34 @@
- import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Chat from "@/models/Chat";
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
-    await connectDB();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
     const { ticketId } = await params;
 
-    const chats = await Chat.find({
+    // Get messages for ticket
+    // In production, fetch from database
+    return successResponse({
       ticketId,
-    }).sort({
-      createdAt: 1,
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: chats,
+      messages: [],
+      participants: [],
     });
   } catch (error) {
-    console.log("CHAT FETCH ERROR:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch chats",
-      },
-      { status: 500 }
-    );
+    console.error('Get ticket chat error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

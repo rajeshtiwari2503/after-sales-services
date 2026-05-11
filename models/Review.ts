@@ -1,37 +1,84 @@
-import mongoose, { Document, Schema } from 'mongoose'
+ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface ReviewDocument extends Document {
-  feedbackId:   string
-  clientId:     string
-  clientName:   string
-  rating:       number
-  title:        string
-  body:         string
-  isVerified:   boolean
-  isApproved:   boolean
-  helpfulVotes: number
-  service?:     string
-  createdAt:    Date
+  feedbackId: mongoose.Types.ObjectId;
+  tenantId: string;
+  customerId: mongoose.Types.ObjectId;
+  customerName: string;
+  rating: number;
+  title?: string;
+  content: string;
+  isVerified: boolean;
+  isPublished: boolean;
+  helpfulCount: number;
+  response?: {
+    content: string;
+    respondedBy: mongoose.Types.ObjectId;
+    respondedAt: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const ReviewSchema = new Schema<ReviewDocument>(
   {
-    feedbackId:   { type: String, required: true, unique: true },
-    clientId:     { type: String, required: true },
-    clientName:   { type: String, required: true },
-    rating:       { type: Number, required: true, min: 1, max: 5 },
-    title:        { type: String, required: true },
-    body:         { type: String, required: true },
-    isVerified:   { type: Boolean, default: false },
-    isApproved:   { type: Boolean, default: false },
-    helpfulVotes: { type: Number, default: 0 },
-    service:      { type: String },
+    feedbackId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Feedback',
+      required: true,
+    },
+    tenantId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    customerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    customerName: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    title: String,
+    content: {
+      type: String,
+      required: true,
+      maxlength: 1000,
+    },
+    isVerified: {
+      type: Boolean,
+      default: true,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+    },
+    helpfulCount: {
+      type: Number,
+      default: 0,
+    },
+    response: {
+      content: String,
+      respondedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+      respondedAt: Date,
+    },
   },
-  { timestamps: true }
-)
+  {
+    timestamps: true,
+  }
+);
 
-ReviewSchema.index({ isApproved: 1, rating: -1 })
+ReviewSchema.index({ tenantId: 1, isPublished: 1, createdAt: -1 });
 
-export const ReviewModel =
-  mongoose.models.Review ||
-  mongoose.model<ReviewDocument>('Review', ReviewSchema)
+const Review: Model<ReviewDocument> =
+  mongoose.models.Review || mongoose.model<ReviewDocument>('Review', ReviewSchema);
+
+export default Review;

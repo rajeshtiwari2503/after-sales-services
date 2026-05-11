@@ -1,29 +1,55 @@
-import mongoose, { Document, Schema } from 'mongoose'
-import type { NotificationPreference as IPref } from '@/types/notification'
+ import mongoose, { Schema, Document, Model } from 'mongoose';
+import { NotificationPreference as NotificationPreferenceType } from '@/types/notification';
 
-export interface NotificationPreferenceDocument extends Omit<IPref, '_id'>, Document {}
+export interface NotificationPreferenceDocument extends Omit<NotificationPreferenceType, '_id'>, Document {}
 
-const PreferenceSchema = new Schema<NotificationPreferenceDocument>(
+const NotificationPreferenceSchema = new Schema<NotificationPreferenceDocument>(
   {
-    userId: { type: String, required: true, unique: true },
-    channels: {
-      in_app:   { type: Boolean, default: true },
-      email:    { type: Boolean, default: true },
-      push:     { type: Boolean, default: false },
-      whatsapp: { type: Boolean, default: false },
-      sms:      { type: Boolean, default: false },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    types: { type: Schema.Types.Mixed, default: {} },
-    quietHours: {
-      enabled: { type: Boolean, default: false },
-      start:   { type: String, default: '22:00' },
-      end:     { type: String, default: '08:00' },
+    tenantId: {
+      type: String,
+      required: true,
     },
-    frequency: { type: String, enum: ['realtime','digest_hourly','digest_daily'], default: 'realtime' },
+    email: {
+      type: Boolean,
+      default: true,
+    },
+    push: {
+      type: Boolean,
+      default: true,
+    },
+    whatsapp: {
+      type: Boolean,
+      default: false,
+    },
+    sms: {
+      type: Boolean,
+      default: false,
+    },
+    inApp: {
+      type: Boolean,
+      default: true,
+    },
+    quietHoursStart: String,
+    quietHoursEnd: String,
+    preferences: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
   },
-  { timestamps: true }
-)
+  {
+    timestamps: true,
+  }
+);
 
-export const NotificationPreferenceModel =
+NotificationPreferenceSchema.index({ userId: 1, tenantId: 1 }, { unique: true });
+
+const NotificationPreference: Model<NotificationPreferenceDocument> =
   mongoose.models.NotificationPreference ||
-  mongoose.model<NotificationPreferenceDocument>('NotificationPreference', PreferenceSchema)
+  mongoose.model<NotificationPreferenceDocument>('NotificationPreference', NotificationPreferenceSchema);
+
+export default NotificationPreference;

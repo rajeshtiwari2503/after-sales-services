@@ -1,45 +1,26 @@
-import { NextResponse } from "next/server";
+ import { NextRequest } from 'next/server';
+import { AnalyticsService } from '@/services/analytics.service';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-import User from "@/models/User";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-import Ticket from "@/models/Ticket";
+export async function GET(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-import { connectDB } from "@/lib/db";
+    const performance = await AnalyticsService.getTechnicianPerformance(user.tenantId);
 
-export async function GET() {
-  await connectDB();
-
-  const technicians =
-    await User.find({
-      role: "TECHNICIAN",
-    });
-
-  const stats =
-    await Promise.all(
-      technicians.map(
-        async (tech) => {
-          const completed =
-            await Ticket.countDocuments(
-              {
-                assignedTo:
-                  tech._id,
-
-                status:
-                  "RESOLVED",
-              }
-            );
-
-          return {
-            technician:
-              tech.name,
-
-            completed,
-          };
-        }
-      )
-    );
-
-  return NextResponse.json(
-    stats
-  );
+    return successResponse(performance);
+  } catch (error) {
+    console.error('Get technician performance error:', error);
+    return errorResponse('An error occurred', 500);
+  }
 }

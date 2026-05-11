@@ -1,21 +1,64 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { FeedbackService } from '@/services/feedback.service'
-import { calculateNPS, npsCategory } from '@/lib/analytics/nps-calculator'
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+import Feedback from '@/models/Feedback';
+import connectDB from '@/lib/db';
 
-/* GET /api/feedback/nps */
-export async function GET(req: NextRequest) {
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const p         = req.nextUrl.searchParams
-    const startDate = p.get('startDate') || undefined
-    const endDate   = p.get('endDate')   || undefined
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const { data }  = await FeedbackService.list({ page:1, limit:10000, startDate, endDate })
-    const scores    = data.filter(f => f.npsScore != null).map(f => f.npsScore as number)
-    const result    = calculateNPS(scores)
-    const category  = npsCategory(result.score)
+    await connectDB();
 
-    return NextResponse.json({ ...result, ...category })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const npsData = await Feedback.aggregate([
+      {
+        $match: {
+          tenantId: user.tenantId,
+          npsScore: { $exists: true },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          promoters: {
+            $sum: { $cond: [{ $gte: ['$npsScore', 9] }, 1, 0] },
+          },
+          passives: {
+            $sum: { $cond: [{ $and: [{ $gte: ['$npsScore', 7] }, { $lt: ['$npsScore', 9] }] }, 1, 0] },
+          },
+          detractors: {
+            $sum: { $cond: [{ $lt: ['$npsScore', 7] }, 1, 0] },
+          },
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const data = npsData[0] || { promoters: 0, passives: 0, detractors: 0, total: 0 };
+    const npsScore = data.total > 0
+      ? ((data.promoters - data.detractors) / data.total) * 100
+      : 0;
+
+    return successResponse({
+      npsScore: Math.round(npsScore),
+      promoters: data.promoters,
+      passives: data.passives,
+      detractors: data.detractors,
+      total: data.total,
+      promoterPercentage: data.total > 0 ? (data.promoters / data.total) * 100 : 0,
+      detractorPercentage: data.total > 0 ? (data.detractors / data.total) * 100 : 0,
+    });
+  } catch (error) {
+    console.error('Get NPS error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

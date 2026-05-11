@@ -1,26 +1,63 @@
- import { NextRequest, NextResponse } from 'next/server'
-import { NotificationService } from '@/services/notification.service'
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+import NotificationPreference from '@/models/NotificationPreference';
+import connectDB from '@/lib/db';
 
-/* GET /api/notifications/preferences?userId=xxx */
-export async function GET(req: NextRequest) {
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const userId = req.nextUrl.searchParams.get('userId')
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
-    const prefs  = await NotificationService.getPreferences(userId)
-    return NextResponse.json(prefs || {})
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    await connectDB();
+
+    let preferences = await NotificationPreference.findOne({
+      userId: user.userId,
+      tenantId: user.tenantId,
+    });
+
+    if (!preferences) {
+      preferences = await NotificationPreference.create({
+        userId: user.userId,
+        tenantId: user.tenantId,
+      });
+    }
+
+    return successResponse(preferences);
+  } catch (error) {
+    console.error('Get preferences error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }
 
-/* PUT /api/notifications/preferences */
-export async function PUT(req: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
-    const body   = await req.json()
-    if (!body.userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
-    const prefs  = await NotificationService.upsertPreferences(body.userId, body)
-    return NextResponse.json(prefs)
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    const body = await request.json();
+
+    await connectDB();
+
+    const preferences = await NotificationPreference.findOneAndUpdate(
+      { userId: user.userId, tenantId: user.tenantId },
+      body,
+      { new: true, upsert: true }
+    );
+
+    return successResponse(preferences, 'Preferences updated successfully');
+  } catch (error) {
+    console.error('Update preferences error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

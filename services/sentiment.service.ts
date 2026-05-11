@@ -1,43 +1,62 @@
-import { analyzeSentiment, batchAnalyzeSentiment } from '@/lib/ai/sentiment-analysis'
-import { FeedbackModel } from '@/models/Feedback'
-import { connectDB } from '@/lib/db'
+ import { SentimentResult } from '@/types/feedback';
 
 export class SentimentService {
-  static analyze(text: string) {
-    return analyzeSentiment(text)
-  }
+  static async analyze(text: string): Promise<SentimentResult> {
+    // Simple keyword-based sentiment analysis
+    // In production, integrate with AI services like OpenAI, AWS Comprehend, etc.
 
-  static analyzeBatch(texts: string[]) {
-    return batchAnalyzeSentiment(texts)
-  }
+    const positiveWords = [
+      'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'good',
+      'happy', 'satisfied', 'helpful', 'professional', 'quick', 'efficient',
+      'recommend', 'best', 'perfect', 'love', 'thank', 'awesome',
+    ];
 
-  /** Re-run sentiment analysis on all feedback missing it */
-  static async backfill(): Promise<{ updated: number }> {
-    await connectDB()
-    const docs = await FeedbackModel.find({ sentiment: { $exists: false } }).lean()
-    let updated = 0
-    for (const doc of docs) {
-      const result = analyzeSentiment((doc as any).comment)
-      await FeedbackModel.findByIdAndUpdate((doc as any)._id, {
-        sentiment:      result.label,
-        sentimentScore: result.score,
-      })
-      updated++
+    const negativeWords = [
+      'bad', 'terrible', 'awful', 'horrible', 'poor', 'slow', 'rude',
+      'unprofessional', 'disappointed', 'frustrated', 'worst', 'never',
+      'waste', 'useless', 'incompetent', 'angry', 'hate', 'problem',
+    ];
+
+    const lowerText = text.toLowerCase();
+    const words = lowerText.split(/\s+/);
+
+    let positiveCount = 0;
+    let negativeCount = 0;
+    const foundKeywords: string[] = [];
+
+    words.forEach((word) => {
+      const cleanWord = word.replace(/[^a-z]/g, '');
+      if (positiveWords.includes(cleanWord)) {
+        positiveCount++;
+        foundKeywords.push(cleanWord);
+      }
+      if (negativeWords.includes(cleanWord)) {
+        negativeCount++;
+        foundKeywords.push(cleanWord);
+      }
+    });
+
+    const totalSentimentWords = positiveCount + negativeCount;
+    let score = 0;
+    let label: 'positive' | 'neutral' | 'negative' = 'neutral';
+    let confidence = 0.5;
+
+    if (totalSentimentWords > 0) {
+      score = (positiveCount - negativeCount) / totalSentimentWords;
+      confidence = Math.min(0.5 + totalSentimentWords * 0.1, 0.95);
+
+      if (score > 0.2) {
+        label = 'positive';
+      } else if (score < -0.2) {
+        label = 'negative';
+      }
     }
-    return { updated }
-  }
 
-  static async getSentimentSummary(clientId?: string) {
-    await connectDB()
-    const match = clientId ? { clientId } : {}
-    const result = await FeedbackModel.aggregate([
-      { $match: match },
-      { $group: {
-          _id:   '$sentiment',
-          count: { $sum: 1 },
-          avg:   { $avg: '$sentimentScore' },
-      }},
-    ])
-    return result
+    return {
+      score,
+      label,
+      confidence,
+      keywords: [...new Set(foundKeywords)].slice(0, 10),
+    };
   }
 }

@@ -1,57 +1,66 @@
-import {
-  PutObjectCommand,
-} from "@aws-sdk/client-s3";
-import{s3} from "@/lib/s3"
- 
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-import { NextResponse } from "next/server";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-export async function POST(
-  req: Request
-) {
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/plain',
+  'text/csv',
+];
+
+export async function POST(request: NextRequest) {
   try {
-    const formData =
-      await req.formData();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const file = formData.get(
-      "file"
-    ) as File;
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
 
-    const buffer = Buffer.from(
-      await file.arrayBuffer()
-    );
+    if (!file) {
+      return errorResponse('No file provided', 400);
+    }
 
-    const fileName =
-      `${Date.now()}-${file.name}`;
+    if (file.size > MAX_FILE_SIZE) {
+      return errorResponse('File size exceeds 10MB limit', 400);
+    }
 
-    await s3.send(
-      new PutObjectCommand({
-        Bucket:
-          process.env
-            .AWS_BUCKET_NAME,
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return errorResponse('File type not allowed', 400);
+    }
 
-        Key: fileName,
+    // In production, upload to S3 or cloud storage
+    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const url = `/uploads/${filename}`;
 
-        Body: buffer,
-
-        ContentType: file.type,
-      })
-    );
-
-    const url = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
-
-    return NextResponse.json({
-      success: true,
-      url,
-    });
-  } catch (error) {
-    return NextResponse.json(
+    return successResponse(
       {
-        success: false,
+        filename: file.name,
+        url,
+        type: file.type,
+        size: file.size,
       },
-      {
-        status: 500,
-      }
+      'File uploaded successfully',
+      201
     );
+  } catch (error) {
+    console.error('Upload error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

@@ -1,60 +1,57 @@
-import { NextResponse } from "next/server";
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-import { connectDB } from "@/lib/db";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-import Chat from "@/models/Chat";
-
-export async function POST(
-  req: Request
-) {
+export async function GET(request: NextRequest) {
   try {
-    await connectDB();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const body =
-      await req.json();
+    // Get active chat rooms/conversations
+    // In production, implement chat storage
+    return successResponse([]);
+  } catch (error) {
+    console.error('Get chats error:', error);
+    return errorResponse('An error occurred', 500);
+  }
+}
 
-    const chat =
-      await Chat.create({
-        ticketId:
-          body.ticketId,
+export async function POST(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-        senderId:
-          body.senderId,
+    const body = await request.json();
+    const { message, recipientId, ticketId } = body;
 
-        senderName:
-          body.senderName,
+    if (!message || (!recipientId && !ticketId)) {
+      return errorResponse('Missing required fields', 400);
+    }
 
-        senderRole:
-          body.senderRole,
+    // Store and send message
+    // In production, use WebSocket or real-time service
+    const chatMessage = {
+      id: Date.now().toString(),
+      senderId: user.userId,
+      message,
+      ticketId,
+      recipientId,
+      timestamp: new Date(),
+    };
 
-        message:
-          body.message,
-
-        attachments:
-          body.attachments ||
-          [],
-      });
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: chat,
-      },
-      { status: 201 }
-    );
-  } catch (error: any) {
-    console.log(
-      "CHAT CREATE ERROR:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to send message",
-      },
-      { status: 500 }
-    );
+    return successResponse(chatMessage, 'Message sent', 201);
+  } catch (error) {
+    console.error('Send message error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

@@ -1,27 +1,26 @@
-import { NextResponse } from "next/server";
+ import { NextRequest } from 'next/server';
+import { AnalyticsService } from '@/services/analytics.service';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-import Ticket from "@/models/Ticket";
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
+}
 
-import { connectDB } from "@/lib/db";
+export async function GET(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-export async function GET() {
-  await connectDB();
+    const slaMetrics = await AnalyticsService.getSLAMetrics(user.tenantId);
 
-  const breached =
-    await Ticket.countDocuments({
-      slaStatus:
-        "BREACHED",
-    });
-
-  const active =
-    await Ticket.countDocuments({
-      slaStatus:
-        "ACTIVE",
-    });
-
-  return NextResponse.json({
-    breached,
-
-    active,
-  });
+    return successResponse(slaMetrics);
+  } catch (error) {
+    console.error('Get SLA metrics error:', error);
+    return errorResponse('An error occurred', 500);
+  }
 }

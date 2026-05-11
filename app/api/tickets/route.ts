@@ -1,101 +1,72 @@
-// import { connectDB } from "@/lib/db";
-// import Ticket from "@/models/Ticket";
-// import {
-//   successResponse,
-//   errorResponse,
-// } from "@/utils/apiResponse";
+import { NextRequest } from 'next/server';
+import { TicketService } from '@/services/ticket.service';
+import { createTicketSchema } from '@/schemas/ticket.schema';
+import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-// export async function GET() {
-//   try {
-//     await connectDB();
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
 
-//     const tickets = await Ticket.find()
-//       .populate("customer")
-//       .populate("technician")
-//       .sort({
-//         createdAt: -1,
-//       });
+  const token = authHeader.substring(7);
+  return verifyToken(token);
+}
 
-//     return successResponse(tickets);
-//   } catch (error) {
-//     return errorResponse("Failed to fetch tickets");
-//   }
-// }
-
-// export async function POST(req: Request) {
-//   try {
-//     await connectDB();
-
-//     const body = await req.json();
-
-//     const ticket = await Ticket.create(body);
-
-//     return successResponse(
-//       ticket,
-//       "Ticket created successfully"
-//     );
-//   } catch (error) {
-//     return errorResponse("Failed to create ticket");
-//   }
-// }
- 
-
-
-import { NextRequest, NextResponse } from "next/server";
-
-import { connectDB } from "@/lib/db";
-
-import Ticket from "@/models/Ticket";
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    await connectDB();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const tickets = await Ticket.find()
-      .sort({ createdAt: -1 })
-      .populate("assignedTo")
-      .populate("customer");
+    const { searchParams } = new URL(request.url);
+    const options = {
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '10'),
+      status: searchParams.get('status') || undefined,
+      priority: searchParams.get('priority') || undefined,
+      category: searchParams.get('category') || undefined,
+      technicianId: searchParams.get('technicianId') || undefined,
+      customerId: searchParams.get('customerId') || undefined,
+      search: searchParams.get('search') || undefined,
+    };
 
-    return NextResponse.json(tickets);
+    const result = await TicketService.getTickets(user.tenantId, options);
+
+    return paginatedResponse(result.tickets, {
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+    });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch tickets" },
-      { status: 500 }
-    );
+    console.error('Get tickets error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }
 
-export async function POST(
-  req: NextRequest
-) {
+export async function POST(request: NextRequest) {
   try {
-    await connectDB();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const body = await req.json();
+    const body = await request.json();
 
-    const ticket = await Ticket.create({
-      ...body,
+    const validation = createTicketSchema.safeParse(body);
+    if (!validation.success) {
+      return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
+    }
 
-      status: "OPEN",
-
-      slaStatus: "ACTIVE",
-
-      activities: [
-        {
-          action:
-            "Ticket Created",
-
-          createdAt:
-            new Date(),
-        },
-      ],
-    });
-
-    return NextResponse.json(ticket);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to create ticket" },
-      { status: 500 }
+    const ticket = await TicketService.createTicket(
+      validation.data,
+      user.userId,
+      user.tenantId
     );
+
+    return successResponse(ticket, 'Ticket created successfully', 201);
+  } catch (error) {
+    console.error('Create ticket error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

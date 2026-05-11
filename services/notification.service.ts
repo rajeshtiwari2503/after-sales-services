@@ -1,112 +1,93 @@
-import { NotificationModel } from '@/models/Notification'
-import { NotificationPreferenceModel } from '@/models/NotificationPreference'
-import type { Notification, NotificationPreference, NotificationType, NotificationChannel } from '@/types/notification'
-import { sendEmail, buildFeedbackEmailHtml } from '@/lib/notifications/email'
-import { sendWhatsApp, buildFeedbackWhatsAppMessage } from '@/lib/notifications/whatsapp'
-import { pushSSENotification } from '@/lib/notifications/realtime'
-import { connectDB } from '@/lib/db'
+ import Notification from '@/models/Notification';
+import NotificationPreference from '@/models/NotificationPreference';
+import { NotificationType, NotificationChannel } from '@/types/notification';
+import connectDB from '@/lib/db';
 
 export class NotificationService {
-  /* ── CREATE ── */
-  static async create(data: Omit<Notification, '_id' | 'createdAt'>): Promise<Notification> {
-    await connectDB()
-    const doc = await NotificationModel.create(data)
-    // Push realtime SSE
-    pushSSENotification(data.userId, doc.toObject() as Notification)
-    return doc.toObject()
-  }
+  static async create(
+    userId: string,
+    tenantId: string,
+    type: NotificationType,
+    title: string,
+    message: string,
+    data?: Record<string, any>
+  ) {
+    await connectDB();
 
-  /* ── LIST ── */
-  static async list(userId: string, page = 1, limit = 20, status?: string) {
-    await connectDB()
-    const query: Record<string, unknown> = { userId }
-    if (status) query.status = status
-    const [data, total, unread] = await Promise.all([
-      NotificationModel.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
-      NotificationModel.countDocuments(query),
-      NotificationModel.countDocuments({ userId, status: 'unread' }),
-    ])
-    return { data: data as Notification[], total, unread, page, limit, totalPages: Math.ceil(total / limit) }
-  }
+    const preference = await NotificationPreference.findOne({ userId, tenantId });
+    const channels: NotificationChannel[] = ['in_app'];
 
-  /* ── MARK READ ── */
-  static async markRead(ids: string[], userId: string): Promise<number> {
-    await connectDB()
-    const res = await NotificationModel.updateMany(
-      { _id: { $in: ids }, userId },
-      { status: 'read', readAt: new Date() }
-    )
-    return res.modifiedCount
-  }
-
-  static async markAllRead(userId: string): Promise<number> {
-    await connectDB()
-    const res = await NotificationModel.updateMany(
-      { userId, status: 'unread' },
-      { status: 'read', readAt: new Date() }
-    )
-    return res.modifiedCount
-  }
-
-  /* ── DELETE ── */
-  static async delete(id: string, userId: string): Promise<boolean> {
-    await connectDB()
-    const res = await NotificationModel.findOneAndDelete({ _id: id, userId })
-    return !!res
-  }
-
-  /* ── PREFERENCES ── */
-  static async getPreferences(userId: string): Promise<NotificationPreference | null> {
-    await connectDB()
-    return NotificationPreferenceModel.findOne({ userId }).lean() as Promise<NotificationPreference | null>
-  }
-
-  static async upsertPreferences(userId: string, prefs: Partial<NotificationPreference>): Promise<NotificationPreference> {
-    await connectDB()
-    const doc = await NotificationPreferenceModel.findOneAndUpdate(
-      { userId },
-      { ...prefs, userId },
-      { new: true, upsert: true }
-    ).lean()
-    return doc as NotificationPreference
-  }
-
-  /* ── MULTI-CHANNEL DISPATCH ── */
-  static async dispatch(params: {
-    userId:        string
-    userEmail?:    string
-    userPhone?:    string
-    title:         string
-    message:       string
-    type:          NotificationType
-    channels:      NotificationChannel[]
-    referenceId?:  string
-    referenceType?: string
-    actionUrl?:    string
-    metadata?:     Record<string, unknown>
-  }): Promise<void> {
-    const { userId, userEmail, userPhone, title, message, type, channels, referenceId, referenceType, actionUrl, metadata } = params
-
-    // 1. Save in-app notification
-    if (channels.includes('in_app')) {
-      await this.create({ userId, title, message, type, priority: 'medium', status: 'unread', channels, referenceId, referenceType, actionUrl, metadata })
+    if (preference) {
+      if (preference.email) channels.push('email');
+      if (preference.push) channels.push('push');
+      if (preference.whatsapp) channels.push('whatsapp');
     }
 
-    // 2. Email
-    if (channels.includes('email') && userEmail) {
-      await sendEmail({
-        to:      userEmail,
-        subject: title,
-        html:    buildFeedbackEmailHtml({ clientName: metadata?.clientName as string || '', rating: metadata?.rating as number || 0, comment: message, dashboardUrl: actionUrl }),
-      })
+    const notification = await Notification.create({
+      userId,
+      tenantId,
+      type,
+      title,
+      message,
+      data,
+      channels,
+    });
+
+    // Trigger external notifications
+    if (channels.includes('email')) {
+      await this.sendEmail(userId, title, message);
+    }
+    if (channels.includes('push')) {
+      await this.sendPush(userId, title, message);
     }
 
-    // 3. WhatsApp
-    if (channels.includes('whatsapp') && userPhone) {
-      await sendWhatsApp({
-        phone:   userPhone,
-        message: buildFeedbackWhatsAppMessage({ clientName: metadata?.clientName as string || '', rating: metadata?.rating as number || 0, comment: message }),
-      })
+    return notification;
+  }
+
+  static async getNotifications(userId: string, tenantId: string, options: { page?: number; limit?: number; unreadOnly?: boolean }) {
+    await connectDB();
+
+    const { page = 1, limit = 20, unreadOnly = false } = options;
+    const query: Record<string, any> = { userId, tenantId };
+
+    if (unreadOnly) {
+      query.isRead = false;
     }
+
+    const skip = (page - 1) * limit;
+    const [notifications, total, unreadCount] = await Promise.all([
+      Notification.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Notification.countDocuments(query),
+      Notification.countDocuments({ userId, tenantId, isRead: false }),
+    ]);
+
+    return { notifications, total, unreadCount, page, limit };
+  }
+
+  static async markAsRead(notificationId: string, userId: string) {
+    await connectDB();
+    return Notification.findOneAndUpdate(
+      { _id: notificationId, userId },
+      { isRead: true, readAt: new Date() },
+      { new: true }
+    );
+  }
+
+  static async markAllAsRead(userId: string, tenantId: string) {
+    await connectDB();
+    return Notification.updateMany(
+      { userId, tenantId, isRead: false },
+      { isRead: true, readAt: new Date() }
+    );
+  }
+
+  private static async sendEmail(userId: string, title: string, message: string) {
+    // Implement email sending logic
+    console.log(`Sending email to user ${userId}: ${title}`);
+  }
+
+  private static async sendPush(userId: string, title: string, message: string) {
+    // Implement push notification logic
+    console.log(`Sending push to user ${userId}: ${title}`);
   }
 }

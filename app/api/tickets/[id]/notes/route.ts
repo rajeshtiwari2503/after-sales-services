@@ -1,59 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from 'next/server';
+import { TicketService } from '@/services/ticket.service';
+import { addNoteSchema } from '@/schemas/ticket.schema';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-import { connectDB } from "@/lib/db";
-
-import Ticket from "@/models/Ticket";
-
-export async function GET(
-  req: NextRequest,
-  { params }: any
-) {
-  await connectDB();
-
-  const ticket =
-    await Ticket.findById(
-      params.id
-    );
-
-  return NextResponse.json(
-    ticket.notes || []
-  );
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
 }
 
 export async function POST(
-  req: NextRequest,
-  { params }: any
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await connectDB();
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
-    const body =
-      await req.json();
+    const body = await request.json();
+    const validation = addNoteSchema.safeParse(body);
+    if (!validation.success) {
+      return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
+    }
 
-    const ticket =
-      await Ticket.findById(
-        params.id
-      );
-
-    ticket.notes.push({
-      text: body.text,
-
-      createdAt:
-        new Date(),
-    });
-
-    await ticket.save();
-
-    return NextResponse.json({
-      success: true,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          "Note add failed",
-      },
-      { status: 500 }
+    const { id } = await params;
+    const ticket = await TicketService.addNote(
+      id,
+      validation.data.content,
+      validation.data.isInternal,
+      user.userId,
+      user.tenantId
     );
+
+    if (!ticket) {
+      return errorResponse('Ticket not found', 404);
+    }
+
+    return successResponse(ticket.notes[ticket.notes.length - 1], 'Note added successfully', 201);
+  } catch (error) {
+    console.error('Add note error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

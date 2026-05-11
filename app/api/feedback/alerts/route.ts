@@ -1,29 +1,40 @@
- import { NextRequest, NextResponse } from 'next/server'
-import { FeedbackService } from '@/services/feedback.service'
-import { runSmartAlerts } from '@/lib/ai/smart-alert-engine'
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+import Feedback from '@/models/Feedback';
+import connectDB from '@/lib/db';
 
-/* GET /api/feedback/alerts — run smart alerts on recent feedback */
-export async function GET(req: NextRequest) {
-  try {
-    const limit = Number(req.nextUrl.searchParams.get('limit') || 50)
-    const { data } = await FeedbackService.list({ page:1, limit, status:'pending' })
-    const allAlerts = data.flatMap(f => runSmartAlerts(f).map(a => ({ ...a, feedback: f })))
-    return NextResponse.json({ total: allAlerts.length, alerts: allAlerts })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
-  }
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
 }
 
-/* POST /api/feedback/alerts — run alerts for a specific feedbackId */
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { feedbackId } = await req.json()
-    if (!feedbackId) return NextResponse.json({ error: 'feedbackId required' }, { status: 400 })
-    const feedback = await FeedbackService.findById(feedbackId)
-    if (!feedback)  return NextResponse.json({ error: 'Feedback not found' }, { status: 404 })
-    const alerts = runSmartAlerts(feedback)
-    return NextResponse.json({ alerts })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    await connectDB();
+
+    const alerts = await Feedback.find({
+      tenantId: user.tenantId,
+      $or: [
+        { rating: { $lte: 2 } },
+        { 'sentiment.label': 'negative' },
+        { npsScore: { $lt: 5 } },
+      ],
+    })
+      .populate('customerId', 'name email')
+      .populate('ticketId', 'ticketNumber title')
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    return successResponse(alerts);
+  } catch (error) {
+    console.error('Get feedback alerts error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

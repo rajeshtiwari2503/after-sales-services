@@ -1,150 +1,71 @@
-// import { NextResponse } from "next/server";
+ import { NextRequest } from 'next/server';
+import { NotificationService } from '@/services/notification.service';
+import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
 
-// import { connectDB } from "@/lib/db";
-
-// import Notification from "@/models/Notification";
-
-// export async function GET(
-//   req: Request
-// ) {
-//   try {
-//     await connectDB();
-
-//     const { searchParams } =
-//       new URL(req.url);
-
-//     const userId =
-//       searchParams.get(
-//         "userId"
-//       );
-
-//     const notifications =
-//       await Notification.find(
-//         userId
-//           ? { userId }
-//           : {}
-//       ).sort({
-//         createdAt: -1,
-//       });
-
-//     return NextResponse.json({
-//       success: true,
-//       data: notifications,
-//     });
-//   } catch (error: any) {
-//     console.log(
-//       "NOTIFICATION FETCH ERROR:",
-//       error
-//     );
-
-//     return NextResponse.json(
-//       {
-//         success: false,
-//         message:
-//           "Failed to fetch notifications",
-//       },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// export async function POST(
-//   req: Request
-// ) {
-//   try {
-//     await connectDB();
-
-//     const body =
-//       await req.json();
-
-//     const notification =
-//       await Notification.create({
-//         userId:
-//           body.userId,
-
-//         title:
-//           body.title,
-
-//         message:
-//           body.message,
-
-//         type:
-//           body.type,
-
-//         actionUrl:
-//           body.actionUrl,
-
-//         metadata:
-//           body.metadata,
-//       });
-
-//     return NextResponse.json(
-//       {
-//         success: true,
-//         data: notification,
-//       },
-//       { status: 201 }
-//     );
-//   } catch (error: any) {
-//     console.log(
-//       "NOTIFICATION CREATE ERROR:",
-//       error
-//     );
-
-//     return NextResponse.json(
-//       {
-//         success: false,
-//         message:
-//           "Failed to create notification",
-//       },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-import { NextRequest, NextResponse } from 'next/server'
-import { NotificationService } from '@/services/notification.service'
-
-/* GET /api/notifications?userId=xxx&page=1&status=unread */
-export async function GET(req: NextRequest) {
-  try {
-    const p      = req.nextUrl.searchParams
-    const userId = p.get('userId')
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
-    const page   = Number(p.get('page')  || 1)
-    const limit  = Number(p.get('limit') || 20)
-    const status = p.get('status') || undefined
-    const result = await NotificationService.list(userId, page, limit, status)
-    return NextResponse.json(result)
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
-  }
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
 }
 
-/* POST /api/notifications — create notification */
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body = await req.json()
-    if (!body.userId || !body.title || !body.message || !body.type) {
-      return NextResponse.json({ error: 'userId, title, message, type required' }, { status: 400 })
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
-    const notif = await NotificationService.create(body)
-    return NextResponse.json(notif, { status: 201 })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+
+    const { searchParams } = new URL(request.url);
+    const options = {
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '20'),
+      unreadOnly: searchParams.get('unreadOnly') === 'true',
+    };
+
+    const result = await NotificationService.getNotifications(
+      user.userId,
+      user.tenantId,
+      options
+    );
+
+    return paginatedResponse(result.notifications, {
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+    });
+  } catch (error) {
+    console.error('Get notifications error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }
 
-/* DELETE /api/notifications?id=xxx&userId=xxx */
-export async function DELETE(req: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
-    const id     = req.nextUrl.searchParams.get('id')
-    const userId = req.nextUrl.searchParams.get('userId')
-    if (!id || !userId) return NextResponse.json({ error: 'id and userId required' }, { status: 400 })
-    const done = await NotificationService.delete(id, userId)
-    if (!done)  return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    const body = await request.json();
+    const { notificationId, markAllRead } = body;
+
+    if (markAllRead) {
+      await NotificationService.markAllAsRead(user.userId, user.tenantId);
+      return successResponse(null, 'All notifications marked as read');
+    }
+
+    if (notificationId) {
+      const notification = await NotificationService.markAsRead(notificationId, user.userId);
+      if (!notification) {
+        return errorResponse('Notification not found', 404);
+      }
+      return successResponse(notification, 'Notification marked as read');
+    }
+
+    return errorResponse('Invalid request', 400);
+  } catch (error) {
+    console.error('Update notifications error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

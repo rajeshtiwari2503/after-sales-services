@@ -1,39 +1,69 @@
- import { NextRequest, NextResponse } from 'next/server'
-import { SentimentService } from '@/services/sentiment.service'
+ import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@/lib/jwt';
+import Feedback from '@/models/Feedback';
+import connectDB from '@/lib/db';
 
-/* GET /api/feedback/sentiment?clientId=xxx  — summary */
-export async function GET(req: NextRequest) {
-  try {
-    const clientId = req.nextUrl.searchParams.get('clientId') || undefined
-    const summary  = await SentimentService.getSentimentSummary(clientId)
-    return NextResponse.json(summary)
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
-  }
+function getAuthUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return verifyToken(authHeader.substring(7));
 }
 
-/* POST /api/feedback/sentiment  — analyze text on the fly */
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { text, texts } = await req.json()
-    if (texts && Array.isArray(texts)) {
-      return NextResponse.json(SentimentService.analyzeBatch(texts))
+    const user = getAuthUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
-    if (text) {
-      return NextResponse.json(SentimentService.analyze(text))
-    }
-    return NextResponse.json({ error: 'Provide "text" or "texts"' }, { status: 400 })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
-  }
-}
 
-/* PATCH /api/feedback/sentiment  — backfill all missing sentiment */
-export async function PATCH() {
-  try {
-    const result = await SentimentService.backfill()
-    return NextResponse.json(result)
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    await connectDB();
+
+    const sentimentData = await Feedback.aggregate([
+      {
+        $match: {
+          tenantId: user.tenantId,
+          'sentiment.label': { $exists: true },
+        },
+      },
+      {
+        $group: {
+          _id: '$sentiment.label',
+          count: { $sum: 1 },
+          avgScore: { $avg: '$sentiment.score' },
+          keywords: { $push: '$sentiment.keywords' },
+        },
+      },
+    ]);
+
+    const result = {
+      positive: { count: 0, avgScore: 0, keywords: [] as string[] },
+      neutral: { count: 0, avgScore: 0, keywords: [] as string[] },
+      negative: { count: 0, avgScore: 0, keywords: [] as string[] },
+    };
+
+    sentimentData.forEach((item: any) => {
+      const allKeywords = item.keywords.flat();
+      const keywordCounts: Record<string, number> = {};
+      allKeywords.forEach((kw: string) => {
+        keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
+      });
+
+      const topKeywords = Object.entries(keywordCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10)
+        .map(([kw]) => kw);
+
+      result[item._id as keyof typeof result] = {
+        count: item.count,
+        avgScore: item.avgScore,
+        keywords: topKeywords,
+      };
+    });
+
+    return successResponse(result);
+  } catch (error) {
+    console.error('Get sentiment error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }
