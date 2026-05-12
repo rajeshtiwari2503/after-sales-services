@@ -20,7 +20,13 @@ setAlerts(alertData.alerts || []);
 };
 return (
 <div className="space-y-6 p-6">
-<SentimentAnalysis data={sentiment} />
+<SentimentAnalysis  breakdown={
+    sentiment?.breakdown || {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    }
+  } />
 <SmartAlerts alerts={alerts} />
 </div>
 );
