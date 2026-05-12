@@ -7,7 +7,7 @@ export default function PublicReviewCard({ review }: { review: Feedback }) {
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-sm">
-            {review.clientName.charAt(0).toUpperCase()}
+            {review.clientName }
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800">{review.clientName}</p>
@@ -27,7 +27,7 @@ export default function PublicReviewCard({ review }: { review: Feedback }) {
       {review.response && (
         <div className="bg-indigo-50 rounded-xl p-3 border-l-4 border-indigo-400">
           <p className="text-xs font-semibold text-indigo-700 mb-1">Response from Power India Services</p>
-          <p className="text-xs text-indigo-600 leading-relaxed">{review.response}</p>
+          {/* <p className="text-xs text-indigo-600 leading-relaxed">{review.response}</p> */}
         </div>
       )}
 

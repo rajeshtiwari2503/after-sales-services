@@ -102,12 +102,22 @@ export interface Feedback {
   ticketId: string;
   customerId: string;
   technicianId?: string;
+  clientName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  type?: string;
+  sentiment?:  string;
+  status?: string;
+  
+  title?: string;
+   
+  technicianName?: string;
   tenantId: string;
   rating: number;
   npsScore?: number;
   comment?: string;
   categories: FeedbackCategory[];
-  sentiment?: SentimentResult;
+  // sentiment?: SentimentResult;
   isPublic: boolean;
   response?: FeedbackResponse;
   createdAt: Date;
@@ -132,13 +142,29 @@ export interface SentimentResult {
 export interface FeedbackResponse {
   content: string;
   respondedBy: string;
+
   respondedAt: Date;
 }
 
 export interface FeedbackAnalytics {
   averageRating: number;
   totalFeedback: number;
+ 
+    distribution: Record<string, number>;  
+    ratingDistribution:{}
+  topTechnicians: {
+    technicianId: string;
+    name: string;
+    avgRating: number;
+    count: number;
+  }[];
+  recentTrend: {
+    date: string;
+    avgRating: number;
+    count: number;
+  }[];
   npsScore: number;
+  byStatus:{pending:number; reviewed:number; resolved:number; escalated:number}; 
   sentimentBreakdown: {
     positive: number;
     neutral: number;

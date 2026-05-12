@@ -100,7 +100,7 @@ export default function FeedbackTable() {
                 </td>
                 <td className="px-4 py-3 capitalize text-slate-600">{f.type}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${STATUS_COLOR[f.status]}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${STATUS_COLOR[f.status|| 'neutral']}`}>
                     {f.status}
                   </span>
                 </td>
