@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     if (!preferences) {
       preferences = await NotificationPreference.create({
         userId: user.userId,
-        tenantId: user.tenantId,
+        // tenantId: user.tenantId,
       });
     }
 
