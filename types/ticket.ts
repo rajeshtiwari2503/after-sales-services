@@ -86,3 +86,23 @@ export interface CreateTicketData {
   customerId: string;
   serviceCenterId?: string;
 }
+
+export interface CreateTicketInput {
+  title: string;
+
+  description: string;
+
+  category: TicketCategory;
+
+  priority?: TicketPriority;
+
+  customerId: string;
+
+  technicianId?: string;
+
+  serviceCenterId?: string;
+
+  tenantId: string;
+
+  attachments?: Attachment[];
+}
