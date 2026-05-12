@@ -13,7 +13,9 @@ setInvoices(data.invoices || []);
 };
 return (
 <div className="p-6">
-<InvoicesTable invoices={invoices} />
+<InvoicesTable 
+// invoices={invoices} 
+/>
 </div>
 );
 }

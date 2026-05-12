@@ -15,7 +15,9 @@ export default function FeedbackPage() {
     return (
         <div className="space-y-6 p-6">
             <FeedbackDashboard />
-            <FeedbackTable feedbacks={feedbacks} />
+            <FeedbackTable
+            //  feedbacks={feedbacks} 
+             />
         </div>
     );
 }

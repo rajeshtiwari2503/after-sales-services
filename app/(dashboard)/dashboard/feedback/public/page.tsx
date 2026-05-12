@@ -7,8 +7,8 @@ export default function Page() {
         Public Reviews
       </h1>
 
-      <PublicReviewCard />
-      <PublicReviewCard />
+      {/* <PublicReviewCard /> */}
+      {/* <PublicReviewCard /> */}
     </div>
   );
 }

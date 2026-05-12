@@ -13,7 +13,9 @@ export default function SubscriptionPage() {
     };
     return (
         <div className="p-6">
-            <PaymentHistory subscriptions={subscriptions} />
+            <PaymentHistory
+            //  subscriptions={subscriptions} 
+             />
         </div>
     );
 }

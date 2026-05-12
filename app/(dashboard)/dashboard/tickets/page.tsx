@@ -27,8 +27,8 @@ Manage support tickets and workflow.
 </p>
 </div>
 <AdvancedTicketTable
-tickets={tickets}
-loading={loading}
+// tickets={tickets}
+// loading={loading}
 />
 </div>
 );

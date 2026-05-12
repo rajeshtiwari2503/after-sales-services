@@ -14,8 +14,12 @@ export default function WarrantyPage() {
   };
   return (
     <div className="space-y-6 p-6">
-      <WarrantyStats warranties={warranties} />
-      <WarrantyTable warranties={warranties} />
+      <WarrantyStats
+      //  warranties={warranties}
+        />
+      <WarrantyTable
+      //  warranties={warranties} 
+       />
     </div>
   );
 }

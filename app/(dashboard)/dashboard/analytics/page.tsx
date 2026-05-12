@@ -20,10 +20,10 @@ export default function AnalyticsPage() {
         <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
       </div>
       <div className="grid md:grid-cols-2 gap-6">
-        <RevenueChart data={analytics?.revenue} />
+        {/* <RevenueChart data={analytics?.revenue} />
         <TicketChart data={analytics?.tickets} />
         <SLAChart data={analytics?.sla} />
-        <TechnicianPerformance data={analytics?.technicians} />
+        <TechnicianPerformance data={analytics?.technicians} /> */}
       </div>
     </div>
   );

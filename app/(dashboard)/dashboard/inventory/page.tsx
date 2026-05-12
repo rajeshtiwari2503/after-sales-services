@@ -14,8 +14,12 @@ setInventory(data.inventory || []);
 };
 return (
 <div className="space-y-6 p-6">
-<InventoryStats inventory={inventory} />
-<InventoryTable inventory={inventory} />
+<InventoryStats 
+// inventory={inventory}
+ />
+<InventoryTable 
+// inventory={inventory} 
+/>
 </div>
 );
 }

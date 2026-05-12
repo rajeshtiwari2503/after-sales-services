@@ -13,7 +13,7 @@ setNotifications(data.notifications || []);
 };
 return (
 <div className="p-6">
-<NotificationDrawer notifications={notifications} />
+{/* <NotificationDrawer notifications={notifications} /> */}
 </div>
 );
 }

@@ -38,7 +38,9 @@ setPlans(data.plans || []);
 return (
 <div className="space-y-6 p-6">
 <SubscriptionCard />
-<BillingPlans plans={plans} />
+<BillingPlans 
+// plans={plans} 
+/>
 </div>
 );
 }

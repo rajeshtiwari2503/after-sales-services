@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import AnalyticsOverview from "@/components/analytics/AnalyticsOverview";
-import NotificationBell from "@/components/notifications/NotificationBell";
+// import NotificationBell from "@/components/notifications/NotificationBell";
 import AdvancedTicketTable from "@/components/tickets/AdvancedTicketTable";
 export default function DashboardPage() {
   const [overview, setOverview] = useState<any>(null);
@@ -27,10 +27,14 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-slate-500">Enterprise CRM Overview</p>
         </div>
-        <NotificationBell />
+        {/* <NotificationBell /> */}
       </div>
-      <AnalyticsOverview data={overview} />
-      <AdvancedTicketTable tickets={tickets} />
+      <AnalyticsOverview
+      //  data={overview}
+        />
+      <AdvancedTicketTable
+      //  tickets={tickets} 
+       />
 
     </div>
   );
