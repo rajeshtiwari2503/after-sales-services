@@ -89,6 +89,14 @@
 //   totalPages: number
 // }
 
+
+export interface FeedbackFilter {
+  status?: string;
+  sentiment?: string;
+  type?: string;
+  startDate?: string;
+  endDate?: string;
+}
 export interface Feedback {
   _id: string;
   ticketId: string;
