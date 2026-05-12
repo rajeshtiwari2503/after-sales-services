@@ -9,22 +9,23 @@ interface Props { userId: string }
 
 export default function NotificationBell({ userId }: Props) {
   const [open, setOpen] = useState(false)
-  const { unreadCount, notifications, loading, fetchNotifications, markRead, markAllRead, deleteNotification } = useNotifications()
+  // const { unreadCount, notifications, loading, fetchNotifications, markRead, markAllRead, deleteNotification } = useNotifications()
+  const { unreadCount, notifications   } = useNotifications()
   const [incoming, setIncoming] = useState<Notification | null>(null)
   const bellRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => { fetchNotifications(userId) }, [userId, fetchNotifications])
+  // useEffect(() => { fetchNotifications(userId) }, [userId, fetchNotifications])
 
-  const { connected } = useRealtimeNotifications({
-    userId,
-    onNew: (n) => {
-      setIncoming(n)
-      fetchNotifications(userId)
-      // Shake bell animation
-      bellRef.current?.classList.add('animate-bounce')
-      setTimeout(() => bellRef.current?.classList.remove('animate-bounce'), 1000)
-    },
-  })
+  // const { connected } = useRealtimeNotifications({
+  //   userId,
+  //   onNew: (n) => {
+  //     setIncoming(n)
+  //     fetchNotifications(userId)
+  //     // Shake bell animation
+  //     bellRef.current?.classList.add('animate-bounce')
+  //     setTimeout(() => bellRef.current?.classList.remove('animate-bounce'), 1000)
+  //   },
+  // })
 
   return (
     <div className="relative">
@@ -38,11 +39,11 @@ export default function NotificationBell({ userId }: Props) {
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
-        {connected && (
+        {/* {connected && (
           <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-green-400 border border-white" title="Live" />
-        )}
+        )} */}
       </button>
-
+{/* 
       {open && (
         <NotificationDrawer
           notifications={notifications}
@@ -54,7 +55,7 @@ export default function NotificationBell({ userId }: Props) {
           onDelete={deleteNotification}
           onLoadMore={() => fetchNotifications(userId)}
         />
-      )}
+      )} */}
     </div>
   )
 }
