@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback } from 'react'
-import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications'
+// import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications'
 import type { Notification } from '@/types/notification'
 
 interface ToastNotif extends Notification { toastId: string }
@@ -16,7 +16,7 @@ export default function RealtimeNotification({ userId }: { userId: string }) {
     }, 5000)
   }, [])
 
-  useRealtimeNotifications({ userId, onNew })
+  // useRealtimeNotifications({ userId, onNew })
 
   const dismiss = (toastId: string) => setToasts(prev => prev.filter(t => t.toastId !== toastId))
 
