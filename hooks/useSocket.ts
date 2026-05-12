@@ -1,48 +1,30 @@
+ // hooks/useSocket.ts
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
-let socket: Socket;
+let socket: Socket | null = null;
 
-export default function useSocket() {
-  const [connected, setConnected] =
-    useState(false);
-
+export default function useSocket(
+  event: string,
+  callback: (data: any) => void
+) {
   useEffect(() => {
-    socket = io(
-      process.env
-        .NEXT_PUBLIC_SOCKET_URL ||
-        "http://localhost:3000"
-    );
+    if (!socket) {
+      socket = io(
+        process.env.NEXT_PUBLIC_SOCKET_URL ||
+          "http://localhost:3000"
+      );
+    }
 
-    socket.on(
-      "connect",
-      () => {
-        setConnected(true);
-        console.log(
-          "Socket connected"
-        );
-      }
-    );
-
-    socket.on(
-      "disconnect",
-      () => {
-        setConnected(false);
-        console.log(
-          "Socket disconnected"
-        );
-      }
-    );
+    socket.on(event, callback);
 
     return () => {
-      socket.disconnect();
+      socket?.off(event, callback);
     };
-  }, []);
+  }, [event, callback]);
 
-  return {
-    socket,
-    connected,
-  };
+  return socket;
 }
