@@ -101,7 +101,7 @@
 //         );
 //     }
 // }
- 
+  
 import { NextResponse } from "next/server";
 
 import Ticket from "@/models/Ticket";
@@ -165,7 +165,7 @@ export async function POST(
 
       createdAt:
         new Date(),
-    });
+    } as any);
 
     // SLA Resolution Tracking
     if (
@@ -207,28 +207,26 @@ export async function POST(
             ticket.sla.isResolutionBreached =
               true;
 
-            ticket.timeline.push(
-              {
-                action:
-                  "SLA_BREACHED",
+            ticket.timeline.push({
+              action:
+                "SLA_BREACHED",
 
-                description:
-                  "Resolution SLA breached",
+              description:
+                "Resolution SLA breached",
 
-                performedBy,
+              performedBy,
 
-                performedByName:
-                  "System",
+              performedByName:
+                "System",
 
-                metadata:
-                  {
-                    type: "resolution",
-                  },
+              metadata:
+                {
+                  type: "resolution",
+                },
 
-                createdAt:
-                  new Date(),
-              }
-            );
+              createdAt:
+                new Date(),
+            } as any);
           }
         }
       }
