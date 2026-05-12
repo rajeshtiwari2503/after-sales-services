@@ -20,9 +20,12 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (
+    
     data: z.infer<typeof registerSchema>
   ) => {
     try {
+      console.log("djjdjh");
+      
       const response = await axios.post(
         "/api/auth/register",
         data
@@ -71,7 +74,8 @@ export default function RegisterPage() {
 
           <button
             disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl"
+            onClick={()=>handleSubmit(onSubmit)}
+            className="w-full bg-blue-600 cursor-pointer text-white py-3 rounded-xl"
           >
             {isSubmitting ? "Loading..." : "Register"}
           </button>
