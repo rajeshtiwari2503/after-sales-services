@@ -12,7 +12,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <NotificationBell />
+        <NotificationBell userId="123456" />
 
         <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
           A
