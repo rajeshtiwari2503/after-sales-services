@@ -1,4 +1,4 @@
-import { uploadToS3 } from './s3';
+import { uploadToS3 } from '../s3';
 import crypto from 'crypto';
 
 export interface UploadResult {
