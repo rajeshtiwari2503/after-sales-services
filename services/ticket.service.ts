@@ -7,86 +7,142 @@ import connectDB from '@/lib/db';
 import { Types } from 'mongoose';
 
 export class TicketService {
-  static async createTicket(data: CreateTicketInput, userId: string, tenantId: string) {
-    await connectDB();
+ static async createTicket(data: any, userId: string, tenantId: string) {
+  await connectDB();
 
-    const tenant = await Tenant.findOne({ slug: tenantId });
-    const slaConfig = tenant?.settings?.slaConfig || SLA_DEFAULTS;
-    const prioritySLA = slaConfig[data.priority as keyof typeof slaConfig];
+  // ✅ ticketNumber pehle generate karo
+  const count = await Ticket.countDocuments({ tenantId });
+  const ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
 
-    const now = new Date();
-    const sla = {
-      responseDeadline: new Date(now.getTime() + prioritySLA.response * 60 * 60 * 1000),
-      resolutionDeadline: new Date(now.getTime() + prioritySLA.resolution * 60 * 60 * 1000),
-      isResponseBreached: false,
-      isResolutionBreached: false,
-    };
+  const { Types } = require('mongoose');
+  const customerId = data.customerId && Types.ObjectId.isValid(data.customerId)
+    ? new Types.ObjectId(data.customerId)
+    : new Types.ObjectId(userId);
 
-    const user = await User.findById(userId);
+  const technicianId = data.technicianId && Types.ObjectId.isValid(data.technicianId)
+    ? new Types.ObjectId(data.technicianId)
+    : undefined;
 
-    const ticket = await Ticket.create({
-      ...data,
-      customerId: data.customerId || userId,
-      tenantId,
-      sla,
-      timeline: [{
-        action: 'created',
-        description: 'Ticket created',
-        performedBy: userId,
-        performedByName: user?.name || 'System',
-        createdAt: new Date(),
-      }],
-    });
+  // ✅ ticketNumber explicitly pass karo — pre('save') pe depend mat karo
+  const ticket = await Ticket.create({
+    title: data.title,
+    description: data.description,
+    category: data.category,
+    priority: data.priority || 'medium',
+    status: 'open',
+    ticketNumber,          // ← yahan explicitly
+    customerId,
+    technicianId,
+    tenantId,
+    estimatedCompletionDate: data.estimatedCompletionDate || undefined,
+  });
 
-    return ticket;
+  return ticket;
+}
+
+  // static async getTickets(
+  //   tenantId: string,
+  //   options: {
+  //     page?: number;
+  //     limit?: number;
+  //     status?: string;
+  //     priority?: string;
+  //     category?: string;
+  //     technicianId?: string;
+  //     customerId?: string;
+  //     search?: string;
+  //   }
+  // ) {
+  //   await connectDB();
+
+  //   const { page = 1, limit = 10, status, priority, category, technicianId, customerId, search } = options;
+
+  //   const query: Record<string, any> = { tenantId };
+
+  //   if (status) query.status = status;
+  //   if (priority) query.priority = priority;
+  //   if (category) query.category = category;
+  //   if (technicianId) query.technicianId = technicianId;
+  //   if (customerId) query.customerId = customerId;
+  //   if (search) {
+  //     query.$or = [
+  //       { title: { $regex: search, $options: 'i' } },
+  //       { ticketNumber: { $regex: search, $options: 'i' } },
+  //       { description: { $regex: search, $options: 'i' } },
+  //     ];
+  //   }
+
+  //   const skip = (page - 1) * limit;
+  //   const [tickets, total] = await Promise.all([
+  //     Ticket.find(query)
+  //       .populate('customerId', 'name email')
+  //       .populate('technicianId', 'userId')
+  //       .sort({ createdAt: -1 })
+  //       .skip(skip)
+  //       .limit(limit),
+  //     Ticket.countDocuments(query),
+  //   ]);
+
+  //   return { tickets, total, page, limit };
+  // }
+static async getTickets(tenantId: string, options: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  priority?: string;
+  category?: string;
+  search?: string;
+  technicianId?: string;
+  customerId?: string;
+}) {
+  await connectDB();
+
+  const { page = 1, limit = 10, status, priority, category, search } = options;
+
+  const query: any = { tenantId };
+  if (status) query.status = status;
+  if (priority) query.priority = priority;
+  if (category) query.category = category;
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { ticketNumber: { $regex: search, $options: 'i' } },
+    ];
   }
 
-  static async getTickets(
-    tenantId: string,
-    options: {
-      page?: number;
-      limit?: number;
-      status?: string;
-      priority?: string;
-      category?: string;
-      technicianId?: string;
-      customerId?: string;
-      search?: string;
-    }
-  ) {
-    await connectDB();
+  const [tickets, total, statsAgg] = await Promise.all([
+    Ticket.find(query)
+      .populate('customerId', 'name email')
+      .populate('technicianId', 'name')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Ticket.countDocuments(query),
+    // ✅ Stats for all statuses
+    Ticket.aggregate([
+      { $match: { tenantId } },
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]),
+  ]);
 
-    const { page = 1, limit = 10, status, priority, category, technicianId, customerId, search } = options;
+  // Stats map
+  const statsMap: Record<string, number> = {};
+  statsAgg.forEach((s: any) => { statsMap[s._id] = s.count; });
 
-    const query: Record<string, any> = { tenantId };
-
-    if (status) query.status = status;
-    if (priority) query.priority = priority;
-    if (category) query.category = category;
-    if (technicianId) query.technicianId = technicianId;
-    if (customerId) query.customerId = customerId;
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { ticketNumber: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    const skip = (page - 1) * limit;
-    const [tickets, total] = await Promise.all([
-      Ticket.find(query)
-        .populate('customerId', 'name email')
-        .populate('technicianId', 'userId')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      Ticket.countDocuments(query),
-    ]);
-
-    return { tickets, total, page, limit };
-  }
-
+  return {
+    tickets,
+    page,
+    limit,
+    total,
+    stats: {
+      open: statsMap['open'] ?? 0,
+      inProgress: (statsMap['in_progress'] ?? 0),
+      pending: (statsMap['pending_parts'] ?? 0) + (statsMap['pending_customer'] ?? 0),
+      resolved: statsMap['resolved'] ?? 0,
+    },
+  };
+}
   static async getTicketById(ticketId: string, tenantId: string) {
     await connectDB();
     return Ticket.findOne({ _id: ticketId, tenantId })

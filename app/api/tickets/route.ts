@@ -112,14 +112,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+ export async function POST(request: NextRequest) {
   try {
-    const user = getAuthUser(request); // ✅ same call
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    const user = getAuthUser(request);
+    if (!user) return errorResponse('Unauthorized', 401);
 
-    const body = await request.json();
+    // ✅ Content-Type check karke parse karo
+    const contentType = request.headers.get('content-type') || '';
+    let body: Record<string, any> = {};
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      formData.forEach((value, key) => {
+        if (key !== 'attachments') body[key] = value;
+      });
+    } else {
+      body = await request.json();
+    }
 
     const validation = createTicketSchema.safeParse(body);
     if (!validation.success) {

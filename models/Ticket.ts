@@ -112,12 +112,13 @@ TicketSchema.index({ tenantId: 1, customerId: 1 });
 TicketSchema.index({ tenantId: 1, technicianId: 1 });
 TicketSchema.index({ createdAt: -1 });
 
+// models/Ticket.ts
 TicketSchema.pre('save', async function (next) {
-  if (this.isNew) {
+  if (this.isNew && !this.ticketNumber) {
     const count = await mongoose.models.Ticket.countDocuments({ tenantId: this.tenantId });
     this.ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
   }
-  // next();
+  next(); // ✅ next() call karna zaroori tha — yahi bug tha
 });
 
 const Ticket: Model<TicketDocument> =
