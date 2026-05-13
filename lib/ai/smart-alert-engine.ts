@@ -229,23 +229,23 @@ export function runSmartAlerts(feedback: FeedbackType): AlertRuleResult[] {
     }))
 }
 
-export function buildNotificationFromAlert(
-  alert: AlertRuleResult,
-  userId: string
-): Omit<Notification, '_id' | 'createdAt'> {
-  return {
-    userId,
-    title:         alert.ruleName,
-    message:       alert.message,
-    type:          alert.priority === 'critical' ? 'sla_breach' : 'low_rating_alert',
-    priority:      alert.priority,
-    status:        'unread',
-    channels:      alert.priority === 'critical' ? ['in_app', 'email', 'whatsapp'] : ['in_app'],
-    referenceId:   alert.feedbackId,
-    referenceType: 'feedback',
-    actionUrl:     `/dashboard/feedback?id=${alert.feedbackId}`,
-  }
-}
+// export function buildNotificationFromAlert(
+//   alert: AlertRuleResult,
+//   userId: string
+// ): Omit<Notification, '_id' | 'createdAt'> {
+//   return {
+//     userId,
+//     title:         alert.ruleName,
+//     message:       alert.message,
+//     type:          alert.priority === 'critical' ? 'sla_breach' : 'low_rating_alert',
+//     priority:      alert.priority,
+//     status:        'unread',
+//     channels:      alert.priority === 'critical' ? ['in_app', 'email', 'whatsapp'] : ['in_app'],
+//     referenceId:   alert.feedbackId,
+//     referenceType: 'feedback',
+//     actionUrl:     `/dashboard/feedback?id=${alert.feedbackId}`,
+//   }
+// }
 
 /* ─── Full SmartAlertEngine (tenant-aware, DB-driven) ────────────── */
 
