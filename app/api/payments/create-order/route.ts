@@ -1,5 +1,5 @@
 import razorpay from "@/lib/razorpay";
-//added enve 
+//added enve hh
 export async function POST(req: Request) {
   const body = await req.json();
 
@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     await razorpay.orders.create({
       amount: body.amount * 100,
 
-      currency: "INR",
+      currency: "INR",  
 
       receipt: `receipt_${Date.now()}`,
     });
