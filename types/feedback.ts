@@ -149,7 +149,15 @@ export interface FeedbackResponse {
 export interface FeedbackAnalytics {
   averageRating: number;
   totalFeedback: number;
- 
+  npsBreakdown: {
+    promoters: number;
+    passives: number;
+    detractors: number;
+  };
+  byType: Record<
+  string,
+  number
+>;
     distribution: Record<string, number>;  
     ratingDistribution:{}
   topTechnicians: {
