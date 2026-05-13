@@ -1,14 +1,10 @@
  import { NextRequest } from 'next/server';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
-import { verifyToken } from '@/lib/jwt';
+ 
 import Ticket from '@/models/Ticket';
 import connectDB from '@/lib/db';
 
-function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  return verifyToken(authHeader.substring(7));
-}
+import { getAuthUser } from '@/lib/auth-helper';
 
 export async function POST(
   request: NextRequest,

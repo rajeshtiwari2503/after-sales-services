@@ -1,13 +1,9 @@
  import { NextRequest } from 'next/server';
 import { AnalyticsService } from '@/services/analytics.service';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
-import { verifyToken } from '@/lib/jwt';
+import { getAuthUser } from '@/lib/auth-helper';
 
-function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  return verifyToken(authHeader.substring(7));
-}
+ 
 
 export async function GET(request: NextRequest) {
   try {
