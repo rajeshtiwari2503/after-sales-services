@@ -48,7 +48,11 @@ export class AuthService {
   static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
     await connectDB();
 
-    const user = await User.findOne({ email: credentials.email, tenantId }).select('+password');
+    // const user = await User.findOne({ email: credentials.email, tenantId }).select('+password');
+    const user = await User.findOne({
+  email: credentials.email,
+  tenantId,
+}).select("+password");
     if (!user) {
       return { success: false, message: 'Invalid credentials' };
     }
@@ -56,7 +60,9 @@ export class AuthService {
     if (!user.isActive) {
       return { success: false, message: 'Account is deactivated' };
     }
-
+if (!user.password) {
+  return { success: false, message: "Password not found" };
+}
     const isValidPassword = await comparePassword(credentials.password, user.password);
     if (!isValidPassword) {
       return { success: false, message: 'Invalid credentials' };

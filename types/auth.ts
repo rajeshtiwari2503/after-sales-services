@@ -24,7 +24,7 @@ export interface User {
 
   isActive: boolean;
 
-  lastLogin?: string;
+ lastLogin?: Date;
 
   createdAt: string;
   updatedAt: string;
@@ -42,6 +42,7 @@ export interface RegisterData {
   password: string;
   role?: UserRole;
   tenantId?: string;
+  
 }
 
 export interface AuthResponse {

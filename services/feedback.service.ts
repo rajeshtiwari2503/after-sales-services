@@ -1,4 +1,4 @@
-//  import Feedback from '@/models/Feedback';
+ import Feedback from '@/models/Feedback';
 import { CreateFeedbackInput } from '@/schemas/feedback.schema';
 import { SentimentService } from './sentiment.service';
 import connectDB from '@/lib/db';
@@ -16,7 +16,7 @@ export class FeedbackService {
       ...data,
       customerId,
       tenantId,
-      sentiment,
+      // sentiment,
     });
 
     return feedback;

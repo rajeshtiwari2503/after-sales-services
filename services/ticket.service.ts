@@ -4,6 +4,7 @@ import Tenant from '@/models/Tenant';
 import { CreateTicketInput, UpdateTicketInput } from '@/schemas/ticket.schema';
 import { SLA_DEFAULTS } from '@/utils/constants';
 import connectDB from '@/lib/db';
+import { Types } from 'mongoose';
 
 export class TicketService {
   static async createTicket(data: CreateTicketInput, userId: string, tenantId: string) {
@@ -108,16 +109,18 @@ export class TicketService {
       }
     });
 
-    if (changes.length > 0) {
-      ticket.timeline.push({
-        action: 'updated',
-        description: `Updated: ${changes.join(', ')}`,
-        performedBy: userId,
-        performedByName: user?.name || 'System',
-        createdAt: new Date(),
-      });
+    if (changes?.length > 0) {
+      ticket.set('timeline', [
+        ...(ticket.timeline || []),
+        {
+          action: 'updated',
+          description: `Updated: ${changes.join(', ')}`,
+          performedBy: userId,
+          performedByName: user?.name || 'System',
+          createdAt: new Date(),
+        },
+      ]);
     }
-
     Object.assign(ticket, data);
     await ticket.save();
 
@@ -132,16 +135,21 @@ export class TicketService {
 
     if (!ticket) return null;
 
-    ticket.technicianId = technicianId;
+    // ticket.technicianId = technicianId;
+    ticket.technicianId = new Types.ObjectId(technicianId);
     ticket.status = 'in_progress';
-    ticket.timeline.push({
-      action: 'assigned',
-      description: `Assigned to technician`,
-      performedBy: userId,
-      performedByName: user?.name || 'System',
-      metadata: { technicianId },
-      createdAt: new Date(),
-    });
+
+    ticket.set('timeline', [
+      ...(ticket.timeline || []),
+      {
+        action: 'assigned',
+        description: `Assigned to technician`,
+        performedBy: userId,
+        performedByName: user?.name || 'System',
+        metadata: { technicianId },
+        createdAt: new Date(),
+      },
+    ]);
 
     await ticket.save();
     return ticket;
@@ -155,20 +163,25 @@ export class TicketService {
 
     if (!ticket) return null;
 
-    const oldStatus = ticket.status;
-    ticket.status = status;
+    const oldStatus = ticket.status as string;
+    ticket.status = status as any;
 
     if (status === 'resolved' || status === 'closed') {
       ticket.actualCompletionDate = new Date();
     }
 
-    ticket.timeline.push({
-      action: 'status_changed',
-      description: `Status changed from ${oldStatus} to ${status}${reason ? `: ${reason}` : ''}`,
-      performedBy: userId,
-      performedByName: user?.name || 'System',
-      metadata: { oldStatus, newStatus: status, reason },
-      createdAt: new Date(),
+    ticket.set({
+      timeline: [
+        ...(ticket.timeline || []),
+        {
+          action: 'status_changed',
+          description: `Status changed from ${oldStatus} to ${status}${reason ? `: ${reason}` : ''}`,
+          performedBy: userId,
+          performedByName: user?.name || 'System',
+          metadata: { oldStatus, newStatus: status, reason },
+          createdAt: new Date(),
+        },
+      ],
     });
 
     await ticket.save();
@@ -183,20 +196,30 @@ export class TicketService {
 
     if (!ticket) return null;
 
-    ticket.notes.push({
-      content,
-      authorId: userId,
-      authorName: user?.name || 'Unknown',
-      isInternal,
-      createdAt: new Date(),
+    ticket.set({
+      notes: [
+        ...(ticket.notes || []),
+        {
+          content,
+          authorId: userId,
+          authorName: user?.name || 'Unknown',
+          isInternal,
+          createdAt: new Date(),
+        },
+      ],
     });
 
-    ticket.timeline.push({
-      action: 'note_added',
-      description: `${isInternal ? 'Internal note' : 'Note'} added`,
-      performedBy: userId,
-      performedByName: user?.name || 'System',
-      createdAt: new Date(),
+    ticket.set({
+      timeline: [
+        ...(ticket.timeline || []),
+        {
+          action: 'note_added',
+          description: `${isInternal ? 'Internal note' : 'Note'} added`,
+          performedBy: userId,
+          performedByName: user?.name || 'System',
+          createdAt: new Date(),
+        },
+      ],
     });
 
     await ticket.save();

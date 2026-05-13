@@ -95,6 +95,7 @@ const TicketSchema = new Schema<TicketDocument>(
       index: true,
     },
     attachments: [AttachmentSchema],
+     
     notes: [NoteSchema],
     timeline: [TimelineEventSchema],
     sla: SLAInfoSchema,
