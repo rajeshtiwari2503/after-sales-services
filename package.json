@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/express": "^5.0.6",
     "@types/node": "^20.19.41",
     "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
