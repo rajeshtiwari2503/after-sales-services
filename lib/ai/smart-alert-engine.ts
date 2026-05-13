@@ -134,10 +134,10 @@
 
 
 import Ticket from '@/models/Ticket'
-import { FeedbackModel } from '@/models/Feedback'
+import Feedback from '@/models/Feedback'
 import Inventory from '@/models/Inventory'
 import { connectDB } from '@/lib/db'
-import type { Feedback } from '@/types/feedback'
+import type { Feedback as FeedbackType } from '@/types/feedback'
 import type { Notification, NotificationPriority } from '@/types/notification'
 
 /* ─── Types ──────────────────────────────────────────────────────── */
@@ -172,9 +172,9 @@ const SEVERITY_ORDER: Record<SmartAlert['severity'], number> = {
 interface FeedbackAlertRule {
   id:        string
   name:      string
-  condition: (f: Feedback) => boolean
+  condition: (f: FeedbackType) => boolean
   priority:  NotificationPriority
-  message:   (f: Feedback) => string
+  message:   (f: FeedbackType) => string
 }
 
 const FEEDBACK_ALERT_RULES: FeedbackAlertRule[] = [
@@ -211,12 +211,12 @@ const FEEDBACK_ALERT_RULES: FeedbackAlertRule[] = [
     name:      'Positive Review Alert',
     condition: f => f.rating === 5 && f.isPublic,
     priority:  'low',
-    message:   f => `5-star public review from ${f.clientName}: "${f.comment.slice(0, 80)}..."`,
+    message:   f => `5-star public review from ${f.clientName}: "${(f.comment ?? '').slice(0, 80)}..."`,
   },
 ]
 
 /* Stateless helpers (used by FeedbackService / API routes) */
-export function runSmartAlerts(feedback: Feedback): AlertRuleResult[] {
+export function runSmartAlerts(feedback: FeedbackType): AlertRuleResult[] {
   return FEEDBACK_ALERT_RULES
     .filter(rule => rule.condition(feedback))
     .map(rule => ({
@@ -304,8 +304,8 @@ export class SmartAlertEngine {
           data: {
             ticketId:     String(ticket._id),
             ticketNumber: ticket.ticketNumber,
-            clientName:   ticket.clientName,
-            assignedTo:   ticket.assignedTo,
+            clientName:     (ticket as any).clientName,
+            assignedTo:   (ticket as any).assignedTo,
             breachedAt:   ticket.sla?.resolutionDeadline,
           },
           createdAt: new Date(),
@@ -359,17 +359,17 @@ export class SmartAlertEngine {
       const previous24Hours  = new Date(now - 48 * 3_600_000)
 
       const [recentNegative, previousNegative, recentTotal] = await Promise.all([
-        FeedbackModel.countDocuments({
+        Feedback.countDocuments({
           tenantId:  this.tenantId,
           createdAt: { $gte: last24Hours },
           $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
         }),
-        FeedbackModel.countDocuments({
+        Feedback.countDocuments({
           tenantId:  this.tenantId,
           createdAt: { $gte: previous24Hours, $lt: last24Hours },
           $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
         }),
-        FeedbackModel.countDocuments({
+        Feedback.countDocuments({
           tenantId:  this.tenantId,
           createdAt: { $gte: last24Hours },
         }),
@@ -400,7 +400,7 @@ export class SmartAlertEngine {
       }
 
       // Overall low avg rating today
-      const avgResult = await FeedbackModel.aggregate([
+      const avgResult = await Feedback.aggregate([
         { $match: { tenantId: this.tenantId, createdAt: { $gte: last24Hours } } },
         { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
       ])
@@ -432,7 +432,16 @@ export class SmartAlertEngine {
         tenantId:  this.tenantId,
         isActive:  true,
         $expr: { $lte: ['$currentStock', '$reorderPoint'] },
-      }).limit(20).lean()
+      }).limit(20).lean() as unknown as Array<{
+        _id: any
+        name: string
+        sku: string
+        currentStock: number
+        reorderPoint: number
+        reorderQuantity?: number
+        pendingOrders?: number
+        lastOrderDate?: Date
+      }>
 
       for (const item of lowStock) {
         const isOut       = item.currentStock <= 0
@@ -484,7 +493,7 @@ export class SmartAlertEngine {
           tenantId:    this.tenantId,
           status:      'open',
           assignedTo:  { $exists: false },
-          priority:    { $in: ['urgent', 'high'] },
+          priority:    { $in: ['critical', 'high'] },
           createdAt:   { $lte: cutoff },
         }).limit(5).lean(),
       ])
@@ -596,7 +605,7 @@ export class SmartAlertEngine {
   private async checkPendingFeedbackAlerts(alerts: SmartAlert[]): Promise<void> {
     try {
       // Escalated feedback not responded to in 24h
-      const escalatedNoResponse = await FeedbackModel.find({
+      const escalatedNoResponse = await Feedback.find({
         tenantId:  this.tenantId,
         status:    'escalated',
         response:  { $exists: false },
@@ -618,7 +627,7 @@ export class SmartAlertEngine {
       }
 
       // Pending feedback older than 48h
-      const stalePending = await FeedbackModel.countDocuments({
+      const stalePending = await Feedback.countDocuments({
         tenantId:  this.tenantId,
         status:    'pending',
         createdAt: { $lte: new Date(Date.now() - 48 * 3_600_000) },
@@ -647,7 +656,7 @@ export class SmartAlertEngine {
     try {
       const since = new Date(Date.now() - 7 * 24 * 3_600_000) // last 7 days
 
-      const repeatComplainters = await FeedbackModel.aggregate([
+      const repeatComplainters = await Feedback.aggregate([
         {
           $match: {
             tenantId:  this.tenantId,
@@ -692,9 +701,9 @@ export class SmartAlertEngine {
       const prev7d   = new Date(now - 14 * 24 * 3_600_000)
 
       const [recentScores, prevScores] = await Promise.all([
-        FeedbackModel.find({ tenantId: this.tenantId, createdAt: { $gte: last7d }, npsScore: { $exists: true } })
+        Feedback.find({ tenantId: this.tenantId, createdAt: { $gte: last7d }, npsScore: { $exists: true } })
           .select('npsScore').lean(),
-        FeedbackModel.find({ tenantId: this.tenantId, createdAt: { $gte: prev7d, $lt: last7d }, npsScore: { $exists: true } })
+        Feedback.find({ tenantId: this.tenantId, createdAt: { $gte: prev7d, $lt: last7d }, npsScore: { $exists: true } })
           .select('npsScore').lean(),
       ])
 
