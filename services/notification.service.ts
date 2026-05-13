@@ -178,6 +178,7 @@ export class NotificationService {
     isRead: false,
   };
 
+  
   const [notifications, total ] = await Promise.all([
     Notification.find(query)
       .sort({ createdAt: -1 })
