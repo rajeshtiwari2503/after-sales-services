@@ -76,15 +76,17 @@ interface RealtimeNotification {
 }
 
 export function useRealtimeNotifications(onNotification?: (notification: RealtimeNotification) => void) {
-  const { token, isAuthenticated } = useAuth();
+  // const { token, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [lastNotification, setLastNotification] = useState<RealtimeNotification | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const connect = useCallback(() => {
-    if (!isAuthenticated || !token) return;
+    // if (!isAuthenticated || !token) return;
+    if (!isAuthenticated  ) return;
 
-    const eventSource = new EventSource(`/api/notifications/realtime?token=${token}`);
+    const eventSource = new EventSource(`/api/notifications/realtime?token=${"dffffftoken"}`);
 
     eventSource.onopen = () => {
       setIsConnected(true);
@@ -109,7 +111,8 @@ export function useRealtimeNotifications(onNotification?: (notification: Realtim
     };
 
     eventSourceRef.current = eventSource;
-  }, [isAuthenticated, token, onNotification]);
+  // }, [isAuthenticated, token, onNotification]);
+  }, [isAuthenticated,   onNotification]);
 
   const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
