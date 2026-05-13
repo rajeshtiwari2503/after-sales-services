@@ -1,3 +1,5 @@
+import { Types } from "mongoose"
+
 export type NotificationType =
   | 'feedback_received'
   | 'feedback_response'
@@ -21,10 +23,12 @@ export type NotificationStatus = 'unread' | 'read' | 'archived'
 
 export interface Notification {
   _id: string
-  userId: string
+  userId: Types.ObjectId;
+  tenantId: string;
   title: string
   message: string
   type: NotificationType
+  data?: Record<string, unknown>;
   priority: NotificationPriority
   status: NotificationStatus
   channels: NotificationChannel[]
@@ -32,6 +36,11 @@ export interface Notification {
   referenceType?: string
   actionUrl?: string
   metadata?: Record<string, unknown>
+   isRead: {
+      type: Boolean,
+      default: false,
+    },
+    
   readAt?: string
   createdAt: string
   expiresAt?: string
@@ -39,7 +48,13 @@ export interface Notification {
 
 export interface NotificationPreference {
   _id: string
-  userId: string
+   userId: Types.ObjectId;
+  tenantId: string;
+    inApp: boolean
+  email: boolean
+  push: boolean
+  whatsapp: boolean
+  sms: boolean
   channels: {
     in_app: boolean
     email: boolean
@@ -56,6 +71,10 @@ export interface NotificationPreference {
     start: string  // "22:00"
     end: string    // "08:00"
   }
+   preferences: Record<string, any>
+
+  quietHoursStart?: string
+  quietHoursEnd?: string
   frequency: 'realtime' | 'digest_hourly' | 'digest_daily'
   updatedAt: string
 }

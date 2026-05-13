@@ -89,6 +89,7 @@
 //   totalPages: number
 // }
 
+import { Types } from "mongoose";
 
 export interface FeedbackFilter {
   status?: string;
@@ -99,8 +100,8 @@ export interface FeedbackFilter {
 }
 export interface Feedback {
   _id: string;
-  ticketId: string;
-  customerId: string;
+  ticketId: Types.ObjectId;
+  customerId: Types.ObjectId;
   technicianId?: string;
   clientName?: string;
   clientEmail?: string;

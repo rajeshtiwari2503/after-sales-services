@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export type TicketStatus = 
   | 'open' 
   | 'in_progress' 
@@ -21,14 +23,16 @@ export type TicketCategory =
 export interface Ticket {
   _id: string;
   ticketNumber: string;
+  ticketId: string;
   title: string;
+  customerId: Types.ObjectId;
   description: string;
   status: TicketStatus;
   priority: TicketPriority;
   category: TicketCategory;
-  customerId: string;
-  technicianId?: string;
-  serviceCenterId?: string;
+ 
+  technicianId?: Types.ObjectId;
+  serviceCenterId?: Types.ObjectId;
   tenantId: string;
   attachments: Attachment[];
   notes: Note[];

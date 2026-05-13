@@ -13,7 +13,7 @@ const NotificationSchema = new Schema<NotificationDocument>(
     tenantId: {
       type: String,
       required: true,
-      index: true,
+      // index: true,
     },
     type: {
       type: String,

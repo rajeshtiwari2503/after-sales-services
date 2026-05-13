@@ -45,6 +45,11 @@ const TicketSchema = new Schema<TicketDocument>(
       required: true,
       unique: true,
     },
+     ticketId: {
+      type: String,
+     
+      unique: true,
+    },
     title: {
       type: String,
       required: [true, 'Title is required'],
@@ -111,7 +116,7 @@ TicketSchema.pre('save', async function (next) {
     const count = await mongoose.models.Ticket.countDocuments({ tenantId: this.tenantId });
     this.ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
   }
-  next();
+  // next();
 });
 
 const Ticket: Model<TicketDocument> =

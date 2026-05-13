@@ -6,7 +6,29 @@ export interface JWTPayload {
   iat?: number;
   exp?: number;
 }
+ 'support';
 
+export interface User {
+  _id: string;
+
+  name: string;
+  email: string;
+  password?: string;
+
+  role: UserRole;
+
+  tenantId: string;
+
+  phone?: string;
+  avatar?: string;
+
+  isActive: boolean;
+
+  lastLogin?: string;
+
+  createdAt: string;
+  updatedAt: string;
+}
 export type UserRole = 'admin' | 'manager' | 'technician' | 'customer' | 'support';
 
 export interface LoginCredentials {

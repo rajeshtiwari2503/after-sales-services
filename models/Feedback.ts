@@ -8,12 +8,12 @@ const FeedbackSchema = new Schema<FeedbackDocument>(
     ticketId: {
       type: Schema.Types.ObjectId,
       ref: 'Ticket',
-      required: true,
+      // required: true,
     },
     customerId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      // required: true,
     },
     technicianId: {
       type: Schema.Types.ObjectId,
