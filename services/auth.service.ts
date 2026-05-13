@@ -45,53 +45,58 @@ export class AuthService {
     };
   }
 
-  static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
-    await connectDB();
+ static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
+  await connectDB();
 
-    // const user = await User.findOne({ email: credentials.email, tenantId }).select('+password');
-    const user = await User.findOne({
-  email: credentials.email,
-  tenantId,
-}).select("+password");
-    if (!user) {
-      return { success: false, message: 'Invalid credentials' };
-    }
+  const user = await User.findOne({
+    email: credentials.email,
+  }).select('+password');
 
-    if (!user.isActive) {
-      return { success: false, message: 'Account is deactivated' };
-    }
-if (!user.password) {
-  return { success: false, message: "Password not found" };
-}
-    const isValidPassword = await comparePassword(credentials.password, user.password);
-    if (!isValidPassword) {
-      return { success: false, message: 'Invalid credentials' };
-    }
+  if (!user) {
+    return { success: false, message: 'Invalid credentials' };
+  }
 
-    user.lastLogin = new Date();
-    await user.save();
+  if (!user.isActive) {
+    return { success: false, message: 'Account is deactivated' };
+  }
 
-    const payload: JWTPayload = {
-      userId: user._id.toString(),
+  if (!user.password) {
+    return { success: false, message: 'Password not found' };
+  }
+
+  const isValidPassword = await comparePassword(credentials.password, user.password);
+  if (!isValidPassword) {
+    return { success: false, message: 'Invalid credentials' };
+  }
+
+  // ✅ tenantId missing hai toh set karo, phir save karo
+  if (!user.tenantId) {
+    user.tenantId = tenantId; // 'default' set ho jaayega
+  }
+  user.lastLogin = new Date();
+  await user.save();
+
+  const payload: JWTPayload = {
+    userId: user._id.toString(),
+    email: user.email,
+    role: user.role,
+    tenantId: user.tenantId,
+  };
+
+  const token = signToken(payload);
+
+  return {
+    success: true,
+    message: 'Login successful',
+    token,
+    user: {
+      id: user._id.toString(),
+      name: user.name,
       email: user.email,
       role: user.role,
-      tenantId,
-    };
-
-    const token = signToken(payload);
-
-    return {
-      success: true,
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id.toString(),
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    };
-  }
+    },
+  };
+}
 
   static async getUserById(userId: string) {
     await connectDB();
