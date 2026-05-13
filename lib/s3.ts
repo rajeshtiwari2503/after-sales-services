@@ -25,7 +25,8 @@ export async function uploadToS3(
 
   await s3Client.send(command);
 
-  return `[${bucket_name}.s3.amazonaws.com](https://${BUCKET_NAME}.s3.amazonaws.com/${key})`;
+  // return `[${bucket_name}.s3.amazonaws.com](https://${BUCKET_NAME}.s3.amazonaws.com/${key})`;
+  return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 }
 
 export async function getSignedDownloadUrl(key: string, expiresIn = 3600): Promise<string> {
