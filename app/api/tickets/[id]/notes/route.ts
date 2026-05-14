@@ -1,41 +1,22 @@
 import { NextRequest } from 'next/server';
 import { TicketService } from '@/services/ticket.service';
-import { addNoteSchema } from '@/schemas/ticket.schema';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
- 
-
+import { errorResponse, successResponse } from '@/utils/apiResponse';
 import { getAuthUser } from '@/lib/auth-helper';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    if (!user) return errorResponse('Unauthorized', 401);
 
-    const body = await request.json();
-    const validation = addNoteSchema.safeParse(body);
-    if (!validation.success) {
-      return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
-    }
+    const { content, isInternal } = await request.json();
+    if (!content?.trim()) return errorResponse('Note content is required', 400);
 
-    const { id } = await params;
     const ticket = await TicketService.addNote(
-      id,
-      validation.data.content,
-      validation.data.isInternal,
-      user.userId,
-      user.tenantId
+      params.id, { content, isInternal: !!isInternal },
+      user.userId, user.tenantId
     );
 
-    if (!ticket) {
-      return errorResponse('Ticket not found', 404);
-    }
-
-    return successResponse(ticket.notes[ticket.notes.length - 1], 'Note added successfully', 201);
+    return successResponse(ticket, 'Note added');
   } catch (error) {
     console.error('Add note error:', error);
     return errorResponse('An error occurred', 500);

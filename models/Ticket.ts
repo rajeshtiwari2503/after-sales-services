@@ -48,7 +48,7 @@ const TicketSchema = new Schema<TicketDocument>(
      ticketId: {
       type: String,
      
-      unique: true,
+      // unique: true,
     },
     title: {
       type: String,
@@ -113,12 +113,22 @@ TicketSchema.index({ tenantId: 1, technicianId: 1 });
 TicketSchema.index({ createdAt: -1 });
 
 // models/Ticket.ts
-TicketSchema.pre('save', async function (next) {
-  if (this.isNew && !this.ticketNumber) {
-    const count = await mongoose.models.Ticket.countDocuments({ tenantId: this.tenantId });
-    this.ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
+TicketSchema.pre('save', async function () {
+  if (this.isNew) {
+    const count = await mongoose.models.Ticket.countDocuments({
+      tenantId: this.tenantId,
+    });
+
+    if (!this.ticketNumber) {
+      this.ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
+    }
+
+    if (!this.ticketId) {
+      this.ticketId = `TID-${Date.now()}-${Math.floor(
+        1000 + Math.random() * 9000
+      )}`;
+    }
   }
-  next(); // ✅ next() call karna zaroori tha — yahi bug tha
 });
 
 const Ticket: Model<TicketDocument> =

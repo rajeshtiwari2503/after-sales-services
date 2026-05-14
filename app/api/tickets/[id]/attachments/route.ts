@@ -1,88 +1,56 @@
- import { NextRequest } from 'next/server';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
- 
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUser } from '@/lib/auth-helper';
+import { errorResponse, successResponse } from '@/utils/apiResponse';
 import Ticket from '@/models/Ticket';
+import User from '@/models/User';
 import connectDB from '@/lib/db';
 
-import { getAuthUser } from '@/lib/auth-helper';
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
-
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-
-    if (!file) {
-      return errorResponse('No file provided', 400);
-    }
-
-    // In production, upload to S3 or similar
-    const url = `/uploads/${Date.now()}-${file.name}`;
+    if (!user) return errorResponse('Unauthorized', 401);
 
     await connectDB();
-    const { id } = await params;
+
+    const formData = await request.formData();
+    const files = formData.getAll('attachments') as File[];
+
+    if (!files.length) return errorResponse('No files provided', 400);
+
+    const userDoc = await User.findById(user.userId).select('name');
+
+    // ⚠️ Yahan actual file upload karo — S3 / Cloudinary / local
+    // Example ke liye mock URLs use kar rahe hain
+    const attachments = files.map((f) => ({
+      filename: f.name,
+      url: `https://your-storage.com/uploads/${Date.now()}-${f.name}`, // replace with real upload
+      type: f.type,
+      size: f.size,
+      uploadedBy: user.userId,
+      uploadedAt: new Date(),
+    }));
 
     const ticket = await Ticket.findOneAndUpdate(
-      { _id: id, tenantId: user.tenantId },
+      { _id: params.id, tenantId: user.tenantId },
       {
         $push: {
-          attachments: {
-            filename: file.name,
-            url,
-            type: file.type,
-            size: file.size,
-            uploadedBy: user.userId,
-            uploadedAt: new Date(),
+          attachments: { $each: attachments },
+          timeline: {
+            action: 'attachment_added',
+            description: `${files.length} attachment(s) added`,
+            performedBy: user.userId,
+            performedByName: userDoc?.name ?? 'System',
           },
         },
       },
       { new: true }
     );
 
-    if (!ticket) {
-      return errorResponse('Ticket not found', 404);
-    }
+    if (!ticket) return errorResponse('Ticket not found', 404);
 
-    const attachment = ticket.attachments[ticket.attachments.length - 1];
-    return successResponse(attachment, 'Attachment uploaded successfully', 201);
+    return successResponse(ticket, 'Attachments uploaded');
   } catch (error) {
-    console.error('Upload attachment error:', error);
-    return errorResponse('An error occurred', 500);
-  }
-}
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
-
-    await connectDB();
-    const { id } = await params;
-
-    const ticket = await Ticket.findOne(
-      { _id: id, tenantId: user.tenantId },
-      { attachments: 1 }
-    );
-
-    if (!ticket) {
-      return errorResponse('Ticket not found', 404);
-    }
-
-    return successResponse(ticket.attachments);
-  } catch (error) {
-    console.error('Get attachments error:', error);
-    return errorResponse('An error occurred', 500);
+    console.error('Attachment upload error:', error);
+    return errorResponse('Upload failed', 500);
   }
 }

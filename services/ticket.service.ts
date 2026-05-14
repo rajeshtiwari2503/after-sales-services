@@ -13,7 +13,12 @@ export class TicketService {
   // ✅ ticketNumber pehle generate karo
   const count = await Ticket.countDocuments({ tenantId });
   const ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
+ 
+ 
 
+const ticketId = `TID-${Date.now()}-${Math.floor(
+  1000 + Math.random() * 9000
+)}`;
   const { Types } = require('mongoose');
   const customerId = data.customerId && Types.ObjectId.isValid(data.customerId)
     ? new Types.ObjectId(data.customerId)
@@ -31,6 +36,7 @@ export class TicketService {
     priority: data.priority || 'medium',
     status: 'open',
     ticketNumber,          // ← yahan explicitly
+    ticketId,
     customerId,
     technicianId,
     tenantId,
@@ -143,45 +149,9 @@ static async getTickets(tenantId: string, options: {
     },
   };
 }
-  static async getTicketById(ticketId: string, tenantId: string) {
-    await connectDB();
-    return Ticket.findOne({ _id: ticketId, tenantId })
-      .populate('customerId', 'name email phone')
-      .populate('technicianId');
-  }
+ 
 
-  static async updateTicket(ticketId: string, data: UpdateTicketInput, userId: string, tenantId: string) {
-    await connectDB();
-
-    const user = await User.findById(userId);
-    const ticket = await Ticket.findOne({ _id: ticketId, tenantId });
-
-    if (!ticket) return null;
-
-    const changes: string[] = [];
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && ticket.get(key) !== value) {
-        changes.push(`${key}: ${ticket.get(key)} → ${value}`);
-      }
-    });
-
-    if (changes?.length > 0) {
-      ticket.set('timeline', [
-        ...(ticket.timeline || []),
-        {
-          action: 'updated',
-          description: `Updated: ${changes.join(', ')}`,
-          performedBy: userId,
-          performedByName: user?.name || 'System',
-          createdAt: new Date(),
-        },
-      ]);
-    }
-    Object.assign(ticket, data);
-    await ticket.save();
-
-    return ticket;
-  }
+  
 
   static async assignTicket(ticketId: string, technicianId: string, userId: string, tenantId: string) {
     await connectDB();
@@ -211,74 +181,99 @@ static async getTickets(tenantId: string, options: {
     return ticket;
   }
 
-  static async updateStatus(ticketId: string, status: string, userId: string, tenantId: string, reason?: string) {
-    await connectDB();
+ static async getTicketById(id: string, tenantId: string) {
+  await connectDB();
+  return Ticket.findOne({ _id: id, tenantId })
+    .populate('customerId', 'name email phone')
+    .populate('technicianId', 'name email')
+    .lean();
+}
 
-    const user = await User.findById(userId);
-    const ticket = await Ticket.findOne({ _id: ticketId, tenantId });
+static async updateTicket(id: string, data: any, userId: string, tenantId: string) {
+  await connectDB();
+  const user = await User.findById(userId).select('name');
 
-    if (!ticket) return null;
+  const ticket = await Ticket.findOneAndUpdate(
+    { _id: id, tenantId },
+    {
+      ...data,
+      $push: {
+        timeline: {
+          action: 'ticket_updated',
+          description: 'Ticket details updated',
+          performedBy: userId,
+          performedByName: user?.name ?? 'System',
+        },
+      },
+    },
+    { new: true }
+  ).populate('customerId', 'name email').populate('technicianId', 'name');
 
-    const oldStatus = ticket.status as string;
-    ticket.status = status as any;
+  return ticket;
+}
 
-    if (status === 'resolved' || status === 'closed') {
-      ticket.actualCompletionDate = new Date();
-    }
+static async changeStatus(id: string, status: string, userId: string, tenantId: string) {
+  await connectDB();
+  const user = await User.findById(userId).select('name');
 
-    ticket.set({
-      timeline: [
-        ...(ticket.timeline || []),
-        {
+  const statusLabels: Record<string, string> = {
+    open: 'Open', in_progress: 'In Progress',
+    pending_parts: 'Pending Parts', pending_customer: 'Pending Customer',
+    resolved: 'Resolved', closed: 'Closed', cancelled: 'Cancelled',
+  };
+
+  const ticket = await Ticket.findOneAndUpdate(
+    { _id: id, tenantId },
+    {
+      status,
+      ...(status === 'resolved' ? { actualCompletionDate: new Date() } : {}),
+      $push: {
+        timeline: {
           action: 'status_changed',
-          description: `Status changed from ${oldStatus} to ${status}${reason ? `: ${reason}` : ''}`,
+          description: `Status changed to ${statusLabels[status] ?? status}`,
           performedBy: userId,
-          performedByName: user?.name || 'System',
-          metadata: { oldStatus, newStatus: status, reason },
-          createdAt: new Date(),
+          performedByName: user?.name ?? 'System',
+          metadata: { status },
         },
-      ],
-    });
+      },
+    },
+    { new: true }
+  ).populate('customerId', 'name email').populate('technicianId', 'name');
 
-    await ticket.save();
-    return ticket;
-  }
+  return ticket;
+}
 
-  static async addNote(ticketId: string, content: string, isInternal: boolean, userId: string, tenantId: string) {
-    await connectDB();
+static async addNote(id: string, note: { content: string; isInternal: boolean }, userId: string, tenantId: string) {
+  await connectDB();
+  const user = await User.findById(userId).select('name');
 
-    const user = await User.findById(userId);
-    const ticket = await Ticket.findOne({ _id: ticketId, tenantId });
-
-    if (!ticket) return null;
-
-    ticket.set({
-      notes: [
-        ...(ticket.notes || []),
-        {
-          content,
+  const ticket = await Ticket.findOneAndUpdate(
+    { _id: id, tenantId },
+    {
+      $push: {
+        notes: {
+          content: note.content,
           authorId: userId,
-          authorName: user?.name || 'Unknown',
-          isInternal,
+          authorName: user?.name ?? 'Unknown',
+          isInternal: note.isInternal,
           createdAt: new Date(),
         },
-      ],
-    });
-
-    ticket.set({
-      timeline: [
-        ...(ticket.timeline || []),
-        {
+        timeline: {
           action: 'note_added',
-          description: `${isInternal ? 'Internal note' : 'Note'} added`,
+          description: note.isInternal ? 'Internal note added' : 'Note added',
           performedBy: userId,
-          performedByName: user?.name || 'System',
-          createdAt: new Date(),
+          performedByName: user?.name ?? 'Unknown',
         },
-      ],
-    });
+      },
+    },
+    { new: true }
+  ).populate('customerId', 'name email').populate('technicianId', 'name');
 
-    await ticket.save();
-    return ticket;
-  }
+  return ticket;
+}
+
+static async deleteTicket(id: string, tenantId: string) {
+  await connectDB();
+  return Ticket.findOneAndDelete({ _id: id, tenantId });
+}
 }

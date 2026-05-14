@@ -1,102 +1,46 @@
- import { NextRequest } from 'next/server';
+ import { NextRequest, NextResponse } from 'next/server';
 import { TicketService } from '@/services/ticket.service';
-import { updateTicketSchema } from '@/schemas/ticket.schema';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
-import { verifyToken } from '@/lib/jwt';
+import { errorResponse, successResponse } from '@/utils/apiResponse';
+import { getAuthUser } from '@/lib/auth-helper';
 
-function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  return verifyToken(authHeader.substring(7));
-}
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
-
-    const { id } = await params;
+    if (!user) return errorResponse('Unauthorized', 401);
+ const { id } = await params;
     const ticket = await TicketService.getTicketById(id, user.tenantId);
+    if (!ticket) return errorResponse('Ticket not found', 404);
 
-    if (!ticket) {
-      return errorResponse('Ticket not found', 404);
-    }
-
-    return successResponse(ticket);
+    return successResponse(ticket, 'Ticket fetched');
   } catch (error) {
     console.error('Get ticket error:', error);
     return errorResponse('An error occurred', 500);
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    if (!user) return errorResponse('Unauthorized', 401);
 
     const body = await request.json();
-    const validation = updateTicketSchema.safeParse(body);
-    if (!validation.success) {
-      return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
-    }
+    const ticket = await TicketService.updateTicket(params.id, body, user.userId, user.tenantId);
+    if (!ticket) return errorResponse('Ticket not found', 404);
 
-    const { id } = await params;
-    const ticket = await TicketService.updateTicket(
-      id,
-      validation.data,
-      user.userId,
-      user.tenantId
-    );
-
-    if (!ticket) {
-      return errorResponse('Ticket not found', 404);
-    }
-
-    return successResponse(ticket, 'Ticket updated successfully');
+    return successResponse(ticket, 'Ticket updated');
   } catch (error) {
     console.error('Update ticket error:', error);
     return errorResponse('An error occurred', 500);
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    if (!user) return errorResponse('Unauthorized', 401);
 
-    if (!['admin', 'manager'].includes(user.role)) {
-      return errorResponse('Forbidden', 403);
-    }
-
-    const { id } = await params;
-    const result = await TicketService.updateStatus(
-      id,
-      'cancelled',
-      user.userId,
-      user.tenantId,
-      'Ticket deleted by admin'
-    );
-
-    if (!result) {
-      return errorResponse('Ticket not found', 404);
-    }
-
-    return successResponse(null, 'Ticket deleted successfully');
+    await TicketService.deleteTicket(params.id, user.tenantId);
+    return successResponse(null, 'Ticket deleted');
   } catch (error) {
     console.error('Delete ticket error:', error);
     return errorResponse('An error occurred', 500);

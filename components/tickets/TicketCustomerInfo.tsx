@@ -1,108 +1,85 @@
 "use client";
 
-import {
-  User2,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { Users, Mail, Phone, MapPin } from "lucide-react";
 
-export default function TicketCustomerInfo({
-  customer,
-}: any) {
+interface Customer {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+interface ServiceCenter {
+  _id: string;
+  name: string;
+  address?: string;
+}
+
+interface Props {
+  customer: Customer | null;
+  serviceCenter: ServiceCenter | null;
+}
+
+const initials = (name?: string) =>
+  (name ?? "?").split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+
+export default function TicketCustomerInfo({ customer, serviceCenter }: Props) {
   return (
-    <div className="bg-white rounded-[30px] border border-slate-200 p-6">
-      <div className="flex items-center gap-3 mb-8">
-        <User2
-          className="text-blue-600"
-          size={24}
-        />
-
-        <h2 className="text-2xl font-black">
-          Customer Information
-        </h2>
+    <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
+        <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+          <Users className="w-4 h-4 text-green-600" />
+        </div>
+        <p className="text-sm font-semibold text-slate-800">Customer</p>
       </div>
 
-      <div className="flex flex-col items-center text-center">
-        <div className="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-black">
-          {customer?.name?.charAt(
-            0
-          ) || "C"}
-        </div>
+      <div className="p-4">
+        {customer ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold shrink-0">
+                {initials(customer.name)}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">{customer.name}</p>
+                <p className="text-xs text-slate-400">Customer</p>
+              </div>
+            </div>
 
-        <h3 className="mt-5 text-2xl font-black">
-          {customer?.name ||
-            "Customer"}
-        </h3>
-
-        <p className="text-slate-500 mt-2">
-          Customer ID: #
-          {customer?._id?.slice(
-            -6
-          ) || "000001"}
-        </p>
-      </div>
-
-      <div className="space-y-5 mt-8">
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50">
-          <Mail
-            className="text-blue-600"
-            size={20}
-          />
-
-          <div>
-            <p className="text-sm text-slate-500">
-              Email
-            </p>
-
-            <p className="font-semibold mt-1">
-              {customer?.email ||
-                "N/A"}
-            </p>
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="truncate">{customer.email}</span>
+              </div>
+              {customer.phone && (
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span>{customer.phone}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <p className="text-xs text-slate-400 text-center py-3">No customer assigned</p>
+        )}
 
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50">
-          <Phone
-            className="text-green-600"
-            size={20}
-          />
-
-          <div>
-            <p className="text-sm text-slate-500">
-              Phone
-            </p>
-
-            <p className="font-semibold mt-1">
-              {customer?.phone ||
-                "N/A"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50">
-          <MapPin
-            className="text-red-600 mt-1"
-            size={20}
-          />
-
-          <div>
-            <p className="text-sm text-slate-500">
-              Address
-            </p>
-
-            <p className="font-semibold mt-1 leading-7">
-              {customer?.address ||
-                "Address not available"}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <button className="w-full h-14 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
-          Contact Customer
-        </button>
+        {serviceCenter && (
+          <>
+            <div className="h-px bg-slate-100 my-4" />
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Service Center</p>
+              <div className="flex items-start gap-2">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-slate-700">{serviceCenter.name}</p>
+                  {serviceCenter.address && (
+                    <p className="text-xs text-slate-400 mt-0.5">{serviceCenter.address}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

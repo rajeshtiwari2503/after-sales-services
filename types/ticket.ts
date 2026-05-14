@@ -43,7 +43,11 @@ export interface Ticket {
   createdAt: Date;
   updatedAt: Date;
 }
-
+export interface TicketDetail extends Omit<Ticket, 'customerId' | 'technicianId' | 'serviceCenterId'> {
+  customerId: { _id: string; name: string; email: string; phone?: string } | null;
+  technicianId: { _id: string; name: string; email: string } | null;
+  serviceCenterId: { _id: string; name: string; address?: string } | null;
+}
 export interface Attachment {
   _id: string;
   filename: string;

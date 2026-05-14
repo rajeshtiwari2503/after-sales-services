@@ -1,99 +1,81 @@
 "use client";
 
-import {
-  AlertTriangle,
-  Clock3,
-} from "lucide-react";
+import { Clock, AlertCircle, CheckCircle } from "lucide-react";
+import { SLAInfo } from "@/types/ticket";
 
-export default function TicketSLA({
-  sla,
-}: any) {
-  const breached =
-    sla?.status ===
-    "BREACHED";
+interface Props { sla?: SLAInfo }
+
+const fmtDateTime = (d?: Date | string) =>
+  d ? new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+
+const timeRemaining = (deadline?: Date | string) => {
+  if (!deadline) return null;
+  const diff = new Date(deadline).getTime() - Date.now();
+  if (diff <= 0) return "Overdue";
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  return h > 24 ? `${Math.floor(h / 24)}d ${h % 24}h remaining` : `${h}h ${m}m remaining`;
+};
+
+const pct = (deadline?: Date | string) => {
+  if (!deadline) return 0;
+  const now = Date.now();
+  const end = new Date(deadline).getTime();
+  const total = 24 * 60 * 60 * 1000;
+  return Math.min(100, Math.max(0, Math.round(((total - (end - now)) / total) * 100)));
+};
+
+export default function TicketSLA({ sla }: Props) {
+  if (!sla) return null;
+
+  const resPct = pct(sla.resolutionDeadline);
 
   return (
-    <div className="bg-white rounded-[30px] border border-slate-200 p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-black">
-          SLA Tracking
-        </h2>
-
-        <div
-          className={`px-4 py-2 rounded-full text-sm font-bold ${
-            breached
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
-        >
-          {sla?.status}
+    <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
+        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+          <Clock className="w-4 h-4 text-amber-600" />
         </div>
+        <p className="text-sm font-semibold text-slate-800">SLA</p>
       </div>
 
-      <div className="space-y-5">
-        <div className="flex items-center gap-4">
-          <Clock3
-            className="text-blue-600"
-            size={22}
-          />
-
-          <div>
-            <p className="text-sm text-slate-500">
-              Deadline
-            </p>
-
-            <p className="font-bold mt-1">
-              {new Date(
-                sla?.deadline
-              ).toLocaleString()}
-            </p>
-          </div>
+      <div className="p-4 space-y-3">
+        {/* Response */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">Response</span>
+          <span className={`text-xs font-medium flex items-center gap-1 ${sla.isResponseBreached ? "text-red-600" : "text-green-600"}`}>
+            {sla.isResponseBreached
+              ? <><AlertCircle className="w-3 h-3" />Breached</>
+              : <><CheckCircle className="w-3 h-3" />Met</>
+            }
+          </span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <AlertTriangle
-            className={`${
-              breached
-                ? "text-red-600"
-                : "text-green-600"
-            }`}
-            size={22}
-          />
-
-          <div>
-            <p className="text-sm text-slate-500">
-              Remaining Time
-            </p>
-
-            <p className="font-bold mt-1">
-              {sla?.remainingTime ||
-                "2h 20m"}
-            </p>
-          </div>
+        {/* Resolution deadline */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">Resolution deadline</span>
+          <span className="text-xs font-medium text-slate-700">{fmtDateTime(sla.resolutionDeadline)}</span>
         </div>
 
-        <div className="pt-4">
-          <div className="w-full h-4 rounded-full bg-slate-100 overflow-hidden">
+        {/* Progress bar */}
+        <div>
+          <div className="flex justify-between text-xs text-slate-400 mb-1.5">
+            <span>Time elapsed</span>
+            <span>{resPct}%</span>
+          </div>
+          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              style={{
-                width: `${
-                  sla?.progress ||
-                  70
-                }%`,
-              }}
-              className={`h-full ${
-                breached
-                  ? "bg-red-500"
-                  : "bg-blue-600"
+              className={`h-full rounded-full transition-all ${
+                resPct < 60 ? "bg-blue-500" : resPct < 85 ? "bg-amber-500" : "bg-red-500"
               }`}
+              style={{ width: `${resPct}%` }}
             />
           </div>
-
-          <p className="mt-3 text-sm text-slate-500">
-            SLA Progress:{" "}
-            {sla?.progress ||
-              70}
-            %
+          <p className={`text-[10px] mt-1.5 ${sla.isResolutionBreached ? "text-red-500" : "text-slate-400"}`}>
+            {sla.isResolutionBreached
+              ? "⚠ Resolution SLA breached"
+              : timeRemaining(sla.resolutionDeadline)
+            }
           </p>
         </div>
       </div>
