@@ -66,11 +66,14 @@ function SkeletonRow() {
 export default function DashboardPage() {
   const { stats, tickets, activity, loading, error } = useDashboard();
   const { user, greeting } = useUser();
+console.log("Dashboard stats:", stats);
+console.log("Dashboard tickets:", tickets);
+console.log("Dashboard activity:", activity);
 
   const statCards = [
     {
       label: "Open Tickets",
-      value: stats?.openTickets ?? "—",
+      value: stats?.tickets?.open ?? "—",
       change: "+3 today",
       up: true,
       icon: Ticket,
@@ -78,7 +81,7 @@ export default function DashboardPage() {
     },
     {
       label: "Resolved",
-      value: stats?.resolvedTickets ?? "—",
+      value: stats?.tickets?.resolved ?? "—",
       change: "+18 this week",
       up: true,
       icon: BarChart2,
@@ -117,7 +120,7 @@ export default function DashboardPage() {
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
         >
           <RefreshCw className="w-4 h-4" />
-          Retry
+          Retry  
         </button>
       </div>
     );

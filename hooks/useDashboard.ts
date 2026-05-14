@@ -50,9 +50,10 @@ export function useDashboard() {
           statsRes.json(),
           ticketsRes.json(),
         ]);
+console.log("statsData, ticketsData",statsData, ticketsData);
 
-        setStats(statsData.data || statsData);
-        setTickets(ticketsData.data?.tickets || ticketsData.tickets || []);
+        setStats(statsData?.data  );
+        setTickets(ticketsData?.data   || []);
 
         // Activity from tickets ya alag endpoint se
         setActivity([

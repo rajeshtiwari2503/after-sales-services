@@ -229,13 +229,24 @@ const NAV = [
       { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", badge: "12" },
       { label: "Customers", icon: Users, href: "/dashboard/customers" },
       { label: "Technicians", icon: Wrench, href: "/dashboard/technicians", dot: true },
-      { label: "Assets", icon: Monitor, href: "/dashboard/assets" },
+        { label: "Service Centers", icon: Wrench, href: "/dashboard/service-centers", dot: true },
+      { label: "Feedback", icon: Wrench, href: "/dashboard/feedback", dot: true },
+      { label: "Chat", icon: Wrench, href: "/dashboard/chat", dot: true },
+      { label: "Inventory", icon: Wrench, href: "/dashboard/inventory", dot: true },
+      { label: "notifications", icon: Wrench, href: "/dashboard/notifications", dot: true },
+      
+      { label: "users", icon: Wrench, href: "/dashboard/users", dot: true },
+      { label: "warranty", icon: Wrench, href: "/dashboard/warranty", dot: true },
+     
+      { label: "Billing", icon: Wrench, href: "/dashboard/billing", dot: true },
+      { label: "Brand", icon: Wrench, href: "/dashboard/brand", dot: true },
     ],
   },
   {
     section: "Management",
     items: [
-      { label: "Vendors", icon: Building2, href: "/dashboard/vendors" },
+       { label: "AI", icon: Wrench, href: "/dashboard/ai", dot: true },
+      { label: "Realtime", icon: Wrench, href: "/dashboard/realtime", dot: true },
       { label: "Reports", icon: FileText, href: "/dashboard/reports" },
       { label: "Settings", icon: Settings, href: "/dashboard/settings" },
     ],
