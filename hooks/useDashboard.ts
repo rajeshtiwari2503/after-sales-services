@@ -50,19 +50,13 @@ export function useDashboard() {
           statsRes.json(),
           ticketsRes.json(),
         ]);
-console.log("statsData, ticketsData",statsData, ticketsData);
+// console.log("statsData, ticketsData",statsData, ticketsData);
 
-        setStats(statsData?.data || {} );
-        setTickets(ticketsData?.data   || []);
+        setStats(statsData?.data?.kpis || {} );
+        setTickets(ticketsData?.data?.tickets   || []);
 
         // Activity from tickets ya alag endpoint se
-        setActivity([
-          { text: "Ticket assigned to technician", time: "2m ago", type: "ticket" },
-          { text: "New customer registered", time: "15m ago", type: "customer" },
-          { text: "Ticket marked resolved", time: "1h ago", type: "ticket" },
-          { text: "New technician onboarded", time: "3h ago", type: "technician" },
-          { text: "SLA breach warning triggered", time: "5h ago", type: "system" },
-        ]);
+        setActivity( statsData?.data?.recentActivity || []);
       } catch (err: any) {
         setError(err.message);
       } finally {
