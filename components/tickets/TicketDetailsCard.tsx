@@ -6,9 +6,13 @@ import ChangeStatus from "./ChangeStatus";
 import TicketNotes from "./TicketNotes";
 
 interface Props {
+  ticketId: string;
+  notes: any[];
+  onUpdate: () => void;
+}
+interface Props {
   ticket: any;
 }
-
 export default function TicketDetailsCard({
   ticket,
 }: Props) {
@@ -46,6 +50,8 @@ export default function TicketDetailsCard({
 
 <TicketNotes
   ticketId={ticket._id.toString()}
+  notes={ticket.notes || []}
+  onUpdate={() => {}}
 />
           </div>
 
