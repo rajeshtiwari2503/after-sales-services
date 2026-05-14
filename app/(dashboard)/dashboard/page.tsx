@@ -73,7 +73,7 @@ console.log("Dashboard activity:", activity);
   const statCards = [
     {
       label: "Open Tickets",
-      value: stats?.tickets?.open ?? "—",
+      value: (stats as any)?.tickets?.open ?? "—",
       change: "+3 today",
       up: true,
       icon: Ticket,
@@ -81,7 +81,7 @@ console.log("Dashboard activity:", activity);
     },
     {
       label: "Resolved",
-      value: stats?.tickets?.resolved ?? "—",
+      value: (stats as any)?.tickets?.resolved ?? "—",
       change: "+18 this week",
       up: true,
       icon: BarChart2,
