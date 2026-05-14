@@ -1,6 +1,6 @@
 "use client";
 
-import RealtimeActivity from "@/components/analytics/RealtimeActivity";
+ 
 
 export default function RealtimePage() {
   return (
@@ -21,7 +21,7 @@ export default function RealtimePage() {
         </div>
       </div>
 
-      <RealtimeActivity />
+    
     </div>
   );
 }
