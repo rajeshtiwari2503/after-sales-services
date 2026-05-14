@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useDashboard } from "@/hooks/useDashboard";
-
+export const dynamic = 'force-dynamic';
 const statusStyle: Record<string, string> = {
   open: "bg-blue-50 text-blue-700 border-blue-100",
   "in-progress": "bg-amber-50 text-amber-700 border-amber-100",

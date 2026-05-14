@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+export const dynamic = 'force-dynamic';
 interface DashboardStats {
   openTickets: number;
   resolvedTickets: number;
@@ -52,7 +52,7 @@ export function useDashboard() {
         ]);
 console.log("statsData, ticketsData",statsData, ticketsData);
 
-        setStats(statsData?.data  );
+        setStats(statsData?.data || {} );
         setTickets(ticketsData?.data   || []);
 
         // Activity from tickets ya alag endpoint se
