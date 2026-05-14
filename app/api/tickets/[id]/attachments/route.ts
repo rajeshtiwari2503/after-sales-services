@@ -1,29 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
+ import { NextRequest } from 'next/server';
 import { getAuthUser } from '@/lib/auth-helper';
 import { errorResponse, successResponse } from '@/utils/apiResponse';
 import Ticket from '@/models/Ticket';
 import User from '@/models/User';
 import connectDB from '@/lib/db';
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
 
     await connectDB();
+
+    // ✅ Await params
+    const { id } = await params;
 
     const formData = await request.formData();
     const files = formData.getAll('attachments') as File[];
 
-    if (!files.length) return errorResponse('No files provided', 400);
+    if (!files.length) {
+      return errorResponse('No files provided', 400);
+    }
 
     const userDoc = await User.findById(user.userId).select('name');
 
-    // ⚠️ Yahan actual file upload karo — S3 / Cloudinary / local
-    // Example ke liye mock URLs use kar rahe hain
     const attachments = files.map((f) => ({
       filename: f.name,
-      url: `https://your-storage.com/uploads/${Date.now()}-${f.name}`, // replace with real upload
+      url: `https://your-storage.com/uploads/${Date.now()}-${f.name}`,
       type: f.type,
       size: f.size,
       uploadedBy: user.userId,
@@ -31,7 +40,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }));
 
     const ticket = await Ticket.findOneAndUpdate(
-      { _id: params.id, tenantId: user.tenantId },
+      {
+        _id: id,
+        tenantId: user.tenantId,
+      },
       {
         $push: {
           attachments: { $each: attachments },
@@ -46,7 +58,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       { new: true }
     );
 
-    if (!ticket) return errorResponse('Ticket not found', 404);
+    if (!ticket) {
+      return errorResponse('Ticket not found', 404);
+    }
 
     return successResponse(ticket, 'Attachments uploaded');
   } catch (error) {
