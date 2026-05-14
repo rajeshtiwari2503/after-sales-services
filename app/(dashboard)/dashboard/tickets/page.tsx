@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import toast from "react-hot-toast";
@@ -223,6 +223,7 @@ export default function TicketsPage() {
     ];
 
     return (
+        <Suspense > 
         <div className="max-w-7xl mx-auto space-y-5">
 
             {/* ── Header ── */}
@@ -610,5 +611,6 @@ export default function TicketsPage() {
                 </div>
             )}
         </div>
+         </Suspense>
     );
 }
