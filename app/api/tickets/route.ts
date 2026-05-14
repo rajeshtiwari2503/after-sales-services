@@ -80,14 +80,59 @@ import { getAuthUser } from '@/lib/auth-helper'; // ✅ import karo
 
  
 
+// export async function GET(request: NextRequest) {
+//   try {
+//     const user = getAuthUser(request); // ✅ same call, kuch nahi badla
+//     if (!user) {
+//       return errorResponse('Unauthorized', 401);
+//     }
+
+//     const { searchParams } = new URL(request.url);
+//     const options = {
+//       page: parseInt(searchParams.get('page') || '1'),
+//       limit: parseInt(searchParams.get('limit') || '10'),
+//       status: searchParams.get('status') || undefined,
+//       priority: searchParams.get('priority') || undefined,
+//       category: searchParams.get('category') || undefined,
+//       technicianId: searchParams.get('technicianId') || undefined,
+//       customerId: searchParams.get('customerId') || undefined,
+//       search: searchParams.get('search') || undefined,
+//     };
+
+//     const result = await TicketService.getTickets(user.tenantId, options);
+
+//  // ✅ stats calculate
+//     const stats = {
+//       open: result.tickets.filter((t: any) => t.status === 'open').length,
+//       inProgress: result.tickets.filter((t: any) => t.status === 'in_progress').length,
+//       pending: result.tickets.filter((t: any) =>
+//         ['pending_parts', 'pending_customer'].includes(t.status)
+//       ).length,
+//       resolved: result.tickets.filter((t: any) =>
+//         ['resolved', 'closed'].includes(t.status)
+//       ).length,
+//     };
+
+//     return paginatedResponse(result.tickets, {
+//       page: result.page,
+//       limit: result.limit,
+//       total: result.total,
+//     });
+//   } catch (error) {
+//     console.error('Get tickets error:', error);
+//     return errorResponse('An error occurred', 500);
+//   }
+// }
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request); // ✅ same call, kuch nahi badla
+    const user = getAuthUser(request);
+
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
 
     const { searchParams } = new URL(request.url);
+
     const options = {
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '10'),
@@ -99,19 +144,45 @@ export async function GET(request: NextRequest) {
       search: searchParams.get('search') || undefined,
     };
 
-    const result = await TicketService.getTickets(user.tenantId, options);
+    const result = await TicketService.getTickets(
+      user.tenantId,
+      options
+    );
 
-    return paginatedResponse(result.tickets, {
+    // ✅ Stats
+    const stats = {
+      open: result.tickets.filter(
+        (t: any) => t.status === 'open'
+      ).length,
+
+      inProgress: result.tickets.filter(
+        (t: any) => t.status === 'in_progress'
+      ).length,
+
+      pending: result.tickets.filter((t: any) =>
+        ['pending_parts', 'pending_customer'].includes(t.status)
+      ).length,
+
+      resolved: result.tickets.filter((t: any) =>
+        ['resolved', 'closed'].includes(t.status)
+      ).length,
+    };
+
+    // ✅ Direct response return karo
+    return successResponse({
+      tickets: result.tickets,
       page: result.page,
       limit: result.limit,
       total: result.total,
+      totalPages: Math.ceil(result.total / result.limit),
+      stats,
     });
+
   } catch (error) {
     console.error('Get tickets error:', error);
     return errorResponse('An error occurred', 500);
   }
 }
-
  export async function POST(request: NextRequest) {
   try {
     const user = getAuthUser(request);
