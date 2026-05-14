@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useDashboard } from "@/hooks/useDashboard";
+import { useEffect, useState } from "react";
 export const dynamic = 'force-dynamic';
 const statusStyle: Record<string, string> = {
   open: "bg-blue-50 text-blue-700 border-blue-100",
@@ -66,9 +67,13 @@ function SkeletonRow() {
 export default function DashboardPage() {
   const { stats, tickets, activity, loading, error } = useDashboard();
   const { user, greeting } = useUser();
-console.log("Dashboard stats:", stats);
-console.log("Dashboard tickets:", tickets);
-console.log("Dashboard activity:", activity);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   const statCards = [
     {
