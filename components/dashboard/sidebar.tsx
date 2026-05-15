@@ -210,49 +210,224 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, BarChart2, Ticket, Users, Wrench,
   Monitor, Building2, FileText, Settings, ChevronLeft,
-  ChevronRight, Menu, X, LogOut, Bell, HelpCircle,
+  ChevronRight, Menu, X, LogOut, Bell, HelpCircle,  MessageSquare,
+  MessagesSquare,
+  Boxes,
+  
+  ShieldCheck,
+  CreditCard,
+  BadgeCheck,
+  Bot,
+  Activity,
+  Package,
+  Wallet,
+  Clock,
+  MapPin,
+  Shield,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
+ 
+
+// const NAV = [
+//   {
+//     section: "Overview",
+//     items: [
+//       { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+//       { label: "Analytics", icon: BarChart2, href: "/dashboard/analytics" },
+//     ],
+//   },
+//   {
+//     section: "Service",
+//     items: [
+//       { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", badge: "12" },
+//       { label: "Customers", icon: Users, href: "/dashboard/customers" },
+//       { label: "Technicians", icon: Wrench, href: "/dashboard/technicians", dot: true },
+//         { label: "Service Centers", icon: Wrench, href: "/dashboard/service-centers", dot: true },
+//       { label: "Feedback", icon: Wrench, href: "/dashboard/feedback", dot: true },
+//       { label: "Chat", icon: Wrench, href: "/dashboard/chat", dot: true },
+//       { label: "Inventory", icon: Wrench, href: "/dashboard/inventory", dot: true },
+//       { label: "notifications", icon: Wrench, href: "/dashboard/notifications", dot: true },
+      
+//       { label: "users", icon: Wrench, href: "/dashboard/users", dot: true },
+//       { label: "warranty", icon: Wrench, href: "/dashboard/warranty", dot: true },
+     
+//       { label: "Billing", icon: Wrench, href: "/dashboard/billing", dot: true },
+//       { label: "Brand", icon: Wrench, href: "/dashboard/brand", dot: true },
+//     ],
+//   },
+//   {
+//     section: "Management",
+//     items: [
+//        { label: "AI", icon: Wrench, href: "/dashboard/ai", dot: true },
+//       { label: "Realtime", icon: Wrench, href: "/dashboard/realtime", dot: true },
+//       { label: "Reports", icon: FileText, href: "/dashboard/reports" },
+//       { label: "Settings", icon: Settings, href: "/dashboard/settings" },
+//     ],
+//   },
+// ];
  
 
 const NAV = [
   {
     section: "Overview",
     items: [
-      { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-      { label: "Analytics", icon: BarChart2, href: "/dashboard/analytics" },
+      {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard",
+      },
+      {
+        label: "Analytics",
+        icon: BarChart2,
+        href: "/dashboard/analytics",
+      },
     ],
   },
+
   {
     section: "Service",
     items: [
-      { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", badge: "12" },
-      { label: "Customers", icon: Users, href: "/dashboard/customers" },
-      { label: "Technicians", icon: Wrench, href: "/dashboard/technicians", dot: true },
-        { label: "Service Centers", icon: Wrench, href: "/dashboard/service-centers", dot: true },
-      { label: "Feedback", icon: Wrench, href: "/dashboard/feedback", dot: true },
-      { label: "Chat", icon: Wrench, href: "/dashboard/chat", dot: true },
-      { label: "Inventory", icon: Wrench, href: "/dashboard/inventory", dot: true },
-      { label: "notifications", icon: Wrench, href: "/dashboard/notifications", dot: true },
-      
-      { label: "users", icon: Wrench, href: "/dashboard/users", dot: true },
-      { label: "warranty", icon: Wrench, href: "/dashboard/warranty", dot: true },
-     
-      { label: "Billing", icon: Wrench, href: "/dashboard/billing", dot: true },
-      { label: "Brand", icon: Wrench, href: "/dashboard/brand", dot: true },
+      {
+        label: "Tickets",
+        icon: Ticket,
+        href: "/dashboard/tickets",
+        badge: "12",
+      },
+
+      {
+        label: "Customers",
+        icon: Users,
+        href: "/dashboard/customers",
+      },
+
+      {
+        label: "Technicians",
+        icon: Wrench,
+        href: "/dashboard/technicians",
+        dot: true,
+      },
+
+      {
+        label: "Service Centers",
+        icon: Building2,
+        href: "/dashboard/service-centers",
+        dot: true,
+      },
+
+      {
+        label: "Feedback",
+        icon: MessageSquare,
+        href: "/dashboard/feedback",
+        dot: true,
+      },
+
+      {
+        label: "Chat",
+        icon: MessagesSquare,
+        href: "/dashboard/chat",
+        dot: true,
+      },
+
+      {
+        label: "Inventory",
+        icon: Boxes,
+        href: "/dashboard/inventory",
+        dot: true,
+      },
+
+      {
+        label: "Notifications",
+        icon: Bell,
+        href: "/dashboard/notifications",
+        dot: true,
+      },
+
+      {
+        label: "Users",
+        icon: Users,
+        href: "/dashboard/users",
+        dot: true,
+      },
+
+      {
+        label: "Warranty",
+        icon: ShieldCheck,
+        href: "/dashboard/warranty",
+        dot: true,
+      },
+
+      {
+        label: "Billing",
+        icon: CreditCard,
+        href: "/dashboard/billing",
+        dot: true,
+      },
+
+      {
+        label: "Brand",
+        icon: BadgeCheck,
+        href: "/dashboard/brand",
+        dot: true,
+      },
     ],
   },
+
   {
     section: "Management",
     items: [
-       { label: "AI", icon: Wrench, href: "/dashboard/ai", dot: true },
-      { label: "Realtime", icon: Wrench, href: "/dashboard/realtime", dot: true },
-      { label: "Reports", icon: FileText, href: "/dashboard/reports" },
-      { label: "Settings", icon: Settings, href: "/dashboard/settings" },
+      {
+        label: "AI",
+        icon: Bot,
+        href: "/dashboard/ai",
+        dot: true,
+      },
+
+      {
+        label: "Realtime",
+        icon: Activity,
+        href: "/dashboard/realtime",
+        dot: true,
+      },
+
+      {
+        label: "Reports",
+        icon: FileText,
+        href: "/dashboard/reports",
+      },
+
+      {
+        label: "Settings",
+        icon: Settings,
+        href: "/dashboard/settings",
+      },
     ],
   },
 ];
 
+const NAV_BY_ROLE: Record<string, typeof NAV> = {
+  admin: NAV, // existing full nav
+  manager: [
+    { section: "Brand", items: [
+      { label: "Dashboard", icon: LayoutDashboard, href: "/brand/dashboard" },
+      { label: "Products", icon: Package, href: "/brand/products" },
+      { label: "Warranty", icon: Shield, href: "/brand/warranty" },
+      { label: "Service Centers", icon: MapPin, href: "/brand/service-centers" },
+      { label: "Analytics", icon: BarChart2, href: "/brand/analytics" },
+      { label: "Tickets", icon: Ticket, href: "/brand/tickets" },
+    ]},
+  ],
+  service_center: [
+    { section: "Operations", items: [
+      { label: "Dashboard", icon: LayoutDashboard, href: "/service-center/dashboard" },
+      { label: "Tickets", icon: Ticket, href: "/service-center/tickets", badge: "12" },
+      { label: "Technicians", icon: Users, href: "/service-center/technicians" },
+      { label: "Inventory", icon: Package, href: "/service-center/inventory" },
+      { label: "Wallet", icon: Wallet, href: "/service-center/wallet" },
+      { label: "SLA Monitor", icon: Clock, href: "/service-center/sla" },
+      { label: "Reports", icon: FileText, href: "/service-center/reports" },
+    ]},
+  ],
+};
 interface NavItemProps {
   label: string;
   icon: React.ElementType;
@@ -306,7 +481,9 @@ function NavItem({ label, icon: Icon, href, badge, dot, active, collapsed, onCli
   );
 }
 
-export default function Sidebar() {
+// export default function Sidebar() {
+export default function Sidebar({ role = "admin" }: { role?: string }) {
+  const navItems = NAV_BY_ROLE[role] ?? NAV;
   const pathname = usePathname();
   const router = useRouter();
   const { user, initials } = useUser();

@@ -29,7 +29,16 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-export type UserRole = 'admin' | 'manager' | 'technician' | 'customer' | 'support';
+// export type UserRole = 'admin' | 'manager' | 'technician' | 'customer' | 'support';
+
+ 
+export type UserRole =
+  | 'admin'           // Super Admin
+  | 'manager'         // Brand Manager
+  | 'service_center'  // Service Center operator
+  | 'technician'      // Field technician
+  | 'customer'        // End customer
+  | 'support';        // Support agent (existing)
 
 export interface LoginCredentials {
   email: string;

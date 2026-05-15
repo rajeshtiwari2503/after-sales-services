@@ -224,18 +224,93 @@ export default function DashboardPage() {
         {loading
           ? Array(4).fill(0).map((_, i) => <SkeletonCard key={i} />)
           : statCards.map(({ label, value, change, up, icon: Icon, color }) => (
-            <div key={label} className="bg-white rounded-xl border border-slate-200/80 p-4 lg:p-5 hover:shadow-sm transition-shadow">
-              <div className="flex items-start justify-between mb-3">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide leading-none">{label}</p>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
+            // <div key={label} className="bg-white rounded-xl border border-slate-200/80 p-4 lg:p-5 hover:shadow-sm transition-shadow">
+            //   <div className="flex items-start justify-between mb-3">
+            //     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide leading-none">{label}</p>
+            //     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
+            //       <Icon className="w-4 h-4" />
+            //     </div>
+            //   </div>
+            //   <p className="text-2xl lg:text-3xl font-bold text-slate-800 tabular-nums">{value}</p>
+            //   <p className={`text-xs mt-1.5 flex items-center gap-1 ${up ? "text-emerald-600" : "text-red-500"}`}>
+            //     {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            //     {change}
+            //   </p>
+            // </div>
+            <div
+              key={label}
+              className="
+    relative overflow-hidden
+    bg-white/90 backdrop-blur
+    rounded-2xl
+    border border-slate-200/70
+    px-4 py-3
+    hover:border-indigo-200
+    hover:shadow-lg hover:shadow-indigo-100/40
+    transition-all duration-300
+    group
+  "
+            >
+              {/* top glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/0 via-transparent to-slate-50 pointer-events-none" />
+
+              <div className="relative flex items-center justify-between gap-3">
+
+                {/* left */}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.15em]">
+                    {label}
+                  </p>
+
+                  <div className="flex items-end gap-2 mt-1">
+                    <h3 className="text-2xl lg:text-[28px] font-black text-slate-800 leading-none tracking-tight tabular-nums">
+                      {value}
+                    </h3>
+
+                    <div
+                      className={`mb-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold
+          ${up
+                          ? "bg-emerald-50 text-emerald-600"
+                          : "bg-red-50 text-red-500"
+                        }`}
+                    >
+                      {up ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+
+                      <span className="leading-none">
+                        {change}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* icon */}
+                <div
+                  className={`
+        relative
+        w-10 h-10 rounded-xl
+        flex items-center justify-center
+        shrink-0
+        shadow-sm
+        ring-1 ring-black/5
+        group-hover:scale-105
+        transition-transform duration-300
+        ${color}
+      `}
+                >
                   <Icon className="w-4 h-4" />
+
+                  <div className="absolute inset-0 rounded-xl bg-white/10" />
                 </div>
               </div>
-              <p className="text-2xl lg:text-3xl font-bold text-slate-800 tabular-nums">{value}</p>
-              <p className={`text-xs mt-1.5 flex items-center gap-1 ${up ? "text-emerald-600" : "text-red-500"}`}>
-                {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                {change}
-              </p>
+
+              {/* bottom subtle line */}
+              <div className="mt-3 h-[2px] w-full rounded-full bg-gradient-to-r from-slate-100 via-slate-200 to-transparent overflow-hidden">
+                <div className="h-full w-1/3 bg-indigo-400/40 rounded-full" />
+              </div>
             </div>
           ))
         }
@@ -273,7 +348,7 @@ export default function DashboardPage() {
                     <p className="text-slate-400 text-xs mt-1">Create your first service ticket</p>
                   </div>
                 )
-                : tickets.map((ticket) => (
+                : tickets?.map((ticket) => (
                   <Link
                     key={ticket._id}
                     href={`/dashboard/tickets/${ticket._id}`}
@@ -336,12 +411,12 @@ export default function DashboardPage() {
 
                     <div
                       className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${item.status === "resolved"
-                          ? "bg-green-500"
-                          : item.status === "pending_parts"
-                            ? "bg-amber-500"
-                            : item.status === "in_progress"
-                              ? "bg-blue-500"
-                              : "bg-slate-400"
+                        ? "bg-green-500"
+                        : item.status === "pending_parts"
+                          ? "bg-amber-500"
+                          : item.status === "in_progress"
+                            ? "bg-blue-500"
+                            : "bg-slate-400"
                         }`}
                     />
 

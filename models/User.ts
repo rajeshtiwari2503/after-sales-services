@@ -1,7 +1,7 @@
- import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { User as UserType, UserRole } from '@/types/auth';
 
-export interface UserDocument extends Omit<UserType, '_id'>, Document {}
+export interface UserDocument extends Omit<UserType, '_id'>, Document { }
 
 const UserSchema = new Schema<UserDocument>(
   {
@@ -25,9 +25,14 @@ const UserSchema = new Schema<UserDocument>(
       minlength: [8, 'Password must be at least 8 characters'],
       select: false,
     },
+    // role: {
+    //   type: String,
+    //   enum: ['admin', 'manager', 'technician', 'customer', 'support'],
+    //   default: 'customer',
+    // },
     role: {
       type: String,
-      enum: ['admin', 'manager', 'technician', 'customer', 'support'],
+      enum: ['admin', 'manager', 'service_center', 'technician', 'customer', 'support'],
       default: 'customer',
     },
     tenantId: {
