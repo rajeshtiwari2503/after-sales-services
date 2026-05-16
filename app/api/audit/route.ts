@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        // totalPages: Math.ceil(total / limit),
       },
       "Audit logs fetched successfully"
     );
