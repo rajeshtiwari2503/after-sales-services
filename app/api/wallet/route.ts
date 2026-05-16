@@ -1,24 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Wallet from "@/models/Wallet";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
+import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
+import { getAuthUser } from '@/lib/auth-helper';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = getAuthUser(req);
 
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
     await connectDB();
 
     const { searchParams } = new URL(req.url);
-    const ownerId = searchParams.get("ownerId") || session.user.id;
+    const ownerId = searchParams.get("ownerId") || user.userId;
     const ownerType = searchParams.get("ownerType") ||
-      (session.user.role === "technician" ? "technician" : "service_center");
+      (user.role === "technician" ? "technician" : "service_center");
 
     // Only super_admin can query other wallets
-    if (ownerId !== session.user.id && session.user.role !== "super_admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (ownerId !== user.userId && user.role !== "super_admin") {
+      return errorResponse('Forbidden', 403);
     }
 
     const wallet = await Wallet.findOne({ ownerId, ownerType });
@@ -34,10 +37,13 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     const transactions = wallet.transactions
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .sort((a: any, b: any) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+      )
       .slice(skip, skip + limit);
 
-    return NextResponse.json({
+    return successResponse({
       success: true,
       data: {
         balance: wallet.balance,
@@ -60,22 +66,24 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = getAuthUser(req);
 
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
+    }
     await connectDB();
     const body = await req.json();
     const { bankDetails, upiId } = body;
 
     const wallet = await Wallet.findOneAndUpdate(
-      { ownerId: session.user.id },
+      { ownerId: user.userId },
       { bankDetails, upiId },
       { new: true, upsert: true }
     );
 
-    return NextResponse.json({ success: true, data: wallet });
+    return successResponse({ success: true, data: wallet });
   } catch (err) {
     console.error("[WALLET PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return errorResponse('Server error', 500);
   }
 }
