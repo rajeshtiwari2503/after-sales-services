@@ -4,6 +4,7 @@ import { errorResponse, successResponse } from '@/utils/apiResponse';
 import Ticket from '@/models/Ticket';
 import connectDB from '@/lib/db';
 
+
 export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);
@@ -136,14 +137,20 @@ export async function GET(request: NextRequest) {
       ]),
 
       // Recent activity — last 10 tickets
-      Ticket.find({ tenantId })
-        .sort({ updatedAt: -1 })
-        .limit(10)
-        .populate('customerId', 'name')
-        .populate('technicianId', 'name')
-        .select('ticketNumber title status priority updatedAt customerId technicianId')
-        .lean(),
-
+      // Ticket.find({ tenantId })
+      //   .sort({ updatedAt: -1 })
+      //   .limit(10)
+      //   .populate('customerId', 'name')
+      //   .populate('technicianId', 'name')
+      //   .select('ticketNumber title status priority updatedAt customerId technicianId')
+      //   .lean(),
+Ticket.find({ tenantId })
+  .sort({ updatedAt: -1 })
+  .limit(10)
+  .select(
+    'ticketNumber title status priority updatedAt customerId technicianId'
+  )
+  .lean(),
       // Customer satisfaction — mock from resolved tickets
       Ticket.aggregate([
         { $match: { tenantId, status: { $in: ['resolved', 'closed'] } } },

@@ -83,11 +83,11 @@ const TicketSchema = new Schema<TicketDocument>(
     },
     technicianId: {
       type: Schema.Types.ObjectId,
-      ref: 'Technician',
+      ref: 'User',
     },
     serviceCenterId: {
       type: Schema.Types.ObjectId,
-      ref: 'ServiceCenter',
+      ref: 'User',
     },
     tenantId: {
       type: String,
