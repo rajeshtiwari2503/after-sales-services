@@ -2,7 +2,7 @@
 interface Props { distribution: Record<string, number>; average: number }
 
 export default function RatingAnalytics({ distribution, average }: Props) {
-  const total = Object.values(distribution).reduce((a, b) => a + b, 0)
+  const total = Object?.values(distribution).reduce((a, b) => a + b, 0)
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
       <h3 className="font-semibold text-slate-800 mb-1">Rating Distribution</h3>

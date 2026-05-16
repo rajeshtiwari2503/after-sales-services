@@ -22,7 +22,7 @@ export default function TechniciansPage() {
         const data =
           await res.json();
 
-        setTechnicians(data);
+        setTechnicians(data?.data || []);
       } catch (error) {
         console.log(error);
       }
@@ -41,7 +41,7 @@ export default function TechniciansPage() {
       </div>
 
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {technicians.map(
+        {technicians?.map(
           (technician: any) => (
             <TechnicianCard
               key={technician._id}
