@@ -1,66 +1,107 @@
- import { NextRequest } from 'next/server';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
+//  import { NextRequest } from 'next/server';
+// import { successResponse, errorResponse } from '@/utils/apiResponse';
  
+// import Warranty from '@/models/Warranty';
+// import connectDB from '@/lib/db';
+
+// import { getAuthUser } from '@/lib/auth-helper';
+
+// export async function GET(
+//   request: NextRequest,
+//   { params }: { params: Promise<{ id: string }> }
+// ) {
+//   try {
+//     const user = getAuthUser(request);
+//     if (!user) {
+//       return errorResponse('Unauthorized', 401);
+//     }
+
+//     await connectDB();
+//     const { id } = await params;
+
+//     const warranty = await Warranty.findOne({ _id: id, tenantId: user.tenantId })
+//       .populate('customerId', 'name email phone');
+
+//     if (!warranty) {
+//       return errorResponse('Warranty not found', 404);
+//     }
+
+//     return successResponse(warranty);
+//   } catch (error) {
+//     console.error('Get warranty error:', error);
+//     return errorResponse('An error occurred', 500);
+//   }
+// }
+
+// export async function PATCH(
+//   request: NextRequest,
+//   { params }: { params: Promise<{ id: string }> }
+// ) {
+//   try {
+//     const user = getAuthUser(request);
+//     if (!user) {
+//       return errorResponse('Unauthorized', 401);
+//     }
+
+//     const body = await request.json();
+
+//     await connectDB();
+//     const { id } = await params;
+
+//     const warranty = await Warranty.findOneAndUpdate(
+//       { _id: id, tenantId: user.tenantId },
+//       body,
+//       { new: true }
+//     );
+
+//     if (!warranty) {
+//       return errorResponse('Warranty not found', 404);
+//     }
+
+//     return successResponse(warranty, 'Warranty updated successfully');
+//   } catch (error) {
+//     console.error('Update warranty error:', error);
+//     return errorResponse('An error occurred', 500);
+//   }
+// }
+
+import { NextRequest } from 'next/server';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { getAuthUser } from '@/lib/auth-helper';
 import Warranty from '@/models/Warranty';
 import connectDB from '@/lib/db';
 
-import { getAuthUser } from '@/lib/auth-helper';
-
-export async function GET(
+export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
-
+    if (!user) return errorResponse('Unauthorized', 401);
     await connectDB();
-    const { id } = await params;
-
-    const warranty = await Warranty.findOne({ _id: id, tenantId: user.tenantId })
-      .populate('customerId', 'name email phone');
-
-    if (!warranty) {
-      return errorResponse('Warranty not found', 404);
-    }
-
-    return successResponse(warranty);
-  } catch (error) {
-    console.error('Get warranty error:', error);
+    const body = await request.json();
+    const item = await Warranty.findOneAndUpdate(
+      { _id: params.id, tenantId: user.tenantId },
+      body, { new: true }
+    );
+    if (!item) return errorResponse('Item not found', 404);
+    return successResponse(item, 'Updated');
+  } catch {
     return errorResponse('An error occurred', 500);
   }
 }
 
-export async function PATCH(
+export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
-
-    const body = await request.json();
-
+    if (!user) return errorResponse('Unauthorized', 401);
     await connectDB();
-    const { id } = await params;
-
-    const warranty = await Warranty.findOneAndUpdate(
-      { _id: id, tenantId: user.tenantId },
-      body,
-      { new: true }
-    );
-
-    if (!warranty) {
-      return errorResponse('Warranty not found', 404);
-    }
-
-    return successResponse(warranty, 'Warranty updated successfully');
-  } catch (error) {
-    console.error('Update warranty error:', error);
+    await Warranty.findOneAndDelete({ _id: params.id, tenantId: user.tenantId });
+    return successResponse(null, 'Deleted');
+  } catch {
     return errorResponse('An error occurred', 500);
   }
 }

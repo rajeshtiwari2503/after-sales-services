@@ -1,126 +1,49 @@
-// app/api/tickets/stats/route.ts
-
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
+ import { NextRequest } from "next/server";
+import { getAuthUser } from "@/lib/auth-helper";
+import { successResponse, errorResponse } from "@/utils/apiResponse";
 import Ticket from "@/models/Ticket";
+import connectDB from "@/lib/db";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
+    const user = getAuthUser(request);
+    if (!user) return errorResponse("Unauthorized", 401);
+
     await connectDB();
+    const { tenantId } = user;
 
-    const { searchParams } = new URL(req.url);
+    const [statsAgg, slaAgg] = await Promise.all([
+      Ticket.aggregate([
+        { $match: { tenantId } },
+        { $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        }},
+      ]),
+      Ticket.aggregate([
+        { $match: { tenantId, "sla.isResolutionBreached": true } },
+        { $count: "breached" },
+      ]),
+    ]);
 
-    const status = searchParams.get("status");
-    const priority = searchParams.get("priority");
-    const technicianId = searchParams.get("technicianId");
-    const customerId = searchParams.get("customerId");
-    const brandId = searchParams.get("brandId");
-    const serviceCenterId = searchParams.get("serviceCenterId");
+    const map: Record<string, number> = {};
+    statsAgg.forEach((s: any) => { map[s._id] = s.count; });
 
-    const filter: any = {};
+    const total = Object.values(map).reduce((a, b) => a + b, 0);
+    const resolved = map["resolved"] ?? 0;
 
-    if (status) filter.status = status;
-    if (priority) filter.priority = priority;
-    if (technicianId) filter.technicianId = technicianId;
-    if (customerId) filter.customerId = customerId;
-    if (brandId) filter.brandId = brandId;
-    if (serviceCenterId) filter.serviceCenterId = serviceCenterId;
-
-    // Total Tickets
-    const totalTickets = await Ticket.countDocuments(filter);
-
-    // Status Counts
-    const openTickets = await Ticket.countDocuments({
-      ...filter,
-      status: "OPEN",
-    });
-
-    const inProgressTickets = await Ticket.countDocuments({
-      ...filter,
-      status: "IN_PROGRESS",
-    });
-
-    const resolvedTickets = await Ticket.countDocuments({
-      ...filter,
-      status: "RESOLVED",
-    });
-
-    const closedTickets = await Ticket.countDocuments({
-      ...filter,
-      status: "CLOSED",
-    });
-
-    const pendingTickets = await Ticket.countDocuments({
-      ...filter,
-      status: "PENDING",
-    });
-
-    // Priority Counts
-    const lowPriority = await Ticket.countDocuments({
-      ...filter,
-      priority: "LOW",
-    });
-
-    const mediumPriority = await Ticket.countDocuments({
-      ...filter,
-      priority: "MEDIUM",
-    });
-
-    const highPriority = await Ticket.countDocuments({
-      ...filter,
-      priority: "HIGH",
-    });
-
-    const urgentPriority = await Ticket.countDocuments({
-      ...filter,
-      priority: "URGENT",
-    });
-
-    // Recent Tickets
-    const recentTickets = await Ticket.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .populate("customerId")
-      .populate("technicianId")
-      .populate("brandId")
-      .populate("serviceCenterId");
-
-    return NextResponse.json(
-      {
-        success: true,
-        stats: {
-          totalTickets,
-
-          status: {
-            open: openTickets,
-            inProgress: inProgressTickets,
-            resolved: resolvedTickets,
-            closed: closedTickets,
-            pending: pendingTickets,
-          },
-
-          priority: {
-            low: lowPriority,
-            medium: mediumPriority,
-            high: highPriority,
-            urgent: urgentPriority,
-          },
-        },
-
-        recentTickets,
-      },
-      { status: 200 }
-    );
-  } catch (error: any) {
-    console.error("Ticket Stats API Error:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch ticket statistics",
-        error: error.message,
-      },
-      { status: 500 }
-    );
+    return successResponse({
+      open: map["open"] ?? 0,
+      inProgress: map["in_progress"] ?? 0,
+      pending: (map["pending_parts"] ?? 0) + (map["pending_customer"] ?? 0),
+      resolved,
+      closed: map["closed"] ?? 0,
+      unassigned: await Ticket.countDocuments({ tenantId, technicianId: null, status: "open" }),
+      slaBreaches: slaAgg[0]?.breached ?? 0,
+      slaRate: total > 0 ? Math.round((1 - (slaAgg[0]?.breached ?? 0) / total) * 100) : 100,
+    }, "Stats fetched");
+  } catch (error) {
+    console.error("Ticket stats error:", error);
+    return errorResponse("An error occurred", 500);
   }
 }
