@@ -26,81 +26,157 @@
 //     return errorResponse('An error occurred', 500);
 //   }
 // }
+ 
 
-import { NextRequest } from 'next/server';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
-import { getAuthUser } from '@/lib/auth-helper';
-import Chat from '@/models/Chat';
-import User from '@/models/User';
-import connectDB from '@/lib/db';
-import { Types } from 'mongoose';
+import { NextRequest } from "next/server";
+import { Types } from "mongoose";
+
+import { successResponse, errorResponse } from "@/utils/apiResponse";
+import { getAuthUser } from "@/lib/auth-helper";
+
+import Chat from "@/models/Chat";
+import connectDB from "@/lib/db";
+
+// ======================
+// GET CHAT MESSAGES
+// ======================
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+    const user = await getAuthUser(request);
+
+    if (!user) {
+      return errorResponse("Unauthorized", 401);
+    }
 
     await connectDB();
 
-    const messages = await Chat
-      .find({ ticketId: new Types.ObjectId(params.ticketId) })
-      .populate('sender', 'name role')
+    const { id } = await context.params;
+
+    if (!Types.ObjectId.isValid(id)) {
+      return errorResponse("Invalid ticket id", 400);
+    }
+
+    const messages = await Chat.find({
+      ticketId: new Types.ObjectId(id),
+    })
+      .populate("sender", "name role")
       .sort({ createdAt: 1 })
       .lean();
 
-    const formatted = messages.map((m: any) => ({
-      _id: m._id,
-      senderId: m.sender?._id?.toString() ?? m.sender,
-      senderName: m.sender?.name ?? 'Unknown',
-      senderRole: m.sender?.role ?? 'unknown',
-      content: m.message,
-      attachments: m.attachments ?? [],
-      createdAt: m.createdAt,
+    const formatted = messages.map((message: any) => ({
+      _id: message._id?.toString(),
+      senderId:
+        message.sender?._id?.toString() ||
+        message.sender?.toString(),
+
+      senderName:
+        message.sender?.name || "Unknown",
+
+      senderRole:
+        message.sender?.role || "unknown",
+
+      content: message.message,
+
+      attachments:
+        message.attachments || [],
+
+      createdAt: message.createdAt,
     }));
 
-    return successResponse({ messages: formatted }, 'Messages fetched');
+    return successResponse(
+      { messages: formatted },
+      "Messages fetched successfully"
+    );
   } catch (error) {
-    console.error('Get chat error:', error);
-    return errorResponse('An error occurred', 500);
+    console.error("[CHAT_GET_ERROR]", error);
+
+    return errorResponse(
+      "Internal Server Error",
+      500
+    );
   }
 }
 
+// ======================
+// SEND MESSAGE
+// ======================
+
 export async function POST(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+    const user = await getAuthUser(request);
 
-    const { message } = await request.json();
-    if (!message?.trim()) return errorResponse('Message content required', 400);
+    if (!user) {
+      return errorResponse("Unauthorized", 401);
+    }
 
     await connectDB();
 
+    const { id } = await context.params;
+
+    if (!Types.ObjectId.isValid(id)) {
+      return errorResponse("Invalid ticket id", 400);
+    }
+
+    const body = await request.json();
+
+    const message = body?.message?.trim();
+
+    if (!message) {
+      return errorResponse(
+        "Message content required",
+        400
+      );
+    }
+
     const chat = await Chat.create({
-      ticketId: new Types.ObjectId(params.ticketId),
+      ticketId: new Types.ObjectId(id),
+
       sender: new Types.ObjectId(user.userId),
-      message: message.trim(),
+
+      message,
     });
 
-    // Populate sender for response
-    await chat.populate('sender', 'name role');
+    await chat.populate("sender", "name role");
 
     const formatted = {
-      _id: chat._id,
+      _id: chat._id?.toString(),
+
       senderId: user.userId,
-      senderName: (chat as any).sender?.name ?? 'Unknown',
+
+      senderName:
+        (chat as any)?.sender?.name ||
+        "Unknown",
+
+      senderRole:
+        (chat as any)?.sender?.role ||
+        "unknown",
+
       content: chat.message,
+
+      attachments:
+        chat.attachments || [],
+
       createdAt: chat.createdAt,
     };
 
-    return successResponse(formatted, 'Message sent', 201);
+    return successResponse(
+      formatted,
+      "Message sent successfully",
+      201
+    );
   } catch (error) {
-    console.error('Send chat error:', error);
-    return errorResponse('An error occurred', 500);
+    console.error("[CHAT_POST_ERROR]", error);
+
+    return errorResponse(
+      "Internal Server Error",
+      500
+    );
   }
 }
