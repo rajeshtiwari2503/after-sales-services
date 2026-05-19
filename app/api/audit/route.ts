@@ -74,7 +74,7 @@
 //     return NextResponse.json({ error: "Server error" }, { status: 500 });
 //   }
 // }
-
+ 
 import { NextRequest } from "next/server";
 
 import { connectDB } from "@/lib/db";
@@ -92,9 +92,9 @@ import {
 // GET AUDIT LOGS
 // ======================
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(req);
+    const user = await getAuthUser(request);
 
     if (!user || user.role !== "super_admin") {
       return errorResponse("Forbidden", 403);
@@ -102,24 +102,26 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
 
+    // ======================
     // Pagination
-    const page = parseInt(
-      searchParams.get("page") || "1"
-    );
+    // ======================
 
-    const limit = parseInt(
-      searchParams.get("limit") || "50"
-    );
+    const page = Number(searchParams.get("page") || 1);
+
+    const limit = Number(searchParams.get("limit") || 50);
 
     const skip = (page - 1) * limit;
 
+    // ======================
     // Filters
+    // ======================
+
     const filter: Record<string, any> = {};
 
     const userId = searchParams.get("userId");
-    const module = searchParams.get("module");
+    const moduleName = searchParams.get("module");
     const action = searchParams.get("action");
     const status = searchParams.get("status");
     const from = searchParams.get("from");
@@ -129,19 +131,25 @@ export async function GET(req: NextRequest) {
       filter.userId = userId;
     }
 
-    if (module) {
-      filter.module = module;
+    if (moduleName) {
+      filter.module = moduleName;
     }
 
     if (action) {
-      filter.action = new RegExp(action, "i");
+      filter.action = {
+        $regex: action,
+        $options: "i",
+      };
     }
 
     if (status) {
       filter.status = status;
     }
 
-    // Date range
+    // ======================
+    // Date Range
+    // ======================
+
     if (from || to) {
       filter.createdAt = {};
 
@@ -154,7 +162,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Fetch logs
+    // ======================
+    // Fetch Logs
+    // ======================
+
     const [logs, total] = await Promise.all([
       AuditLog.find(filter)
         .sort({ createdAt: -1 })
@@ -175,10 +186,10 @@ export async function GET(req: NextRequest) {
       },
       "Audit logs fetched successfully"
     );
-  } catch (err) {
-    console.error("[AUDIT GET]", err);
+  } catch (error) {
+    console.error("[AUDIT_LOG_GET_ERROR]", error);
 
-    return errorResponse("Server error", 500);
+    return errorResponse("Internal Server Error", 500);
   }
 }
 
@@ -186,23 +197,26 @@ export async function GET(req: NextRequest) {
 // CREATE AUDIT LOG
 // ======================
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const body = await req.json();
+    const body = await request.json();
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+
+    const ipAddress =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    const userAgent =
+      request.headers.get("user-agent") || "unknown";
 
     const log = await AuditLog.create({
       ...body,
-
-      ipAddress:
-        req.headers.get("x-forwarded-for") ||
-        req.headers.get("x-real-ip") ||
-        "unknown",
-
-      userAgent:
-        req.headers.get("user-agent") ||
-        "unknown",
+      ipAddress,
+      userAgent,
     });
 
     return successResponse(
@@ -210,9 +224,9 @@ export async function POST(req: NextRequest) {
       "Audit log created successfully",
       201
     );
-  } catch (err) {
-    console.error("[AUDIT POST]", err);
+  } catch (error) {
+    console.error("[AUDIT_LOG_POST_ERROR]", error);
 
-    return errorResponse("Server error", 500);
+    return errorResponse("Internal Server Error", 500);
   }
 }
