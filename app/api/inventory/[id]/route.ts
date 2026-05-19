@@ -103,73 +103,171 @@
 //   }
 // }
 
+ import { NextRequest } from "next/server";
 
-import { NextRequest } from 'next/server';
-import { successResponse, errorResponse } from '@/utils/apiResponse';
-import { getAuthUser } from '@/lib/auth-helper';
-import Inventory from '@/models/Inventory';
-import connectDB from '@/lib/db';
+import { successResponse, errorResponse } from "@/utils/apiResponse";
+import { getAuthUser } from "@/lib/auth-helper";
+
+import Inventory from "@/models/Inventory";
+import connectDB from "@/lib/db";
+
+// ======================
+// GET INVENTORY ITEM
+// ======================
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+    const user = await getAuthUser(request);
+
+    if (!user) {
+      return errorResponse("Unauthorized", 401);
+    }
+
     await connectDB();
-    const item = await Inventory.findOne({ _id: params.id, tenantId: user.tenantId });
-    if (!item) return errorResponse('Item not found', 404);
-    return successResponse(item, 'Item fetched');
-  } catch {
-    return errorResponse('An error occurred', 500);
+
+    const { id } = await context.params;
+
+    const item = await Inventory.findOne({
+      _id: id,
+      tenantId: user.tenantId,
+    });
+
+    if (!item) {
+      return errorResponse("Item not found", 404);
+    }
+
+    return successResponse(
+      item,
+      "Item fetched successfully"
+    );
+  } catch (error) {
+    console.error("[INVENTORY_GET_ERROR]", error);
+
+    return errorResponse(
+      "Internal Server Error",
+      500
+    );
   }
 }
 
+// ======================
+// UPDATE INVENTORY ITEM
+// ======================
+
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+    const user = await getAuthUser(request);
+
+    if (!user) {
+      return errorResponse("Unauthorized", 401);
+    }
 
     await connectDB();
+
+    const { id } = await context.params;
+
     const body = await request.json();
 
-    // Only allow safe field updates
-    const allowed = ['quantity', 'name', 'unitPrice', 'costPrice', 'location', 'minQuantity', 'maxQuantity', 'isActive'];
+    // ======================
+    // Allowed Fields
+    // ======================
+
+    const allowedFields = [
+      "quantity",
+      "name",
+      "unitPrice",
+      "costPrice",
+      "location",
+      "minQuantity",
+      "maxQuantity",
+      "isActive",
+    ];
+
     const updateData: Record<string, any> = {};
-    allowed.forEach(f => { if (body[f] !== undefined) updateData[f] = body[f]; });
+
+    allowedFields.forEach((field) => {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    });
 
     if (body.quantity !== undefined) {
       updateData.lastRestockedAt = new Date();
     }
 
     const item = await Inventory.findOneAndUpdate(
-      { _id: params.id, tenantId: user.tenantId },
+      {
+        _id: id,
+        tenantId: user.tenantId,
+      },
       updateData,
-      { new: true }
+      {
+        new: true,
+      }
     );
 
-    if (!item) return errorResponse('Item not found', 404);
-    return successResponse(item, 'Item updated');
-  } catch {
-    return errorResponse('An error occurred', 500);
+    if (!item) {
+      return errorResponse("Item not found", 404);
+    }
+
+    return successResponse(
+      item,
+      "Item updated successfully"
+    );
+  } catch (error) {
+    console.error("[INVENTORY_PATCH_ERROR]", error);
+
+    return errorResponse(
+      "Internal Server Error",
+      500
+    );
   }
 }
 
+// ======================
+// DELETE INVENTORY ITEM
+// ======================
+
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return errorResponse('Unauthorized', 401);
+    const user = await getAuthUser(request);
+
+    if (!user) {
+      return errorResponse("Unauthorized", 401);
+    }
+
     await connectDB();
-    await Inventory.findOneAndDelete({ _id: params.id, tenantId: user.tenantId });
-    return successResponse(null, 'Item deleted');
-  } catch {
-    return errorResponse('An error occurred', 500);
+
+    const { id } = await context.params;
+
+    const item = await Inventory.findOneAndDelete({
+      _id: id,
+      tenantId: user.tenantId,
+    });
+
+    if (!item) {
+      return errorResponse("Item not found", 404);
+    }
+
+    return successResponse(
+      null,
+      "Item deleted successfully"
+    );
+  } catch (error) {
+    console.error("[INVENTORY_DELETE_ERROR]", error);
+
+    return errorResponse(
+      "Internal Server Error",
+      500
+    );
   }
 }
