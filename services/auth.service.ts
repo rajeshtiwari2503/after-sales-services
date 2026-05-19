@@ -1,3 +1,112 @@
+// import User from '@/models/User';
+// import { hashPassword, comparePassword } from '@/lib/hash';
+// import { signToken } from '@/lib/jwt';
+// import { LoginCredentials, RegisterData, AuthResponse, JWTPayload } from '@/types/auth';
+// import connectDB from '@/lib/db';
+
+// export class AuthService {
+//   static async register(data: RegisterData, tenantId: string): Promise<AuthResponse> {
+//     await connectDB();
+
+//     const existingUser = await User.findOne({ email: data.email, tenantId });
+//     if (existingUser) {
+//       return { success: false, message: 'Email already registered' };
+//     }
+
+//     const hashedPassword = await hashPassword(data.password);
+
+//     const user = await User.create({
+//       name: data.name,
+//       email: data.email,
+//       password: hashedPassword,
+//       role: data.role || 'customer',
+//       tenantId,
+//     });
+
+//     const payload: JWTPayload = {
+//       userId: user._id.toString(),
+//       email: user.email,
+//       role: user.role,
+//       tenantId,
+//     };
+
+//     const token = signToken(payload);
+
+//     return {
+//       success: true,
+//       message: 'Registration successful',
+//       token,
+//       user: {
+//         id: user._id.toString(),
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//       },
+//     };
+//   }
+
+//  static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
+//   await connectDB();
+
+//   const user = await User.findOne({
+//     email: credentials.email,
+//   }).select('+password');
+
+//   if (!user) {
+//     return { success: false, message: 'Invalid credentials' };
+//   }
+
+//   if (!user.isActive) {
+//     return { success: false, message: 'Account is deactivated' };
+//   }
+
+//   if (!user.password) {
+//     return { success: false, message: 'Password not found' };
+//   }
+
+//   const isValidPassword = await comparePassword(credentials.password, user.password);
+//   if (!isValidPassword) {
+//     return { success: false, message: 'Invalid credentials' };
+//   }
+
+//   // ✅ tenantId missing hai toh set karo, phir save karo
+//   if (!user.tenantId) {
+//     user.tenantId = tenantId; // 'default' set ho jaayega
+//   }
+//   user.lastLogin = new Date();
+//   await user.save();
+
+//   const payload: JWTPayload = {
+//     userId: user._id.toString(),
+//     email: user.email,
+//     role: user.role,
+//     tenantId: user.tenantId,
+//   };
+
+//   const token = signToken(payload);
+
+//   return {
+//     success: true,
+//     message: 'Login successful',
+//     token,
+//     user: {
+//       id: user._id.toString(),
+//       name: user.name,
+//       email: user.email,
+//       role: user.role,
+//     },
+//   };
+// }
+
+//   static async getUserById(userId: string) {
+//     await connectDB();
+//     return User.findById(userId).select('-password');
+//   }
+// }
+
+// services/auth.service.ts  — REPLACE your existing file
+// Change: embeds serviceCenterId into JWT payload for service_center role users
+
 import User from '@/models/User';
 import { hashPassword, comparePassword } from '@/lib/hash';
 import { signToken } from '@/lib/jwt';
@@ -45,58 +154,50 @@ export class AuthService {
     };
   }
 
- static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
-  await connectDB();
+  static async login(credentials: LoginCredentials, tenantId: string): Promise<AuthResponse> {
+    await connectDB();
 
-  const user = await User.findOne({
-    email: credentials.email,
-  }).select('+password');
+    const user = await User.findOne({ email: credentials.email }).select('+password');
 
-  if (!user) {
-    return { success: false, message: 'Invalid credentials' };
-  }
+    if (!user) return { success: false, message: 'Invalid credentials' };
+    if (!user.isActive) return { success: false, message: 'Account is deactivated' };
+    if (!user.password) return { success: false, message: 'Password not found' };
 
-  if (!user.isActive) {
-    return { success: false, message: 'Account is deactivated' };
-  }
+    const isValidPassword = await comparePassword(credentials.password, user.password);
+    if (!isValidPassword) return { success: false, message: 'Invalid credentials' };
 
-  if (!user.password) {
-    return { success: false, message: 'Password not found' };
-  }
+    if (!user.tenantId) {
+      user.tenantId = tenantId;
+    }
+    user.lastLogin = new Date();
+    await user.save();
 
-  const isValidPassword = await comparePassword(credentials.password, user.password);
-  if (!isValidPassword) {
-    return { success: false, message: 'Invalid credentials' };
-  }
-
-  // ✅ tenantId missing hai toh set karo, phir save karo
-  if (!user.tenantId) {
-    user.tenantId = tenantId; // 'default' set ho jaayega
-  }
-  user.lastLogin = new Date();
-  await user.save();
-
-  const payload: JWTPayload = {
-    userId: user._id.toString(),
-    email: user.email,
-    role: user.role,
-    tenantId: user.tenantId,
-  };
-
-  const token = signToken(payload);
-
-  return {
-    success: true,
-    message: 'Login successful',
-    token,
-    user: {
-      id: user._id.toString(),
-      name: user.name,
+    // Build JWT payload — include serviceCenterId for SC operators
+    const payload: JWTPayload = {
+      userId: user._id.toString(),
       email: user.email,
       role: user.role,
-    },
-  };
-}
+      tenantId: user.tenantId,
+      // ← NEW: SC operators carry their serviceCenterId in the token
+      ...(user.serviceCenterId ? { serviceCenterId: user.serviceCenterId } : {}),
+    };
+
+    const token = signToken(payload);
+
+    return {
+      success: true,
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenantId,
+        ...(user.serviceCenterId ? { serviceCenterId: user.serviceCenterId } : {}),
+      },
+    };
+  }
 
   static async getUserById(userId: string) {
     await connectDB();
