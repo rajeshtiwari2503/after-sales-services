@@ -116,7 +116,10 @@ import { getAuthUser } from '@/lib/auth-helper';
 import { NotificationService } from '@/services/notification.service';
 import User from '@/models/User';
 import connectDB from '@/lib/db';
-
+import "@/models/Category";
+import "@/models/User";
+import "@/models/Product";
+import "@/models/ServiceCenter";
 export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);

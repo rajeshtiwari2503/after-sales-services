@@ -15,6 +15,10 @@ export interface UserDocument extends Document {
   avatar?: string;
   isActive: boolean;
   lastLogin?: Date;
+    // ── Password reset fields ──
+  resetPasswordOTP?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpiry?: Date; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +64,21 @@ const UserSchema = new Schema<UserDocument>(
     avatar: { type: String },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },
+     // ── Password reset fields ──────────────────────────────────────────
+    resetPasswordOTP: {
+      type: String,
+      select: false,   // never returned in normal queries
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+      index: true,     // fast lookup by token
+    },
+    resetPasswordExpiry: {
+      type: Date,
+      select: false,
+    },
+    
   },
   { timestamps: true }
 );
@@ -67,6 +86,7 @@ const UserSchema = new Schema<UserDocument>(
 UserSchema.index({ email: 1, tenantId: 1 }, { unique: true });
 UserSchema.index({ tenantId: 1, role: 1 });
 UserSchema.index({ tenantId: 1, serviceCenterId: 1 });
+UserSchema.index({ resetPasswordToken: 1 }, { sparse: true });
 
 const User: Model<UserDocument> =
   mongoose.models.User || mongoose.model<UserDocument>('User', UserSchema);
