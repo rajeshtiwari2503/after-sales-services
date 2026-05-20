@@ -46,7 +46,7 @@ export default function BrandsPage() {
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/brands", { credentials: "include" });
+      const res = await fetch("/api/brand", { credentials: "include" });
       const data = await res.json();
       setBrands(data.data ?? []);
     } catch {
@@ -65,7 +65,7 @@ export default function BrandsPage() {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/brands", {
+      const res = await fetch("/api/brand", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

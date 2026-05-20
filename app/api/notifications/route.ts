@@ -1,106 +1,94 @@
-//  import { NextRequest } from 'next/server';
-// import { NotificationService } from '@/services/notification.service';
-// import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
-// import { getAuthUser } from '@/lib/auth-helper';
+ // app/api/notifications/route.ts  — REPLACE existing mock file
 
-// export async function GET(request: NextRequest) {
-//   try {
-//     const user = getAuthUser(request);
-//     if (!user) {
-//       return errorResponse('Unauthorized', 401);
-//     }
+import { NextRequest } from 'next/server';
+import { getAuthUser } from '@/lib/auth-helper';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { NotificationService } from '@/services/notification.service';
 
-//     const { searchParams } = new URL(request.url);
-//     const options = {
-//       page: parseInt(searchParams.get('page') || '1'),
-//       limit: parseInt(searchParams.get('limit') || '20'),
-//       unreadOnly: searchParams.get('unreadOnly') === 'true',
-//     };
-
-//     const result = await NotificationService.getNotifications(
-//       user.userId,
-//       user.tenantId,
-//       options
-//     );
-
-//     return paginatedResponse(result.notifications, {
-//       page: result.page,
-//       limit: result.limit,
-//       total: result.total,
-//     });
-//   } catch (error) {
-//     console.error('Get notifications error:', error);
-//     return errorResponse('An error occurred', 500);
-//   }
-// }
-
-// export async function PATCH(request: NextRequest) {
-//   try {
-//     const user = getAuthUser(request);
-//     if (!user) {
-//       return errorResponse('Unauthorized', 401);
-//     }
-
-//     const body = await request.json();
-//     const { notificationId, markAllRead } = body;
-
-//     if (markAllRead) {
-//       await NotificationService.markAllAsRead(user.userId, user.tenantId);
-//       return successResponse(null, 'All notifications marked as read');
-//     }
-
-//     if (notificationId) {
-//       const notification = await NotificationService.markAsRead(notificationId, user.userId);
-//       if (!notification) {
-//         return errorResponse('Notification not found', 404);
-//       }
-//       return successResponse(notification, 'Notification marked as read');
-//     }
-
-//     return errorResponse('Invalid request', 400);
-//   } catch (error) {
-//     console.error('Update notifications error:', error);
-//     return errorResponse('An error occurred', 500);
-//   }
-// }
-
-
-import { NextRequest } from "next/server";
-import { getAuthUser } from "@/lib/auth-helper";
-import { successResponse, errorResponse } from "@/utils/apiResponse";
-import connectDB from "@/lib/db";
-
-// Simple notification model (add to models/Notification.ts if needed)
-// For now returns mock data
+/* ── GET /api/notifications ─────────────────────────────────────────────────
+   Query params:
+     page        (default 1)
+     limit       (default 20)
+     unreadOnly  (default false)
+──────────────────────────────────────────────────────────────────────────── */
 export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);
-    if (!user) return errorResponse("Unauthorized", 401);
+    if (!user) return errorResponse('Unauthorized', 401);
 
-    // Return mock notifications — replace with real model when ready
-    const notifications = [
-      {
-        _id: "1", title: "New ticket assigned",
-        message: "Ticket TKT-000042 has been assigned to you",
-        type: "info", isRead: false,
-        createdAt: new Date(Date.now() - 2 * 60000).toISOString(),
-      },
-      {
-        _id: "2", title: "SLA warning",
-        message: "TKT-000038 response deadline approaching",
-        type: "warning", isRead: false,
-        createdAt: new Date(Date.now() - 28 * 60000).toISOString(),
-      },
-      {
-        _id: "3", title: "Ticket resolved",
-        message: "TKT-000035 was marked as resolved",
-        type: "success", isRead: true,
-        createdAt: new Date(Date.now() - 2 * 3600000).toISOString(),
-      },
-    ];
+    const { searchParams } = new URL(request.url);
+    const page       = parseInt(searchParams.get('page')  ?? '1');
+    const limit      = parseInt(searchParams.get('limit') ?? '20');
+    const unreadOnly = searchParams.get('unreadOnly') === 'true';
 
-    return successResponse({ notifications }, "Notifications fetched");
-  } catch {
-    return errorResponse("An error occurred", 500);
+    const result = await NotificationService.getForUser(
+      user.userId,
+      user.tenantId,
+      { page, limit, unreadOnly }
+    );
+
+    return successResponse(
+      {
+        notifications: result.notifications,
+        unreadCount:   result.unreadCount,
+        total:         result.total,
+        page:          result.page,
+        limit:         result.limit,
+        totalPages:    Math.ceil(result.total / result.limit),
+      },
+      'Notifications fetched'
+    );
+  } catch (error) {
+    console.error('Get notifications error:', error);
+    return errorResponse('An error occurred', 500);
+  }
+}
+
+/* ── PATCH /api/notifications ───────────────────────────────────────────────
+   Body options:
+     { markAllRead: true }              → mark all as read
+     { notificationId: "abc123" }       → mark one as read
+──────────────────────────────────────────────────────────────────────────── */
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) return errorResponse('Unauthorized', 401);
+
+    const body = await request.json();
+    const { markAllRead, notificationId } = body;
+
+    if (markAllRead) {
+      await NotificationService.markAllAsRead(user.userId, user.tenantId);
+      return successResponse(null, 'All notifications marked as read');
+    }
+
+    if (notificationId) {
+      const notif = await NotificationService.markAsRead(notificationId, user.userId);
+      if (!notif) return errorResponse('Notification not found', 404);
+      return successResponse(notif, 'Notification marked as read');
+    }
+
+    return errorResponse('Provide markAllRead or notificationId', 400);
+  } catch (error) {
+    console.error('Update notifications error:', error);
+    return errorResponse('An error occurred', 500);
+  }
+}
+
+/* ── DELETE /api/notifications?id=<notifId> ─────────────────────────────── */
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) return errorResponse('Unauthorized', 401);
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return errorResponse('Notification id is required', 400);
+
+    await NotificationService.delete(id, user.userId);
+    return successResponse(null, 'Notification deleted');
+  } catch (error) {
+    console.error('Delete notification error:', error);
+    return errorResponse('An error occurred', 500);
   }
 }

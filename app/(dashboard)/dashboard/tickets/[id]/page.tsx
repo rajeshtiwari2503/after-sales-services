@@ -842,7 +842,7 @@ export default function TicketDetailPage() {
           {/* Customer info */}
           <TicketCustomerInfo
             customer={ticket.customerId}
-            serviceCenter={ticket.serviceCenterId}
+            serviceCenter={ticket.serviceCenterId  as any}
           />
 
           {/* Assignment */}

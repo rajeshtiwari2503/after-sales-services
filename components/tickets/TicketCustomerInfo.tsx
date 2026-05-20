@@ -9,12 +9,22 @@ interface Customer {
   phone?: string;
 }
 
+// interface ServiceCenter {
+//   _id: string;
+//   name: string;
+//   address?: string;
+// }
 interface ServiceCenter {
   _id: string;
   name: string;
-  address?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
 }
-
 interface Props {
   customer: Customer | null;
   serviceCenter: ServiceCenter | null;
@@ -23,7 +33,9 @@ interface Props {
 const initials = (name?: string) =>
   (name ?? "?").split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
+
 export default function TicketCustomerInfo({ customer, serviceCenter }: Props) {
+  // console.log(serviceCenter);
   return (
     <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
       <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
@@ -63,7 +75,7 @@ export default function TicketCustomerInfo({ customer, serviceCenter }: Props) {
           <p className="text-xs text-slate-400 text-center py-3">No customer assigned</p>
         )}
 
-        {serviceCenter && (
+        {/* {serviceCenter && (
           <>
             <div className="h-px bg-slate-100 my-4" />
             <div className="space-y-2">
@@ -71,15 +83,28 @@ export default function TicketCustomerInfo({ customer, serviceCenter }: Props) {
               <div className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-slate-700">{serviceCenter.name}</p>
-                  {serviceCenter.address && (
-                    <p className="text-xs text-slate-400 mt-0.5">{serviceCenter.address}</p>
+                  <p className="text-sm font-medium text-slate-700">{serviceCenter?.name}</p>
+                  {serviceCenter?.address && (
+                    <p className="text-xs text-slate-400 mt-0.5">{serviceCenter?.address}</p>
                   )}
                 </div>
               </div>
             </div>
           </>
-        )}
+        )} */}
+        {serviceCenter?.address && (
+  <p className="mt-0.5 text-xs text-slate-400">
+    {[
+      serviceCenter.address.street,
+      serviceCenter.address.city,
+      serviceCenter.address.state,
+      serviceCenter.address.postalCode,
+      serviceCenter.address.country,
+    ]
+      .filter(Boolean)
+      .join(", ")}
+  </p>
+)}
       </div>
     </div>
   );

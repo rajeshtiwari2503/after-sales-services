@@ -64,7 +64,7 @@ export default function ServiceCentersPage() {
         setUserRole(role);
         // Admin: load brands for the dropdown
         if (role === "admin") {
-          const bRes = await fetch("/api/brands", { credentials: "include" });
+          const bRes = await fetch("/api/brand", { credentials: "include" });
           const bData = await bRes.json();
           setBrands(bData.data ?? []);
         }

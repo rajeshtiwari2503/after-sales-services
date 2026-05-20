@@ -1,25 +1,24 @@
+ 
+
 // import { NextRequest } from 'next/server';
 // import { TicketService } from '@/services/ticket.service';
 // import { createTicketSchema } from '@/schemas/ticket.schema';
 // import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
-// import { verifyToken } from '@/lib/jwt';
+// import { getAuthUser } from '@/lib/auth-helper'; // ✅ import karo
 
-// function getAuthUser(request: NextRequest) {
-//   const authHeader = request.headers.get('authorization');
-//   if (!authHeader?.startsWith('Bearer ')) return null;
+ 
 
-//   const token = authHeader.substring(7);
-//   return verifyToken(token);
-// }
-
+ 
 // export async function GET(request: NextRequest) {
 //   try {
 //     const user = getAuthUser(request);
+
 //     if (!user) {
 //       return errorResponse('Unauthorized', 401);
 //     }
 
 //     const { searchParams } = new URL(request.url);
+
 //     const options = {
 //       page: parseInt(searchParams.get('page') || '1'),
 //       limit: parseInt(searchParams.get('limit') || '10'),
@@ -31,27 +30,62 @@
 //       search: searchParams.get('search') || undefined,
 //     };
 
-//     const result = await TicketService.getTickets(user.tenantId, options);
+//     const result = await TicketService.getTickets(
+//       user.tenantId,
+//       options
+//     );
 
-//     return paginatedResponse(result.tickets, {
+//     // ✅ Stats
+//     const stats = {
+//       open: result.tickets.filter(
+//         (t: any) => t.status === 'open'
+//       ).length,
+
+//       inProgress: result.tickets.filter(
+//         (t: any) => t.status === 'in_progress'
+//       ).length,
+
+//       pending: result.tickets.filter((t: any) =>
+//         ['pending_parts', 'pending_customer'].includes(t.status)
+//       ).length,
+
+//       resolved: result.tickets.filter((t: any) =>
+//         ['resolved', 'closed'].includes(t.status)
+//       ).length,
+//     };
+
+//     // ✅ Direct response return karo
+//     return successResponse({
+//       tickets: result.tickets,
 //       page: result.page,
 //       limit: result.limit,
 //       total: result.total,
+//       totalPages: Math.ceil(result.total / result.limit),
+//       stats,
 //     });
+
 //   } catch (error) {
 //     console.error('Get tickets error:', error);
 //     return errorResponse('An error occurred', 500);
 //   }
 // }
-
-// export async function POST(request: NextRequest) {
+//  export async function POST(request: NextRequest) {
 //   try {
 //     const user = getAuthUser(request);
-//     if (!user) {
-//       return errorResponse('Unauthorized', 401);
-//     }
+//     if (!user) return errorResponse('Unauthorized', 401);
 
-//     const body = await request.json();
+//     // ✅ Content-Type check karke parse karo
+//     const contentType = request.headers.get('content-type') || '';
+//     let body: Record<string, any> = {};
+
+//     if (contentType.includes('multipart/form-data')) {
+//       const formData = await request.formData();
+//       formData.forEach((value, key) => {
+//         if (key !== 'attachments') body[key] = value;
+//       });
+//     } else {
+//       body = await request.json();
+//     }
 
 //     const validation = createTicketSchema.safeParse(body);
 //     if (!validation.success) {
@@ -71,125 +105,79 @@
 //   }
 // }
 
+// app/api/tickets/route.ts  — REPLACE existing
+// Added: NotificationService.onTicketCreated fires on new ticket creation
 
 import { NextRequest } from 'next/server';
 import { TicketService } from '@/services/ticket.service';
 import { createTicketSchema } from '@/schemas/ticket.schema';
 import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
-import { getAuthUser } from '@/lib/auth-helper'; // ✅ import karo
+import { getAuthUser } from '@/lib/auth-helper';
+import { NotificationService } from '@/services/notification.service';
+import User from '@/models/User';
+import connectDB from '@/lib/db';
 
- 
-
-// export async function GET(request: NextRequest) {
-//   try {
-//     const user = getAuthUser(request); // ✅ same call, kuch nahi badla
-//     if (!user) {
-//       return errorResponse('Unauthorized', 401);
-//     }
-
-//     const { searchParams } = new URL(request.url);
-//     const options = {
-//       page: parseInt(searchParams.get('page') || '1'),
-//       limit: parseInt(searchParams.get('limit') || '10'),
-//       status: searchParams.get('status') || undefined,
-//       priority: searchParams.get('priority') || undefined,
-//       category: searchParams.get('category') || undefined,
-//       technicianId: searchParams.get('technicianId') || undefined,
-//       customerId: searchParams.get('customerId') || undefined,
-//       search: searchParams.get('search') || undefined,
-//     };
-
-//     const result = await TicketService.getTickets(user.tenantId, options);
-
-//  // ✅ stats calculate
-//     const stats = {
-//       open: result.tickets.filter((t: any) => t.status === 'open').length,
-//       inProgress: result.tickets.filter((t: any) => t.status === 'in_progress').length,
-//       pending: result.tickets.filter((t: any) =>
-//         ['pending_parts', 'pending_customer'].includes(t.status)
-//       ).length,
-//       resolved: result.tickets.filter((t: any) =>
-//         ['resolved', 'closed'].includes(t.status)
-//       ).length,
-//     };
-
-//     return paginatedResponse(result.tickets, {
-//       page: result.page,
-//       limit: result.limit,
-//       total: result.total,
-//     });
-//   } catch (error) {
-//     console.error('Get tickets error:', error);
-//     return errorResponse('An error occurred', 500);
-//   }
-// }
 export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);
-
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    if (!user) return errorResponse('Unauthorized', 401);
 
     const { searchParams } = new URL(request.url);
 
     const options = {
-      page: parseInt(searchParams.get('page') || '1'),
-      limit: parseInt(searchParams.get('limit') || '10'),
-      status: searchParams.get('status') || undefined,
-      priority: searchParams.get('priority') || undefined,
-      category: searchParams.get('category') || undefined,
-      technicianId: searchParams.get('technicianId') || undefined,
-      customerId: searchParams.get('customerId') || undefined,
-      search: searchParams.get('search') || undefined,
+      page:      parseInt(searchParams.get('page')  ?? '1'),
+      limit:     parseInt(searchParams.get('limit') ?? '10'),
+      status:    searchParams.get('status')      ?? undefined,
+      priority:  searchParams.get('priority')    ?? undefined,
+      category:  searchParams.get('category')    ?? undefined,
+      categoryId:searchParams.get('categoryId')  ?? undefined,
+      productId: searchParams.get('productId')   ?? undefined,
+      technicianId: searchParams.get('technicianId') ?? undefined,
+      customerId:   searchParams.get('customerId')    ?? undefined,
+      serviceCenterId: searchParams.get('serviceCenterId') ?? undefined,
+      search:    searchParams.get('search')      ?? undefined,
     };
 
-    const result = await TicketService.getTickets(
-      user.tenantId,
-      options
-    );
+    // RBAC: SC operators only see their SC's tickets
+    if (user.role === 'service_center') {
+      const scId = request.headers.get('x-service-center-id');
+      if (scId) options.serviceCenterId = scId;
+    }
 
-    // ✅ Stats
+    // Technician: only their assigned tickets
+    if (user.role === 'technician') {
+      options.technicianId = user.userId;
+    }
+
+    const result = await TicketService.getTickets(user.tenantId, options);
+
     const stats = {
-      open: result.tickets.filter(
-        (t: any) => t.status === 'open'
-      ).length,
-
-      inProgress: result.tickets.filter(
-        (t: any) => t.status === 'in_progress'
-      ).length,
-
-      pending: result.tickets.filter((t: any) =>
-        ['pending_parts', 'pending_customer'].includes(t.status)
-      ).length,
-
-      resolved: result.tickets.filter((t: any) =>
-        ['resolved', 'closed'].includes(t.status)
-      ).length,
+      open:       result.tickets.filter((t: any) => t.status === 'open').length,
+      inProgress: result.tickets.filter((t: any) => t.status === 'in_progress').length,
+      pending:    result.tickets.filter((t: any) => ['pending_parts', 'pending_customer'].includes(t.status)).length,
+      resolved:   result.tickets.filter((t: any) => ['resolved', 'closed'].includes(t.status)).length,
     };
 
-    // ✅ Direct response return karo
     return successResponse({
-      tickets: result.tickets,
-      page: result.page,
-      limit: result.limit,
-      total: result.total,
+      tickets:    result.tickets,
+      page:       result.page,
+      limit:      result.limit,
+      total:      result.total,
       totalPages: Math.ceil(result.total / result.limit),
       stats,
     });
-
   } catch (error) {
     console.error('Get tickets error:', error);
     return errorResponse('An error occurred', 500);
   }
 }
- export async function POST(request: NextRequest) {
+
+export async function POST(request: NextRequest) {
   try {
     const user = getAuthUser(request);
     if (!user) return errorResponse('Unauthorized', 401);
 
-    // ✅ Content-Type check karke parse karo
-    const contentType = request.headers.get('content-type') || '';
+    const contentType = request.headers.get('content-type') ?? '';
     let body: Record<string, any> = {};
 
     if (contentType.includes('multipart/form-data')) {
@@ -206,11 +194,30 @@ export async function GET(request: NextRequest) {
       return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
     }
 
-    const ticket = await TicketService.createTicket(
-      validation.data,
-      user.userId,
-      user.tenantId
-    );
+    const ticket = await TicketService.createTicket(validation.data, user.userId, user.tenantId);
+
+    // Notify brand managers when a new ticket is created
+    try {
+      await connectDB();
+      const managers = await User.find({
+        tenantId: user.tenantId,
+        role: 'manager',
+        isActive: true,
+      }).select('_id');
+
+      if (managers.length > 0) {
+        await NotificationService.onTicketCreated({
+          managerUserIds: managers.map(m => m._id.toString()),
+          tenantId:       user.tenantId,
+          ticketId:       (ticket as any)._id.toString(),
+          ticketNumber:   (ticket as any).ticketNumber,
+          title:          (ticket as any).title,
+        });
+      }
+    } catch (notifErr) {
+      // Non-critical — don't fail ticket creation if notification fails
+      console.error('Notification error (non-critical):', notifErr);
+    }
 
     return successResponse(ticket, 'Ticket created successfully', 201);
   } catch (error) {
