@@ -19,6 +19,7 @@ export interface NotificationDocument extends Document {
   tenantId: string;
   title: string;
   message: string;
+  actionUrl: string;
   type: NotificationType;
   event: NotificationEvent;
   isRead: boolean;
@@ -53,6 +54,11 @@ const NotificationSchema = new Schema<NotificationDocument>(
     },
     isRead:   { type: Boolean, default: false, index: true },
     readAt:   { type: Date },
+    actionUrl: {
+  type: String,
+  required: false,
+  default: null,
+},
     metadata: {
       ticketId:        { type: String },
       ticketNumber:    { type: String },
