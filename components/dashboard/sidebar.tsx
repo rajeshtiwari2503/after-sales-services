@@ -435,44 +435,167 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, BarChart2, Ticket, Users, Wrench,
   Building2, FileText, Settings, ChevronLeft,
-  ChevronRight, Menu, X, LogOut, Shield, Package,
-  Wallet, Clock, MapPin, Star, Bell, HelpCircle,
+  ChevronRight, Menu, X, LogOut,   Star, Bell, HelpCircle,
+      MessageSquare,
+  MessagesSquare,
+  Boxes,
+  
+  ShieldCheck,
+  CreditCard,
+  BadgeCheck,
+  Bot,
+  Activity,
+  Package,
+  Wallet,
+  Clock,
+  MapPin,
+  Shield,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 
 // ─── Nav config per role ───────────────────────────────────────
 const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon: any; href: string; badge?: string; dot?: boolean }[] }[]> = {
-  admin: [
-    {
-      section: "Overview",
-      items: [
-        { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-        { label: "Analytics", icon: BarChart2, href: "/dashboard/analytics" },
-      ],
-    },
-    {
-      section: "Platform",
-      items: [
-        { label: "Brands", icon: Building2, href: "/dashboard/brands" },
-        { label: "Service Centers", icon: MapPin, href: "/dashboard/service-centers" },
-        { label: "Users & Roles", icon: Users, href: "/dashboard/users" },
-      ],
-    },
-    {
-      section: "Service",
-      items: [
-        { label: "Tickets", icon: Ticket, href: "/dashboard/tickets", badge: "12" },
-      ],
-    },
-    {
-      section: "Management",
-      items: [
-        { label: "Audit Logs", icon: FileText, href: "/dashboard/audit-logs" },
-        { label: "Roles", icon: Shield, href: "/dashboard/roles" },
-        { label: "Settings", icon: Settings, href: "/dashboard/settings" },
-      ],
-    },
-  ],
+  admin:    [
+  {
+    section: "Overview",
+    items: [
+      {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard",
+      },
+      {
+        label: "Analytics",
+        icon: BarChart2,
+        href: "/dashboard/analytics",
+      },
+    ],
+  },
+
+  {
+    section: "Service",
+    items: [
+      {
+        label: "Tickets",
+        icon: Ticket,
+        href: "/dashboard/tickets",
+        badge: "12",
+      },
+
+      {
+        label: "Customers",
+        icon: Users,
+        href: "/dashboard/customers",
+      },
+
+      {
+        label: "Technicians",
+        icon: Wrench,
+        href: "/dashboard/technicians",
+        dot: true,
+      },
+
+      {
+        label: "Service Centers",
+        icon: Building2,
+        href: "/dashboard/service-centers",
+        dot: true,
+      },
+
+      {
+        label: "Feedback",
+        icon: MessageSquare,
+        href: "/dashboard/feedback",
+        dot: true,
+      },
+
+      {
+        label: "Chat",
+        icon: MessagesSquare,
+        href: "/dashboard/chat",
+        dot: true,
+      },
+
+      {
+        label: "Inventory",
+        icon: Boxes,
+        href: "/dashboard/inventory",
+        dot: true,
+      },
+
+      {
+        label: "Notifications",
+        icon: Bell,
+        href: "/dashboard/notifications",
+        dot: true,
+      },
+
+      {
+        label: "Users",
+        icon: Users,
+        href: "/dashboard/users",
+        dot: true,
+      },
+
+      {
+        label: "Warranty",
+        icon: ShieldCheck,
+        href: "/dashboard/warranty",
+        dot: true,
+      },
+
+      {
+        label: "Billing",
+        icon: CreditCard,
+        href: "/dashboard/billing",
+        dot: true,
+      },
+
+      {
+        label: "Brand",
+        icon: BadgeCheck,
+        href: "/dashboard/brand",
+        dot: true,
+      },
+    ],
+  },
+
+  {
+    section: "Management",
+    items: [
+      {
+        label: "AI",
+        icon: Bot,
+        href: "/dashboard/ai",
+        dot: true,
+      },
+ {
+        label: "Roles & Permissions",
+        icon: Users,
+        href: "/dashboard/roles",
+        dot: true,
+      },
+      {
+        label: "Realtime",
+        icon: Activity,
+        href: "/dashboard/realtime",
+        dot: true,
+      },
+
+      {
+        label: "Reports",
+        icon: FileText,
+        href: "/dashboard/reports",
+      },
+
+      {
+        label: "Settings",
+        icon: Settings,
+        href: "/dashboard/settings",
+      },
+    ],
+  },
+],
   manager: [
     {
       section: "Brand",
