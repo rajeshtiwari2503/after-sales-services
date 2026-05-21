@@ -615,8 +615,9 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
     {
       section: "Network",
       items: [
-        { label: "Service Centers", icon: MapPin, href: "/brand/service-centers" },
+        { label: "Service Centers", icon: MapPin, href: "/brand/service-centers" }, 
         { label: "Tickets", icon: Ticket, href: "/brand/tickets" },
+        { label: "Reports", icon: FileText, href: "/brand/reports" },
       ],
     },
   ],

@@ -43,7 +43,7 @@ export default function UsersPage() {
       if (roleFilter) params.set("role", roleFilter);
       const res = await fetch(`/api/users?${params}`, { credentials: "include" });
       const data = await res.json();
-      setUsers(data.data ?? []);
+      setUsers(data?.data?.users ?? []);
     } catch { toast.error("Failed to load users"); }
     finally { setLoading(false); }
   };

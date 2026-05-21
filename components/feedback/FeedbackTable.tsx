@@ -15,7 +15,13 @@ const SENTIMENT_COLOR: Record<string, string> = {
   negative: 'text-red-500',
 }
 
-export default function FeedbackTable() {
+interface FeedbackTableProps {
+  feedbacks?: Feedback[];
+}
+
+export default function FeedbackTable({
+  feedbacks = [],
+}: FeedbackTableProps) {
   const [data,    setData]    = useState<Feedback[]>([])
   const [total,   setTotal]   = useState(0)
   const [page,    setPage]    = useState(1)
