@@ -9,7 +9,12 @@ import User from '@/models/User';
 import connectDB from '@/lib/db';
 import { Types } from 'mongoose';
 
-type Params = { params: Promise<{ ticketId: string }> };
+// type Params = { params: Promise<{ ticketId: string }> };
+type Params = {
+  params: {
+    ticketId: string;
+  };
+};
 
 /* ── guard: only ticket participants can access chat ───────────────── */
 async function assertParticipant(ticketId: string, userId: string, tenantId: string) {
