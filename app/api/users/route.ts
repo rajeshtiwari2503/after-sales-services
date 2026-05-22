@@ -242,7 +242,14 @@ export async function POST(request: NextRequest) {
   try {
     const authUser = getAuthUser(request);
     if (!authUser) return errorResponse("Unauthorized", 401);
-    if (authUser.role !== "admin") return errorResponse("Forbidden", 403);
+    // if (authUser.role !== "admin") return errorResponse("Forbidden", 403);
+    if (
+  authUser.role !== "admin" &&
+  authUser.role !== "brand" &&
+  authUser.role !== "manager"
+) {
+  return errorResponse("Forbidden", 403);
+}
 
     await connectDB();
     const body = await request.json();
