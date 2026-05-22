@@ -576,7 +576,7 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
       },
        {
         label: "Audit Logs",
-        icon: Bot,
+        icon: Star,
         href: "/dashboard/audit-logs",
         dot: true,
       },
