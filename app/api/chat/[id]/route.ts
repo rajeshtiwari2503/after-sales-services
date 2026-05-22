@@ -9,12 +9,8 @@ import User from '@/models/User';
 import connectDB from '@/lib/db';
 import { Types } from 'mongoose';
 
-// type Params = { params: Promise<{ ticketId: string }> };
-type Params = {
-  params: {
-    ticketId: string;
-  };
-};
+type Params = { params: Promise<{ id: string }> };
+ 
 
 /* ── guard: only ticket participants can access chat ───────────────── */
 async function assertParticipant(ticketId: string, userId: string, tenantId: string) {
@@ -33,13 +29,13 @@ export async function GET(request: NextRequest, { params }: Params) {
     if (!user) return errorResponse('Unauthorized', 401);
 
     await connectDB();
-    const { ticketId } = await params;
+    const { id } = await params;
 
-    if (!Types.ObjectId.isValid(ticketId))
+    if (!Types.ObjectId.isValid(id))
       return errorResponse('Invalid ticket ID', 400);
 
     const messages = await Chat.find({
-      ticketId:  new Types.ObjectId(ticketId),
+      ticketId:  new Types.ObjectId(id),
       isDeleted: false,
     })
       .populate('sender', 'name role avatar')
@@ -69,7 +65,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     // Mark all as read for this user
     await Chat.updateMany(
       {
-        ticketId:  new Types.ObjectId(ticketId),
+        ticketId:  new Types.ObjectId(id),
         isDeleted: false,
         readBy:    { $ne: new Types.ObjectId(user.userId) },
       },
@@ -93,9 +89,9 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!user) return errorResponse('Unauthorized', 401);
 
     await connectDB();
-    const { ticketId } = await params;
+    const { id } = await params;
 
-    if (!Types.ObjectId.isValid(ticketId))
+    if (!Types.ObjectId.isValid(id))
       return errorResponse('Invalid ticket ID', 400);
 
     const body = await request.json();
@@ -104,7 +100,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!message?.trim()) return errorResponse('Message content required', 400);
 
     const chat = await Chat.create({
-      ticketId:    new Types.ObjectId(ticketId),
+      ticketId:    new Types.ObjectId(id),
       sender:      new Types.ObjectId(user.userId),
       message:     message.trim(),
       messageType,
@@ -145,7 +141,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (!user) return errorResponse('Unauthorized', 401);
 
     await connectDB();
-    const { ticketId } = await params;
+    const { id } = await params;
     const body = await request.json();
     const { action, messageId, emoji, newMessage } = body;
 
@@ -153,7 +149,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       // Mark all as read for this ticket
       await Chat.updateMany(
         {
-          ticketId:  new Types.ObjectId(ticketId),
+          ticketId:  new Types.ObjectId(id),
           isDeleted: false,
           readBy:    { $ne: new Types.ObjectId(user.userId) },
         },
