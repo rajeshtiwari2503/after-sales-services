@@ -1,136 +1,5 @@
  
 
-// import Ticket from '@/models/Ticket';
-// import Feedback from '@/models/Feedback';
-// import Inventory from '@/models/Inventory';
-// import connectDB from '@/lib/db';
-
-// export interface SmartAlert {
-//   id: string;
-//   type: string;
-//   severity: 'critical' | 'high' | 'medium' | 'low';
-//   title: string;
-//   message: string;
-//   actionRequired: boolean;
-//   suggestedAction?: string;
-//   data: Record<string, any>;
-//   createdAt: Date;
-// }
-
-// export class SmartAlertEngine {
-//   private tenantId: string;
-
-//   constructor(tenantId: string) {
-//     this.tenantId = tenantId;
-//   }
-
-//   async generateAlerts(): Promise<SmartAlert[]> {
-//     await connectDB();
-//     const alerts: SmartAlert[] = [];
-
-//     await Promise.all([
-//       this.checkSLABreaches(alerts),
-//       this.checkNegativeFeedbackSpike(alerts),
-//       this.checkLowInventory(alerts),
-//       this.checkUnassignedTickets(alerts),
-//       this.checkTechnicianOverload(alerts),
-//     ]);
-
-//     return alerts.sort((a, b) => {
-//       const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-//       return severityOrder[a.severity] - severityOrder[b.severity];
-//     });
-//   }
-
-//   private async checkSLABreaches(alerts: SmartAlert[]): Promise<void> {
-//     const now = new Date();
-
-//     // Already breached
-//     const breached = await Ticket.find({
-//       tenantId: this.tenantId,
-//       status: { $nin: ['resolved', 'closed', 'cancelled'] },
-//       $or: [
-//         { 'sla.isResponseBreached': true },
-//         { 'sla.isResolutionBreached': true },
-//       ],
-//     }).limit(10);
-
-//     breached.forEach((ticket) => {
-//       alerts.push({
-//         id: `sla-breach-${ticket._id}`,
-//         type: 'sla_breach',
-//         severity: 'critical',
-//         title: 'SLA Breach',
-//         message: `Ticket ${ticket.ticketNumber} has breached SLA`,
-//         actionRequired: true,
-//         suggestedAction: 'Escalate to supervisor immediately',
-//         data: {
-//           ticketId: ticket._id,
-//           ticketNumber: ticket.ticketNumber,
-//         },
-//         createdAt: new Date(),
-//       });
-//     });
-
-//     // About to breach (within 2 hours)
-//     const aboutToBreach = await Ticket.find({
-//       tenantId: this.tenantId,
-//       status: { $nin: ['resolved', 'closed', 'cancelled'] },
-//       'sla.isResponseBreached': false,
-//       'sla.isResolutionBreached': false,
-//       $or: [
-//         { 'sla.responseDeadline': { $lte: new Date(now.getTime() + 2 * 60 * 60 * 1000), $gt: now } },
-//         { 'sla.resolutionDeadline': { $lte: new Date(now.getTime() + 4 * 60 * 60 * 1000), $gt: now } },
-//       ],
-//     }).limit(10);
-
-//     aboutToBreach.forEach((ticket) => {
-//       alerts.push({
-//         id: `sla-warning-${ticket._id}`,
-//         type: 'sla_warning',
-//         severity: 'high',
-//         title: 'SLA Warning',
-//         message: `Ticket ${ticket.ticketNumber} is approaching SLA deadline`,
-//         actionRequired: true,
-//         suggestedAction: 'Prioritize this ticket to avoid SLA breach',
-//         data: {
-//           ticketId: ticket._id,
-//           ticketNumber: ticket.ticketNumber,
-//           deadline: ticket.sla.resolutionDeadline,
-//         },
-//         createdAt: new Date(),
-//       });
-//     });
-//   }
-
-//   private async checkNegativeFeedbackSpike(alerts: SmartAlert[]): Promise<void> {
-//     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
-//     const previous24Hours = new Date(Date.now() - 48 * 60 * 60 * 1000);
-
-//     const [recentNegative, previousNegative] = await Promise.all([
-//       Feedback.countDocuments({
-//         tenantId: this.tenantId,
-//         createdAt: { $gte: last24Hours },
-//         $or: [{ rating: { $lte: 2 } }, { 'sentiment.label': 'negative' }],
-//       }),
-//       Feedback.countDocuments({
-//         tenantId: this.tenantId,
-//         createdAt: { $gte: previous24Hours, $lt: last24Hours },
-//         $or: [{ rating: { $lte: 2 } }, { 'sentiment.label': 'negative' }],
-//       }),
-//     ]);
-
-//     if (recentNegative > previousNegative * 1.5 && recentNegative >= 3) {
-//       alerts.push({
-//         id: `feedback-spike-${Date.now()}`,
-//         type: 'feedback_spike',
-//         severity: 'high',
-//         title: 'Negative Feedback Spike',
-//         message: `${recentNegative} negative feedback received in last 24 hours (${Math.round(((recentNegative - previousNegative) / Math.max(previousNegative, 1)) * 100)}% increase)`,
-//         actionRequired: true,
-//         suggestedAction: 'Review recent
-//       })}
-
 
 
 import Ticket from '@/models/Ticket'
@@ -358,23 +227,52 @@ export class SmartAlertEngine {
       const last24Hours      = new Date(now - 24 * 3_600_000)
       const previous24Hours  = new Date(now - 48 * 3_600_000)
 
-      const [recentNegative, previousNegative, recentTotal] = await Promise.all([
-        Feedback.countDocuments({
-          tenantId:  this.tenantId,
-          createdAt: { $gte: last24Hours },
-          $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
-        }),
-        Feedback.countDocuments({
-          tenantId:  this.tenantId,
-          createdAt: { $gte: previous24Hours, $lt: last24Hours },
-          $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
-        }),
-        Feedback.countDocuments({
-          tenantId:  this.tenantId,
-          createdAt: { $gte: last24Hours },
-        }),
-      ])
+      // const [recentNegative, previousNegative, recentTotal] = await Promise.all([
+      //   Feedback.countDocuments({
+      //     tenantId:  this.tenantId,
+      //     createdAt: { $gte: last24Hours },
+      //     $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
+      //   }),
+      //   Feedback.countDocuments({
+      //     tenantId:  this.tenantId,
+      //     createdAt: { $gte: previous24Hours, $lt: last24Hours },
+      //     $or: [{ rating: { $lte: 2 } }, { sentiment: 'negative' }],
+      //   }),
+      //   Feedback.countDocuments({
+      //     tenantId:  this.tenantId,
+      //     createdAt: { $gte: last24Hours },
+      //   }),
+      // ])
+const [recentNegative, previousNegative, recentTotal] =
+  await Promise.all([
+    Feedback.countDocuments({
+      tenantId: this.tenantId,
+      createdAt: { $gte: last24Hours },
 
+      $or: [
+        { rating: { $lte: 2 } },
+        { 'sentiment.label': 'negative' },
+      ],
+    }),
+
+    Feedback.countDocuments({
+      tenantId: this.tenantId,
+      createdAt: {
+        $gte: previous24Hours,
+        $lt: last24Hours,
+      },
+
+      $or: [
+        { rating: { $lte: 2 } },
+        { 'sentiment.label': 'negative' },
+      ],
+    }),
+
+    Feedback.countDocuments({
+      tenantId: this.tenantId,
+      createdAt: { $gte: last24Hours },
+    }),
+  ]);
       const increasePct = previousNegative > 0
         ? Math.round(((recentNegative - previousNegative) / previousNegative) * 100)
         : recentNegative > 0 ? 100 : 0
