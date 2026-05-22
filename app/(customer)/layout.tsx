@@ -1,4 +1,4 @@
- 
+
 "use client";
 
 import Link from "next/link";
@@ -42,15 +42,31 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     <div className="min-h-screen bg-slate-50 flex flex-col max-w-lg mx-auto">
       {/* Top header */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30">
-        <div className="px-4 h-14 flex items-center justify-between">
-          {/* Brand */}
-          <Link href="/customer/dashboard" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center">
-              <span className="text-white text-xs font-bold">ST</span>
-            </div>
-            <span className="font-bold text-sm text-slate-800">SaaS Techify</span>
-          </Link>
+        <div className=" pe-6 h-16 flex items-center justify-between">
 
+          {/* Brand */}
+          <Link
+            href="/customer/dashboard"
+            className="flex items-center gap-3"
+          >
+            <div className="w-30 h-30 flex items-center justify-center overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            <div>
+              {/* <p className="font-bold text-sm text-slate-800 leading-none">
+          SaaS Techify
+        </p> */}
+
+              <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">
+                Customer Portal
+              </p>
+            </div>
+          </Link>
           {/* Right actions */}
           <div className="flex items-center gap-1.5">
             {/* Notifications */}

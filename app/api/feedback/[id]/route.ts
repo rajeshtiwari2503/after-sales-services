@@ -1,144 +1,75 @@
- import { NextResponse } from "next/server";
-
-import { connectDB } from "@/lib/db";
-
-import Feedback from "@/models/Feedback";
-
-export async function GET(
-  req: Request,
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-) {
-  try {
-    await connectDB();
-
-    const { id } = await params;
-
-    const feedback =
-      await Feedback.findById(id);
-
-    if (!feedback) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Feedback not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: feedback,
-    });
-  } catch (error) {
-    console.log(
-      "FEEDBACK GET ERROR:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to fetch feedback",
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  req: Request,
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-) {
-  try {
-    await connectDB();
-
-    const { id } = await params;
-
-    const body =
-      await req.json();
-
-    const updated =
-      await Feedback.findByIdAndUpdate(
-        id,
-        body,
-        {
-          new: true,
-        }
-      );
-
-    return NextResponse.json({
-      success: true,
-      data: updated,
-    });
-  } catch (error) {
-    console.log(
-      "FEEDBACK UPDATE ERROR:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to update feedback",
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  req: Request,
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-) {
-  try {
-    await connectDB();
-
-    const { id } = await params;
-
-    await Feedback.findByIdAndDelete(
-      id
-    );
-
-    return NextResponse.json({
-      success: true,
-      message:
-        "Feedback deleted",
-    });
-  } catch (error) {
-    console.log(
-      "FEEDBACK DELETE ERROR:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to delete feedback",
-      },
-      { status: 500 }
-    );
-  }
-}
+ 
+ // ═══════════════════════════════════════════════════════════════
+ // FILE 2: app/api/feedback/[id]/route.ts  — GET + respond (PATCH)
+ // ═══════════════════════════════════════════════════════════════
+ 
+ import { NextRequest } from 'next/server';
+ import { successResponse, errorResponse } from '@/utils/apiResponse';
+ import { getAuthUser } from '@/lib/auth-helper';
+ import Feedback from '@/models/Feedback';
+ import connectDB from '@/lib/db';
+ import { Types } from 'mongoose';
+ 
+ interface RouteCtx { params: Promise<{ id: string }> }
+ 
+ export async function GET(request: NextRequest, context: RouteCtx) {
+   try {
+     const user = getAuthUser(request);
+     if (!user) return errorResponse('Unauthorized', 401);
+     await connectDB();
+     const { id } = await context.params;
+ 
+     const feedback = await Feedback.findOne({ _id: id, tenantId: user.tenantId })
+       .populate('customerId',   'name email phone')
+       .populate('technicianId', 'name')
+       .populate('ticketId',     'ticketNumber title status category')
+       .lean();
+ 
+     if (!feedback) return errorResponse('Feedback not found', 404);
+     return successResponse(feedback, 'Feedback fetched');
+   } catch { return errorResponse('An error occurred', 500); }
+ }
+ 
+ // Admin responds to feedback
+ export async function PATCH(request: NextRequest, context: RouteCtx) {
+   try {
+     const user = getAuthUser(request);
+     if (!user) return errorResponse('Unauthorized', 401);
+     if (!['admin', 'manager'].includes(user.role)) return errorResponse('Forbidden', 403);
+ 
+     await connectDB();
+     const { id } = await context.params;
+     const { content } = await request.json();
+     if (!content?.trim()) return errorResponse('Response content required', 400);
+ 
+     const feedback = await Feedback.findOneAndUpdate(
+       { _id: id, tenantId: user.tenantId },
+       {
+         response: {
+           content:      content.trim(),
+           respondedBy:  new Types.ObjectId(user.userId),
+           respondedAt:  new Date(),
+         },
+       },
+       { new: true }
+     ).populate('customerId', 'name email')
+      .populate('ticketId', 'ticketNumber title')
+      .lean();
+ 
+     if (!feedback) return errorResponse('Feedback not found', 404);
+     return successResponse(feedback, 'Response submitted');
+   } catch { return errorResponse('An error occurred', 500); }
+ }
+ 
+ export async function DELETE(request: NextRequest, context: RouteCtx) {
+   try {
+     const user = getAuthUser(request);
+     if (!user) return errorResponse('Unauthorized', 401);
+     if (user.role !== 'admin') return errorResponse('Forbidden', 403);
+     await connectDB();
+     const { id } = await context.params;
+     await Feedback.findOneAndDelete({ _id: id, tenantId: user.tenantId });
+     return successResponse(null, 'Feedback deleted');
+   } catch { return errorResponse('An error occurred', 500); }
+ }
+ 

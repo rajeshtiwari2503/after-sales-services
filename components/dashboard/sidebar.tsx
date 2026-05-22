@@ -550,7 +550,12 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
         href: "/dashboard/billing",
         dot: true,
       },
-
+{
+        label: "Wallet",
+        icon: Wallet,
+        href: "/dashboard/wallet",
+        dot: true,
+      },
       {
         label: "Brand",
         icon: BadgeCheck,
@@ -567,6 +572,12 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
         label: "AI",
         icon: Bot,
         href: "/dashboard/ai",
+        dot: true,
+      },
+       {
+        label: "Audit Logs",
+        icon: Bot,
+        href: "/dashboard/audit-logs",
         dot: true,
       },
  {
@@ -602,6 +613,7 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
       items: [
         { label: "Dashboard", icon: LayoutDashboard, href: "/brand/dashboard" },
         { label: "Analytics", icon: BarChart2, href: "/brand/analytics" },
+        { label: "Wallet", icon: Wallet, href: "/brand/wallet" },
       ],
     },
     {
@@ -627,6 +639,7 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
       items: [
         { label: "Dashboard", icon: LayoutDashboard, href: "/service-center/dashboard" },
         { label: "Tickets", icon: Ticket, href: "/service-center/tickets", badge: "5" },
+          { label: "Wallet", icon: Shield, href: "/service-center/wallet" },
       ],
     },
     {

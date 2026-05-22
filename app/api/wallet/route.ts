@@ -1,89 +1,130 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Wallet from "@/models/Wallet";
-
-import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiResponse';
+ // app/api/wallet/route.ts  — REPLACE existing
+import { NextRequest } from 'next/server';
 import { getAuthUser } from '@/lib/auth-helper';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
+import connectDB from '@/lib/db';
+import Wallet from '@/models/Wallet';
+import ServiceCenter from '@/models/ServiceCenter';
+import mongoose from 'mongoose';
 
+/* ── GET /api/wallet ─────────────────────────────────────────────────────────
+   SC operator  → their SC wallet
+   Brand manager→ their brand wallet
+   Admin        → pass ?ownerId=&ownerType= to view any wallet
+──────────────────────────────────────────────────────────────────────────── */
 export async function GET(req: NextRequest) {
   try {
     const user = getAuthUser(req);
+    if (!user) return errorResponse('Unauthorized', 401);
 
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
     await connectDB();
 
     const { searchParams } = new URL(req.url);
-    const ownerId = searchParams.get("ownerId") || user.userId;
-    const ownerType = searchParams.get("ownerType") ||
-      (user.role === "technician" ? "technician" : "service_center");
+    const page  = parseInt(searchParams.get('page')  ?? '1');
+    const limit = parseInt(searchParams.get('limit') ?? '20');
+    const type  = searchParams.get('type') ?? '';   // credit|debit|withdrawal
 
-    // Only super_admin can query other wallets
-    if (ownerId !== user.userId && user.role !== "super_admin") {
+    let ownerId: string;
+    let ownerType: 'service_center' | 'brand';
+    let tenantId: string;
+
+    if (user.role === 'admin') {
+      ownerId   = searchParams.get('ownerId')   ?? user.userId;
+      ownerType = (searchParams.get('ownerType') ?? 'service_center') as any;
+      tenantId  = searchParams.get('tenantId')  ?? user.tenantId;
+    } else if (user.role === 'service_center') {
+      const scId = req.headers.get('x-service-center-id') ?? '';
+      ownerId   = scId || user.userId;
+      ownerType = 'service_center';
+      tenantId  = user.tenantId;
+    } else if (user.role === 'manager') {
+      ownerId   = user.userId;
+      ownerType = 'brand';
+      tenantId  = user.tenantId;
+    } else {
       return errorResponse('Forbidden', 403);
     }
 
-    const wallet = await Wallet.findOne({ ownerId, ownerType });
+    // Auto-create wallet if not exists
+    let wallet = await Wallet.findOne({ ownerId, ownerType });
     if (!wallet) {
-      // Auto-create wallet on first access
-      const newWallet = await Wallet.create({ ownerId, ownerType });
-      return NextResponse.json({ success: true, data: newWallet });
+      wallet = await Wallet.create({
+        ownerId:   new mongoose.Types.ObjectId(ownerId),
+        ownerType,
+        tenantId,
+        balance:       0,
+        totalEarned:   0,
+        totalWithdrawn:0,
+        pendingAmount: 0,
+        ticketRate:    500,
+      });
     }
 
-    // Pagination for transactions
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const skip = (page - 1) * limit;
+    // Filter + paginate transactions
+    let txs = [...wallet.transactions].sort(
+      (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    if (type) txs = txs.filter((t: any) => t.type === type);
 
-    const transactions = wallet.transactions
-      .sort((a: any, b: any) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
-      )
-      .slice(skip, skip + limit);
+    const total      = txs.length;
+    const paginated  = txs.slice((page - 1) * limit, page * limit);
+
+    // Pending withdrawal count
+    const pendingWithdrawals = wallet.withdrawalRequests?.filter(
+      (w: any) => w.status === 'pending'
+    ).length ?? 0;
 
     return successResponse({
-      success: true,
-      data: {
-        balance: wallet.balance,
-        totalEarned: wallet.totalEarned,
-        totalWithdrawn: wallet.totalWithdrawn,
-        pendingAmount: wallet.pendingAmount,
-        bankDetails: wallet.bankDetails,
-        upiId: wallet.upiId,
-        transactions,
-        totalTransactions: wallet.transactions.length,
-        page,
-        totalPages: Math.ceil(wallet.transactions.length / limit),
-      },
-    });
+      balance:           wallet.balance,
+      totalEarned:       wallet.totalEarned,
+      totalWithdrawn:    wallet.totalWithdrawn,
+      pendingAmount:     wallet.pendingAmount,
+      ticketRate:        wallet.ticketRate,
+      bankDetails:       wallet.bankDetails,
+      upiId:             wallet.upiId,
+      isActive:          wallet.isActive,
+      pendingWithdrawals,
+      transactions:      paginated,
+      totalTransactions: total,
+      page,
+      totalPages:        Math.ceil(total / limit),
+    }, 'Wallet fetched');
   } catch (err) {
-    console.error("[WALLET GET]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error('[WALLET GET]', err);
+    return errorResponse('Server error', 500);
   }
 }
 
+/* ── PATCH /api/wallet — update bank details / UPI ─────────────────────── */
 export async function PATCH(req: NextRequest) {
   try {
     const user = getAuthUser(req);
+    if (!user) return errorResponse('Unauthorized', 401);
+    if (!['service_center','manager'].includes(user.role))
+      return errorResponse('Forbidden', 403);
 
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
     await connectDB();
     const body = await req.json();
     const { bankDetails, upiId } = body;
 
+    const ownerType: 'service_center' | 'brand' =
+      user.role === 'manager' ? 'brand' : 'service_center';
+
+    const scId   = req.headers.get('x-service-center-id');
+    const ownerId = (user.role === 'service_center' && scId) ? scId : user.userId;
+
     const wallet = await Wallet.findOneAndUpdate(
-      { ownerId: user.userId },
-      { bankDetails, upiId },
+      { ownerId, ownerType },
+      { $set: { bankDetails, upiId } },
       { new: true, upsert: true }
     );
 
-    return successResponse({ success: true, data: wallet });
+    return successResponse(
+      { bankDetails: wallet.bankDetails, upiId: wallet.upiId },
+      'Payment details updated'
+    );
   } catch (err) {
-    console.error("[WALLET PATCH]", err);
+    console.error('[WALLET PATCH]', err);
     return errorResponse('Server error', 500);
   }
 }
