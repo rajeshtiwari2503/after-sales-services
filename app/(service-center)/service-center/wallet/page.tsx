@@ -1,4 +1,4 @@
-//  "use client";
+ "use client";
 // app/(service-center)/service-center/wallet/page.tsx  — REPLACE existing
 
 import { useState, useEffect, useCallback } from "react";
