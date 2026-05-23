@@ -450,6 +450,7 @@ import {
   Clock,
   MapPin,
   Shield,
+  Contact,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 
@@ -516,6 +517,12 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
         dot: true,
       },
 
+      {
+        label: "Contact",
+        icon: Contact,
+        href: "/dashboard/contact",
+        dot: true,
+      },
       {
         label: "Inventory",
         icon: Boxes,
