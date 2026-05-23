@@ -508,7 +508,7 @@ export default function RegisterPage() {
           className="
             w-full h-12
             rounded-xl
-            cursor-pointer
+            cursor-pointer 
             bg-gradient-to-r
             from-cyan-500
             via-blue-500
