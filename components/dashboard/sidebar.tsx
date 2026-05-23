@@ -453,6 +453,7 @@ import {
   Contact,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
+import Image from "next/image";
 
 // ─── Nav config per role ───────────────────────────────────────
 const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon: any; href: string; badge?: string; dot?: boolean }[] }[]> = {
@@ -752,9 +753,28 @@ export default function Sidebar({ role: roleProp }: { role?: string }) {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className={`flex items-center gap-3 h-16 px-4 border-b border-white/[0.06] shrink-0 ${collapsed ? "justify-center" : ""}`}>
-        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-indigo-900/40">
-          <span className="text-white font-bold text-xs font-mono">ST</span>
-        </div>
+         <div
+    className={`
+      relative z-10
+      flex items-center
+      ${collapsed ? "justify-center" : "justify-center"}
+      pt-6 pb-5
+      border-b border-cyan-100/70
+    `}
+  >
+    <Image
+      src="/logo13.png"
+      alt="SaaSTechify"
+      width={collapsed ? 42 : 190}
+      height={collapsed ? 42 : 70}
+      priority
+      className={`
+        object-contain transition-all duration-300
+        drop-shadow-[0_0_30px_rgba(34,211,238,0.25)]
+        ${collapsed ? "h-10 w-10" : "h-16 w-auto"}
+      `}
+    />
+  </div>
         {!collapsed && (
           <div className="overflow-hidden">
             <p className="text-white font-bold text-sm leading-none tracking-tight">SaaS Techify</p>

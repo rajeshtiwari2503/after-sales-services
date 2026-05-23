@@ -596,7 +596,7 @@
 //   ];
 
 //   return (
-//     <section id="features" className="max-w-7xl mx-auto px-5 sm:px-8 py-28">
+//     <section id="features" className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
 //       <div className="text-center max-w-2xl mx-auto mb-16">
 //         <div className="inline-flex items-center gap-2 text-sky-400 text-xs font-bold uppercase tracking-widest mb-5 border border-sky-500/20 bg-sky-500/5 px-4 py-2 rounded-full">
 //           <Zap size={12} /> Powerful Features
@@ -664,7 +664,7 @@
 //   ];
 
 //   return (
-//     <section id="how-it-works" className="max-w-7xl mx-auto px-5 sm:px-8 py-28">
+//     <section id="how-it-works" className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
 //       <div className="text-center max-w-2xl mx-auto mb-16">
 //         <div className="inline-flex items-center gap-2 text-violet-400 text-xs font-bold uppercase tracking-widest mb-5 border border-violet-500/20 bg-violet-500/5 px-4 py-2 rounded-full">
 //           <Settings size={12} /> How It Works
@@ -853,7 +853,7 @@
 //   ];
 
 //   return (
-//     <section id="modules" className="bg-[#080b12] border-y border-white/[0.05] py-28">
+//     <section id="modules" className="bg-[#080b12] border-y border-white/[0.05] py-12">
 //       <div className="max-w-7xl mx-auto px-5 sm:px-8">
 //         <div className="text-center max-w-2xl mx-auto mb-16">
 //           <div className="inline-flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-5 border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 rounded-full">
@@ -946,7 +946,7 @@
 //   ];
 
 //   return (
-//     <section className="max-w-7xl mx-auto px-5 sm:px-8 py-28">
+//     <section className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
 //       <div className="text-center max-w-2xl mx-auto mb-16">
 //         <div className="inline-flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-widest mb-5 border border-pink-500/20 bg-pink-500/5 px-4 py-2 rounded-full">
 //           <Users size={12} /> Role-Based Access
@@ -1018,7 +1018,7 @@
 //   ];
 
 //   return (
-//     <section id="pricing" className="bg-[#080b12] border-y border-white/[0.05] py-28">
+//     <section id="pricing" className="bg-[#080b12] border-y border-white/[0.05] py-12">
 //       <div className="max-w-7xl mx-auto px-5 sm:px-8">
 //         <div className="text-center max-w-2xl mx-auto mb-14">
 //           <div className="inline-flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest mb-5 border border-amber-500/20 bg-amber-500/5 px-4 py-2 rounded-full">
@@ -1132,7 +1132,7 @@
 //   ];
 
 //   return (
-//     <section className="max-w-7xl mx-auto px-5 sm:px-8 py-28">
+//     <section className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
 //       <div className="text-center mb-16">
 //         <h2 className="text-4xl font-black text-white">Loved by Service Leaders</h2>
 //         <p className="text-slate-500 mt-3">Real results from real customers across India</p>
@@ -1536,81 +1536,146 @@ export default function LandingPage() {
       {/* ══ NAV ══════════════════════════════════════════════════════ */}
 
 
- 
 
-<nav
-  className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-    navScrolled
-      ? "bg-white/80 backdrop-blur-xl border-b border-slate-200/70 shadow-sm"
-      : "bg-white/60 backdrop-blur-lg"
-  }`}
->
-  <div className="max-w-7xl mx-auto px-6 h-[78px] flex items-center justify-between">
 
-    {/* Logo */}
-    <Link href="/" className="flex items-center shrink-0">
-      <Image
-  src="/logo6.png"
-  alt="SaaSTechify"
-  width={100}
-  height={60}
-  className="  w-auto object-contain"
-/>
-    </Link>
-
-    {/* Desktop nav */}
-    <div className="hidden md:flex items-center gap-8">
-      {[
-        ["#features", "Features"],
-        ["#how", "How it works"],
-        ["#roles", "For Teams"],
-        ["#pricing", "Pricing"],
-        ["#contact", "Contact"],
-      ].map(([href, label]) => (
-        <a
-          key={href}
-          href={href}
-          className="text-sm font-semibold text-slate-700 hover:text-blue-600 transition"
-        >
-          {label}
-        </a>
-      ))}
-    </div>
-
-    {/* CTA */}
-    <div className="hidden md:flex items-center gap-3">
-      <Link
-        href="/login"
-        className="text-sm font-medium text-slate-600 hover:text-slate-900 transition px-4 py-2"
+      <nav
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navScrolled
+          ? "bg-white/80 backdrop-blur-xl border-b border-slate-200/70 shadow-sm"
+          : "bg-white/60 backdrop-blur-lg"
+          }`}
       >
-        Sign in
-      </Link>
+        <div className="max-w-7xl mx-auto px-6 h-[78px] flex items-center justify-between">
 
-      <Link
-        href="/login"
-        className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl transition shadow-lg shadow-blue-500/20 flex items-center gap-1.5"
-      >
-        Get started <ArrowRight className="w-3.5 h-3.5" />
-      </Link>
-    </div>
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center shrink-0 -ml-5 md:-ml-6"
+          >
+            <Image
+              src="/logo13.png"
+              alt="SaaSTechify"
+              width={220}
+              height={80}
+              priority
+              className="
+    h-[58px] md:h-[75px]
+    w-auto object-contain
+    drop-shadow-[0_8px_25px_rgba(59,130,246,0.45)]
+    hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.55)]
+    hover:scale-[1.03]
+    transition-all duration-300
+  "
+            />
+          </Link>
 
-    {/* Mobile menu */}
-    <button
-      onClick={() => setMobileOpen(!mobileOpen)}
-      className="md:hidden w-10 h-10 flex items-center justify-center text-slate-700"
-    >
-      {mobileOpen ? (
-        <X className="w-5 h-5" />
-      ) : (
-        <Menu className="w-5 h-5" />
-      )}
-    </button>
-  </div>
-</nav>
+
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-8">
+            {[
+              ["#features", "Features"],
+              ["#how", "How it works"],
+              ["#roles", "For Teams"],
+              ["#pricing", "Pricing"],
+              ["#contact", "Contact"],
+            ].map(([href, label]) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm font-semibold text-slate-700 hover:text-blue-600 transition"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/login"
+              className="
+    relative overflow-hidden
+    text-sm font-semibold text-white
+    px-5 py-2 rounded-xl
+    bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)]
+  "
+            >
+              Sign in
+            </Link>
+
+
+          </div>
+
+          {/* Mobile menu */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 backdrop-blur text-slate-700 shadow-sm"
+          >
+            {mobileOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+
+        {/* Mobile dropdown */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-slate-200/70 bg-white/95 backdrop-blur-2xl shadow-xl">
+            <div className="px-6 py-5 flex flex-col gap-1">
+
+              {[
+                ["#features", "Features"],
+                ["#how", "How it works"],
+                ["#roles", "For Teams"],
+                ["#pricing", "Pricing"],
+                ["#contact", "Contact"],
+              ].map(([href, label]) => (
+                <a
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                >
+                  {label}
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              ))}
+
+              {/* Divider */}
+              <div className="border-t border-slate-200 my-2" />
+
+              {/* Auth buttons */}
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="
+  w-full text-center
+  py-3 rounded-xl
+  text-sm font-semibold
+  text-white
+  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)]
+"
+              >
+                Sign in
+              </Link>
+
+
+            </div>
+          </div>
+        )}
+
+      </nav>
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
 
-      <section className="relative pt-32 pb-24 overflow-hidden">
+      <section className="relative pt-32 pb-12 overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-[-120px] left-[10%] w-[520px] h-[520px] bg-blue-400/10 rounded-full blur-[120px]" />
@@ -1634,7 +1699,7 @@ export default function LandingPage() {
             {/* Top glow */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
-            <div className="relative z-10 px-6 sm:px-10 lg:px-16 py-16 sm:py-20">
+            <div className="relative z-10 px-6 sm:px-10 lg:px-16 py-12 sm:py-12">
 
               {/* Badge */}
               <Reveal>
@@ -1828,7 +1893,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ TRUSTED BY ═══════════════════════════════════════════════ */}
-      <section className="py-14">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-6">
           <div className="relative overflow-hidden rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-2xl shadow-[0_10px_60px_rgba(15,23,42,0.05)] px-8 py-10">
 
@@ -1900,7 +1965,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ FEATURES ═════════════════════════════════════════════════ */}
-      <section className="relative py-28 overflow-hidden" id="features">
+      <section className="relative py-12 overflow-hidden" id="features">
 
         {/* Background Glow */}
         <div className="absolute inset-0 -z-10">
@@ -2048,7 +2113,7 @@ export default function LandingPage() {
 
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
       <section
-        className="relative py-28 bg-gradient-to-b from-[#F8FBFF] via-white to-[#F4F8FF]"
+        className="relative py-12 bg-gradient-to-b from-[#F8FBFF] via-white to-[#F4F8FF]"
         id="how"
       >
         {/* Background glow */}
@@ -2145,7 +2210,7 @@ export default function LandingPage() {
       </section>
       {/* ══ ROLES ════════════════════════════════════════════════════ */}
       <section
-        className="relative py-28 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF]"
+        className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF]"
         id="roles"
       >
         {/* Background glow */}
@@ -2187,8 +2252,8 @@ export default function LandingPage() {
                   key={r.key}
                   onClick={() => setActiveRole(r.key)}
                   className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 cursor-pointer border ${activeRole === r.key
-                      ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-transparent shadow-lg shadow-indigo-200"
-                      : "bg-white/80 backdrop-blur-xl border-slate-200 text-slate-600 hover:border-blue-200 hover:text-slate-900 hover:bg-white"
+                    ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-transparent shadow-lg shadow-indigo-200"
+                    : "bg-white/80 backdrop-blur-xl border-slate-200 text-slate-600 hover:border-blue-200 hover:text-slate-900 hover:bg-white"
                     }`}
                 >
                   <span className="text-base">{r.emoji}</span>
@@ -2260,7 +2325,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ METRICS ══════════════════════════════════════════════════ */}
-      <section className="relative py-24 bg-gradient-to-b from-[#F4F8FF] via-white to-[#F8FBFF] overflow-hidden">
+      <section className="relative py-12 bg-gradient-to-b from-[#F4F8FF] via-white to-[#F8FBFF] overflow-hidden">
 
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -2348,7 +2413,7 @@ export default function LandingPage() {
         </div>
       </section>
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════ */}
-      <section className="relative py-28 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF] overflow-hidden">
+      <section className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF] overflow-hidden">
 
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -2461,7 +2526,7 @@ export default function LandingPage() {
       </section>
       {/* ══ PRICING ══════════════════════════════════════════════════ */}
       <section
-        className="relative py-28 overflow-hidden bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc]"
+        className="relative py-12 overflow-hidden bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc]"
         id="pricing"
       >
         {/* Background */}
@@ -2552,14 +2617,14 @@ export default function LandingPage() {
               <Reveal key={p.name} delay={i * 100}>
                 <div
                   className={`relative h-full rounded-[32px] p-[1px] transition-all duration-500 hover:-translate-y-2 ${p.popular
-                      ? "bg-gradient-to-b from-indigo-500 via-violet-500 to-cyan-500 shadow-[0_25px_80px_rgba(99,102,241,0.28)]"
-                      : "bg-slate-200 hover:bg-indigo-200"
+                    ? "bg-gradient-to-b from-indigo-500 via-violet-500 to-cyan-500 shadow-[0_25px_80px_rgba(99,102,241,0.28)]"
+                    : "bg-slate-200 hover:bg-indigo-200"
                     }`}
                 >
                   <div
                     className={`h-full rounded-[31px] backdrop-blur-xl p-8 lg:p-9 flex flex-col ${p.popular
-                        ? "bg-gradient-to-b from-[#111827] to-[#0f172a]"
-                        : "bg-white/95"
+                      ? "bg-gradient-to-b from-[#111827] to-[#0f172a]"
+                      : "bg-white/95"
                       }`}
                   >
                     {/* Popular Badge */}
@@ -2591,8 +2656,8 @@ export default function LandingPage() {
                     {/* Price */}
                     <div
                       className={`pb-7 mb-7 border-b ${p.popular
-                          ? "border-white/10"
-                          : "border-slate-200"
+                        ? "border-white/10"
+                        : "border-slate-200"
                         }`}
                     >
                       <div className="flex items-end gap-2">
@@ -2645,8 +2710,8 @@ export default function LandingPage() {
                     <Link
                       href={p.name === "Enterprise" ? "#contact" : "/login"}
                       className={`group relative overflow-hidden text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 ${p.popular
-                          ? "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-500/20"
-                          : "bg-slate-100 hover:bg-slate-900 text-slate-900 hover:text-white border border-slate-200"
+                        ? "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-500/20"
+                        : "bg-slate-100 hover:bg-slate-900 text-slate-900 hover:text-white border border-slate-200"
                         }`}
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
@@ -2666,7 +2731,7 @@ export default function LandingPage() {
 
       {/* ══ FAQ ══════════════════════════════════════════════════════ */}
       <section
-        className="relative py-28 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white"
+        className="relative py-12 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white"
         id="faq"
       >
         {/* Background Blur */}
@@ -2791,7 +2856,7 @@ export default function LandingPage() {
 
       {/* ══ CONTACT ══════════════════════════════════════════════════ */}
       <section
-        className="relative py-24 sm:py-28 overflow-hidden"
+        className="relative py-12 sm:py-12 overflow-hidden"
         id="contact"
       >
         {/* Background */}
@@ -2898,7 +2963,10 @@ export default function LandingPage() {
 
                     <button
                       onClick={() => setFormSuccess("")}
-                      className="mt-6 text-sm font-medium text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                      className="mt-6 text-sm font-medium text-slate-500  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)] cursor-pointer"
                     >
                       Send another message
                     </button>
@@ -3077,7 +3145,10 @@ export default function LandingPage() {
                     <button
                       type="submit"
                       disabled={formLoading}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_12px_40px_rgba(99,102,241,0.35)] cursor-pointer"
+                      className="w-full py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)] disabled:opacity-60 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_12px_40px_rgba(99,102,241,0.35)] cursor-pointer"
                     >
                       {formLoading ? (
                         <>
@@ -3105,7 +3176,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ CTA BANNER ═══════════════════════════════════════════════ */}
-      <section className="relative py-24 sm:py-28 overflow-hidden">
+      <section className="relative py-12 sm:py-12 overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-[#f8fbff] to-[#eef4ff]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-500/10 rounded-full blur-3xl" />
@@ -3122,7 +3193,7 @@ export default function LandingPage() {
               <div className="absolute -top-20 -left-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl" />
               <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-violet-500/10 rounded-full blur-3xl" />
 
-              <div className="relative z-10 px-8 py-16 sm:px-14 sm:py-20 text-center">
+              <div className="relative z-10 px-8 py-12 sm:px-14 sm:py-12 text-center">
 
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-[0.18em] uppercase mb-8">
@@ -3150,7 +3221,10 @@ export default function LandingPage() {
 
                   <Link
                     href="/login"
-                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold transition-all duration-300 shadow-[0_15px_45px_rgba(99,102,241,0.35)] hover:shadow-[0_20px_55px_rgba(99,102,241,0.45)]"
+                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)] text-white font-semibold transition-all duration-300 shadow-[0_15px_45px_rgba(99,102,241,0.35)] hover:shadow-[0_20px_55px_rgba(99,102,241,0.45)]"
                   >
                     Start free 14-day trial
                     <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -3211,22 +3285,29 @@ export default function LandingPage() {
           {/* Top */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-12 pb-14 border-b border-slate-200/70">
 
+
             {/* Brand */}
             <div className="col-span-2 sm:col-span-4 lg:col-span-2">
 
-              <Link href="/" className="inline-flex items-center gap-3 group mb-5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-[0_10px_30px_rgba(99,102,241,0.35)]">
-                  <Zap className="w-5 h-5 text-white" strokeWidth={2.5} />
-                </div>
-
-                <div>
-                  <span className="block text-2xl font-black tracking-tight text-slate-900">
-                    Techify
-                  </span>
-                  <span className="block text-xs text-slate-500 font-medium -mt-0.5">
-                    After-sales service platform
-                  </span>
-                </div>
+              <Link
+                href="/"
+                className="flex items-center shrink-0 -ml-5 md:-ml-6"
+              >
+                <Image
+                  src="/logo13.png"
+                  alt="SaaSTechify"
+                  width={220}
+                  height={80}
+                  priority
+                  className="
+    h-[58px] md:h-[75px]
+    w-auto object-contain
+    drop-shadow-[0_8px_25px_rgba(59,130,246,0.45)]
+    hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.55)]
+    hover:scale-[1.03]
+    transition-all duration-300
+  "
+                />
               </Link>
 
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-md mb-7">
@@ -3245,7 +3326,18 @@ export default function LandingPage() {
                   <a
                     key={i}
                     href={s.href}
-                    className="w-10 h-10 rounded-xl border border-slate-200 bg-white/80 hover:bg-indigo-600 hover:border-indigo-600 text-slate-500 hover:text-white flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-lg"
+                    className="
+          w-10 h-10 rounded-xl
+          border border-cyan-400/20
+          bg-white/10 backdrop-blur-md
+          hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-fuchsia-500/20
+          hover:border-fuchsia-400/40
+          text-slate-500 hover:text-white
+          flex items-center justify-center
+          text-sm font-semibold
+          transition-all duration-300
+          hover:shadow-[0_0_20px_rgba(168,85,247,0.35)]
+        "
                   >
                     {s.icon}
                   </a>
@@ -3312,7 +3404,7 @@ export default function LandingPage() {
 
             {/* Copyright */}
             <p className="text-sm text-slate-500 text-center md:text-left">
-              © 2025 Techify Technologies Pvt. Ltd. All rights reserved.
+              © 2026 SaaS Techify. All rights reserved.
             </p>
 
             {/* Bottom Links */}
