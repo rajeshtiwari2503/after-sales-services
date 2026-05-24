@@ -375,7 +375,7 @@ export default function Sidebar({ role: roleProp }: { role?: string }) {
 
       {/* Glow */}
 
-      <div className="relative z-10 flex justify-center border-b border-slate-400/80">
+      <div className="relative z-10 flex justify-center border-b border-slate-200/80">
         <div className="relative flex items-center  md:gap-3">
 
           {/* Glow */}
@@ -419,7 +419,7 @@ export default function Sidebar({ role: roleProp }: { role?: string }) {
 
       {/* ───────────────── Navigation ───────────────── */}
       {/* <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6 bg-white scrollbar-hide"> */}
-      <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6 bg-white  ">
+    <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6 bg-[#F8FAFC]  ">
 
         {navItems.map(({ section, items }) => (
           <div key={section}>
