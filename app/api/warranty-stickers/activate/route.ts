@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     warrantyEnd.setMonth(warrantyEnd.getMonth() + sticker.warrantyPeriod);
  
     // Create Warranty record
-    const warranty = await Warranty.create({
+    const warranty: any = await Warranty.create({
       productName:       sticker.productName,
       serialNumber:      serialNumber.trim().toUpperCase(),
       tenantId:          sticker.tenantId,
@@ -71,9 +71,9 @@ export async function POST(request: NextRequest) {
       claims:            [],
       documents:         [],
       // Extra fields
-      productId:         sticker.productId,
-      categoryId:        sticker.categoryId,
-      stickerId:         sticker._id,
+    //   productId:         sticker.productId,
+    //   categoryId:        sticker.categoryId,
+    //   stickerId:         sticker._id,
     });
  
     // Update sticker
