@@ -6,9 +6,10 @@ export default function CustomersPage() {
         fetchCustomers();
     }, []);
     const fetchCustomers = async () => {
-        const res = await fetch("/api/customers");
+        const res = await fetch("/api/users?role=customer");
         const data = await res.json();
-        setCustomers(data.customers || []);
+        
+        setCustomers(data?.data?.users || []);
     };
     return (
         <div className="p-6">
