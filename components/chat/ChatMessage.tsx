@@ -1,34 +1,26 @@
 "use client";
 
-export default function ChatMessage({
-  message,
-}: any) {
-  const isAdmin =
-    message.sender ===
-    "Admin";
+interface MessageShape {
+  id?: string | number;
+  sender: string;
+  message: string;
+  isOwn?: boolean;
+}
+
+export default function ChatMessage({ message }: { message: MessageShape }) {
+  const isOwn = message.isOwn ?? message.sender === "Admin";
 
   return (
-    <div
-      className={`flex ${
-        isAdmin
-          ? "justify-end"
-          : "justify-start"
-      }`}
-    >
+    <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[70%] rounded-3xl px-5 py-4 ${
-          isAdmin
-            ? "bg-blue-600 text-white"
-            : "bg-slate-100 text-slate-900"
+        className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+          isOwn ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-900"
         }`}
       >
-        <p className="text-sm font-bold mb-2">
+        <p className={`text-xs font-semibold mb-1 ${isOwn ? "text-indigo-100" : "text-slate-500"}`}>
           {message.sender}
         </p>
-
-        <p className="leading-7">
-          {message.message}
-        </p>
+        <p className="text-sm leading-relaxed">{message.message}</p>
       </div>
     </div>
   );

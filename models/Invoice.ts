@@ -85,12 +85,11 @@ const InvoiceSchema = new Schema<InvoiceDocument>(
   }
 );
 
-InvoiceSchema.pre('save', async function (next) {
-  if (this.isNew) {
+InvoiceSchema.pre('save', async function () {
+  if (this.isNew && !this.invoiceNumber) {
     const count = await mongoose.models.Invoice.countDocuments({ tenantId: this.tenantId });
     this.invoiceNumber = `INV-${String(count + 1).padStart(6, '0')}`;
   }
-  // next();
 });
 
 const Invoice: Model<InvoiceDocument> =

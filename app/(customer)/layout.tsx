@@ -3,7 +3,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Ticket, MessageSquare, Star, MapPin, Bell, User, LogOut, X, Settings } from "lucide-react";
+import { Ticket, MessageSquare, Star, MapPin, User, LogOut, X, Settings } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { useState, useRef, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
 
@@ -69,11 +70,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           </Link>
           {/* Right actions */}
           <div className="flex items-center gap-1.5">
-            {/* Notifications */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition cursor-pointer" aria-label="Notifications">
-              <Bell className="w-4.5 h-4.5" />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-500" />
-            </button>
+            <NotificationBell viewAllHref="/customer/dashboard" />
 
             {/* Profile menu */}
             <div className="relative" ref={menuRef}>

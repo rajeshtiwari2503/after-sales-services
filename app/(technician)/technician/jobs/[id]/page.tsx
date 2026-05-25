@@ -7,6 +7,7 @@ import {
   Clock, User, MapPin, Phone, Package, AlertTriangle, RefreshCw
 } from "lucide-react";
 import toast from "react-hot-toast";
+import TicketParts from "@/components/tickets/TicketParts";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   open: { label: "Not started", color: "text-blue-600", bg: "bg-blue-50" },
@@ -186,6 +187,9 @@ export default function JobDetailPage() {
               }`}>{ticket.priority} priority</span>
             </div>
           </div>
+
+          {/* Parts used */}
+          <TicketParts ticketId={id} />
 
           {/* Add update */}
           <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">

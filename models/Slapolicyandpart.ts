@@ -83,7 +83,7 @@ const PartSchema = new Schema<IPart>(
 // Auto-flag low stock
 PartSchema.pre<IPart>("save", function (next) {
   this.lowStockAlert = this.quantity <= this.minStockLevel;
-//   next();
+  next();
 });
 
 PartSchema.index({ serviceCenterId: 1, partNumber: 1 }, { unique: true });

@@ -155,6 +155,12 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
           dot: true,
         },
         {
+          label: "Help Center",
+          icon: HelpCircle,
+          href: "/dashboard/help-center",
+          dot: true,
+        },
+        {
           label: "Audit Logs",
           icon: Star,
           href: "/dashboard/audit-logs",

@@ -44,7 +44,17 @@ export default function TechnicianChatPage() {
       const result = await res.json();
 
       if (result?.success) {
-        setMessages(result.data || []);
+        const list = result.data?.messages ?? result.data ?? [];
+        setMessages(
+          list.map((m: any) => ({
+            _id: m._id,
+            senderId: m.senderId,
+            senderName: m.senderName,
+            message: m.content ?? m.message,
+            createdAt: m.createdAt,
+            isOwn: false,
+          }))
+        );
       }
     } catch (error) {
       console.error('Chat fetch error:', error);
@@ -87,12 +97,20 @@ export default function TechnicianChatPage() {
       const result = await res.json();
 
       if (result?.success) {
+        const m = result.data;
         setMessages((prev) => [
           ...prev,
-          result.data,
+          {
+            _id: m._id ?? String(Date.now()),
+            senderId: m.senderId ?? "",
+            senderName: m.senderName ?? "You",
+            message: m.content ?? message,
+            createdAt: m.createdAt ?? new Date().toISOString(),
+            isOwn: true,
+          },
         ]);
-
-        setMessage('');
+        setMessage("");
+        fetchMessages();
       }
     } catch (error) {
       console.error('Send message error:', error);

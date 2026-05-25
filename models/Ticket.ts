@@ -221,6 +221,20 @@ const TicketSchema = new Schema<TicketDocument>(
     productId:  { type: Schema.Types.ObjectId, ref: 'Product',  index: true },
     faultId:    { type: Schema.Types.ObjectId },     // fault subdoc _id from Category
     faultName:  { type: String },                    // denormalized for display
+    // ─── Parts used on this ticket ──────────────────────────────────────────────
+    partsUsed: [{
+      partId:      { type: Schema.Types.ObjectId, ref: 'Part' },
+      inventoryId: { type: Schema.Types.ObjectId, ref: 'Inventory' },
+      partName:    { type: String, required: true },
+      partNumber:  { type: String },
+      sku:         { type: String },
+      quantity:    { type: Number, required: true, min: 1 },
+      unitPrice:   { type: Number, required: true, min: 0 },
+      total:       { type: Number, required: true, min: 0 },
+      loggedBy:    { type: Schema.Types.ObjectId, ref: 'User' },
+      loggedAt:    { type: Date, default: Date.now },
+      notes:       { type: String },
+    }],
     // ────────────────────────────────────────────────────────────────────────
     customerId: {
       type: Schema.Types.ObjectId,

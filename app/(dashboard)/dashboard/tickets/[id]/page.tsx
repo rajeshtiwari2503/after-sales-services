@@ -607,6 +607,7 @@ import TicketAssignment from "@/components/tickets/TicketAssignment";
 import TicketStatusWorkflow from "@/components/tickets/TicketStatusWorkflow";
 import TicketAttachments from "@/components/tickets/TicketAttachments";
 import TicketSLA from "@/components/tickets/TicketSLA";
+import TicketParts from "@/components/tickets/TicketParts";
 
 import { TicketStatus } from "@/types/ticket";
 
@@ -763,6 +764,7 @@ export default function TicketDetailPage() {
         deleting={deleting}
         onDelete={handleDelete}
         onRefresh={fetchTicket}
+        onEscalated={fetchTicket}
       />
 
       {/* ── Main grid ── */}
@@ -817,6 +819,9 @@ export default function TicketDetailPage() {
             attachments={ticket.attachments ?? []}
             onUpdate={fetchTicket}
           />
+
+          {/* Parts Used */}
+          <TicketParts ticketId={ticket._id} />
 
           {/* Timeline */}
           <TicketTimeline timeline={ticket.timeline ?? []} />

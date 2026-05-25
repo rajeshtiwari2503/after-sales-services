@@ -12,14 +12,19 @@ interface CreateInput {
   message: string;
   type?: NotificationType;
   event?: NotificationEvent;
-  metadata?: {
-    ticketId?: string;
-    ticketNumber?: string;
-    technicianId?: string;
-    serviceCenterId?: string;
-    fromStatus?: string;
-    toStatus?: string;
-  };
+  link?: string;
+  metadata?: Record<string, any>;
+}
+
+interface CreateBulkInput {
+  userIds: string[];
+  tenantId: string;
+  title: string;
+  message: string;
+  type?: NotificationType;
+  event?: NotificationEvent;
+  link?: string;
+  metadata?: Record<string, any>;
 }
 
 export class NotificationService {
@@ -50,8 +55,26 @@ export class NotificationService {
         message:  d.message,
         type:     d.type  ?? 'info',
         event:    d.event ?? 'system',
+        link:     d.link,
         metadata: d.metadata ?? {},
         isRead:   false,
+      }))
+    );
+  }
+
+  /* ── Broadcast to a list of userIds ─────────────────────────────────── */
+  static async createBulk(data: CreateBulkInput) {
+    if (!data.userIds.length) return;
+    return this.createMany(
+      data.userIds.map(uid => ({
+        userId:   uid,
+        tenantId: data.tenantId,
+        title:    data.title,
+        message:  data.message,
+        type:     data.type,
+        event:    data.event,
+        link:     data.link,
+        metadata: data.metadata,
       }))
     );
   }

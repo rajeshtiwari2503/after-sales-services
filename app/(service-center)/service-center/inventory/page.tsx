@@ -30,7 +30,7 @@ export default function SCInventoryPage() {
       if (showLowStock) params.set("lowStock", "true");
       const res = await fetch(`/api/inventory?${params}`, { credentials: "include" });
       const data = await res.json();
-      setItems(data.data?.items ?? data.data ?? []);
+      setItems(data.data?.inventory ?? data.data?.items ?? []);
     } catch { toast.error("Failed to load inventory"); }
     finally { setLoading(false); }
   };

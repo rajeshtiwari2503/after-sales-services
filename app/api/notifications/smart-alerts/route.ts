@@ -1,106 +1,128 @@
- import { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
- 
 import Ticket from '@/models/Ticket';
 import Inventory from '@/models/Inventory';
 import Warranty from '@/models/Warranty';
 import Feedback from '@/models/Feedback';
 import connectDB from '@/lib/db';
-
 import { getAuthUser } from '@/lib/auth-helper';
 
 export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);
-    if (!user) {
-      return errorResponse('Unauthorized', 401);
-    }
+    if (!user) return errorResponse('Unauthorized', 401);
 
     await connectDB();
 
     const now = new Date();
     const alerts: any[] = [];
 
-    // SLA Warnings
-    const slaWarnings = await Ticket.find({
-      tenantId: user.tenantId,
-      status: { $nin: ['resolved', 'closed', 'cancelled'] },
-      $or: [
-        { 'sla.responseDeadline': { $lte: new Date(now.getTime() + 2 * 60 * 60 * 1000) } },
-        { 'sla.resolutionDeadline': { $lte: new Date(now.getTime() + 4 * 60 * 60 * 1000) } },
-      ],
-    }).limit(10);
+    // 1. SLA breaches (already breached)
+    const [slaBreached, slaWarning] = await Promise.all([
+      Ticket.countDocuments({
+        tenantId: user.tenantId,
+        status: { $nin: ['resolved', 'closed', 'cancelled'] },
+        $or: [
+          { 'sla.isResolutionBreached': true },
+          { 'sla.isResponseBreached': true },
+        ],
+      }),
+      Ticket.countDocuments({
+        tenantId: user.tenantId,
+        status: { $nin: ['resolved', 'closed', 'cancelled'] },
+        'sla.resolutionDeadline': { $lte: new Date(now.getTime() + 2 * 60 * 60 * 1000), $gt: now },
+      }),
+    ]);
 
-    slaWarnings.forEach((ticket: any) => {
+    if (slaBreached > 0) {
       alerts.push({
-        type: 'sla_warning',
-        severity: 'high',
-        title: 'SLA Warning',
-        message: `Ticket ${ticket.ticketNumber} is approaching SLA deadline`,
-        data: { ticketId: ticket._id, ticketNumber: ticket.ticketNumber },
+        type: 'sla_breach', severity: 'critical',
+        title: `${slaBreached} SLA Breach${slaBreached > 1 ? 'es' : ''}`,
+        message: `${slaBreached} active ticket${slaBreached > 1 ? 's have' : ' has'} breached SLA. Immediate action required.`,
+        count: slaBreached, link: '/dashboard/tickets?status=open',
+        createdAt: now.toISOString(),
       });
-    });
+    }
+    if (slaWarning > 0) {
+      alerts.push({
+        type: 'sla_breach', severity: 'warning',
+        title: `${slaWarning} Ticket${slaWarning > 1 ? 's' : ''} Near SLA Deadline`,
+        message: `${slaWarning} ticket${slaWarning > 1 ? 's are' : ' is'} due to breach SLA in less than 2 hours.`,
+        count: slaWarning, link: '/dashboard/tickets',
+        createdAt: now.toISOString(),
+      });
+    }
 
-    // Low Stock Alerts
-    const lowStock = await Inventory.find({
+    // 2. Low stock
+    const lowStockCount = await Inventory.countDocuments({
       tenantId: user.tenantId,
+      isActive: true,
       $expr: { $lte: ['$quantity', '$minQuantity'] },
-    }).limit(10);
-
-    lowStock.forEach((item: any) => {
-      alerts.push({
-        type: 'low_stock',
-        severity: 'medium',
-        title: 'Low Stock Alert',
-        message: `${item.name} (${item.sku}) is below minimum quantity`,
-        data: { itemId: item._id, sku: item.sku, quantity: item.quantity },
-      });
     });
+    if (lowStockCount > 0) {
+      alerts.push({
+        type: 'low_stock', severity: lowStockCount > 5 ? 'warning' : 'info',
+        title: `${lowStockCount} Low Stock Item${lowStockCount > 1 ? 's' : ''}`,
+        message: `${lowStockCount} inventory item${lowStockCount > 1 ? 's are' : ' is'} at or below minimum stock level.`,
+        count: lowStockCount, link: '/dashboard/inventory',
+        createdAt: now.toISOString(),
+      });
+    }
 
-    // Expiring Warranties
-    const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const expiringWarranties = await Warranty.find({
+    // 3. High volume — open tickets in last 24h
+    const newTickets24h = await Ticket.countDocuments({
       tenantId: user.tenantId,
-      status: 'active',
-      warrantyEndDate: { $lte: thirtyDaysLater, $gte: now },
-    }).limit(10);
-
-    expiringWarranties.forEach((warranty: any) => {
-      alerts.push({
-        type: 'warranty_expiry',
-        severity: 'low',
-        title: 'Warranty Expiring',
-        message: `Warranty for ${warranty.productName} expires soon`,
-        data: { warrantyId: warranty._id, expiryDate: warranty.warrantyEndDate },
-      });
+      createdAt: { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
     });
+    if (newTickets24h > 20) {
+      alerts.push({
+        type: 'high_volume', severity: 'warning',
+        title: 'High Ticket Volume',
+        message: `${newTickets24h} new tickets in the last 24 hours. Consider allocating more technicians.`,
+        count: newTickets24h, link: '/dashboard/tickets',
+        createdAt: now.toISOString(),
+      });
+    }
 
-    // Negative Feedback
-    const negativeFeedback = await Feedback.find({
+    // 4. Negative feedback in last 24h
+    const negativeFeedback = await Feedback.countDocuments({
       tenantId: user.tenantId,
       createdAt: { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
       $or: [{ rating: { $lte: 2 } }, { 'sentiment.label': 'negative' }],
-    })
-      .populate('ticketId', 'ticketNumber')
-      .limit(5);
-
-    negativeFeedback.forEach((feedback: any) => {
-      alerts.push({
-        type: 'negative_feedback',
-        severity: 'high',
-        title: 'Negative Feedback Received',
-        message: `Low rating on ticket ${feedback.ticketId?.ticketNumber || 'Unknown'}`,
-        data: { feedbackId: feedback._id, rating: feedback.rating },
-      });
     });
+    if (negativeFeedback > 0) {
+      alerts.push({
+        type: 'new_feedback', severity: negativeFeedback > 3 ? 'warning' : 'info',
+        title: `${negativeFeedback} Negative Feedback${negativeFeedback > 1 ? 's' : ''} Today`,
+        message: `${negativeFeedback} customer${negativeFeedback > 1 ? 's' : ''} left negative reviews in the last 24 hours.`,
+        count: negativeFeedback, link: '/dashboard/feedback',
+        createdAt: now.toISOString(),
+      });
+    }
 
-    // Sort by severity
-    const severityOrder = { high: 0, medium: 1, low: 2 };
-    alerts.sort((a, b) => severityOrder[a.severity as keyof typeof severityOrder] - severityOrder[b.severity as keyof typeof severityOrder]);
+    // 5. Unassigned open tickets
+    const unassigned = await Ticket.countDocuments({
+      tenantId: user.tenantId,
+      status: 'open',
+      technicianId: null,
+    });
+    if (unassigned > 5) {
+      alerts.push({
+        type: 'high_volume', severity: 'info',
+        title: `${unassigned} Unassigned Open Tickets`,
+        message: `${unassigned} tickets are open but have no technician assigned.`,
+        count: unassigned, link: '/dashboard/tickets?status=open',
+        createdAt: now.toISOString(),
+      });
+    }
 
-    return successResponse(alerts);
+    // Sort: critical first
+    const ORDER: Record<string, number> = { critical: 0, warning: 1, info: 2 };
+    alerts.sort((a, b) => (ORDER[a.severity] ?? 3) - (ORDER[b.severity] ?? 3));
+
+    return successResponse({ alerts, generatedAt: now.toISOString() });
   } catch (error) {
-    console.error('Get smart alerts error:', error);
+    console.error('Smart alerts error:', error);
     return errorResponse('An error occurred', 500);
   }
 }

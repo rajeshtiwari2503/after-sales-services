@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, Edit, Trash2, Printer, RefreshCw } from "lucide-react";
+import TicketEscalateButton from "@/components/tickets/TicketEscalateButton";
 import { TicketStatus, TicketPriority } from "@/types/ticket";
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
@@ -30,9 +31,10 @@ interface Props {
   deleting: boolean;
   onDelete: () => void;
   onRefresh: () => void;
+  onEscalated?: () => void;
 }
 
-export default function TicketHeader({ ticketId, ticketNumber, title, status, priority, deleting, onDelete, onRefresh }: Props) {
+export default function TicketHeader({ ticketId, ticketNumber, title, status, priority, deleting, onDelete, onRefresh, onEscalated }: Props) {
   const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.open;
 
   return (
@@ -78,6 +80,12 @@ export default function TicketHeader({ ticketId, ticketNumber, title, status, pr
           >
             <Edit className="w-3.5 h-3.5" /> Edit
           </Link>
+          <TicketEscalateButton
+            ticketId={ticketId}
+            ticketNumber={ticketNumber}
+            status={status}
+            onEscalated={onEscalated}
+          />
           <button
             onClick={onDelete}
             disabled={deleting}

@@ -45,7 +45,7 @@ CommissionSchema.pre<ICommission>("save", function (next) {
   this.scEarnings = (this.totalJobValue * this.scCommissionRate) / 100;
   this.techEarnings = (this.scEarnings * this.techCommissionRate) / 100;
   this.platformFee = this.totalJobValue - this.scEarnings;
-//   next();
+  next();
 });
 
 CommissionSchema.index({ serviceCenterId: 1, status: 1 });
