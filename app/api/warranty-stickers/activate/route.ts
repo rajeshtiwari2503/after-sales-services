@@ -1,6 +1,112 @@
-//    Customer activates warranty by scanning QR
-// ═══════════════════════════════════════════════════════════════
+// //    Customer activates warranty by scanning QR
+// // ═══════════════════════════════════════════════════════════════
  
+// import { NextRequest } from "next/server";
+// import { getAuthUser } from "@/lib/auth-helper";
+// import { successResponse, errorResponse } from "@/utils/apiResponse";
+// import WarrantySticker from "@/models/WarrantySticker";
+// import Warranty from "@/models/Warranty";
+// import connectDB from "@/lib/db";
+// import { Types } from "mongoose";
+ 
+// export async function POST(request: NextRequest) {
+//   try {
+//     // Must be logged in to activate
+//     const user = getAuthUser(request);
+//     if (!user) return errorResponse("Please login to activate warranty", 401);
+//     if (user.role !== "customer" && user.role !== "admin") {
+//       return errorResponse("Only customers can activate warranties", 403);
+//     }
+ 
+//     await connectDB();
+//     const body = await request.json();
+//     const { token, serialNumber, purchaseDate, purchaseLocation } = body;
+ 
+//     if (!token)        return errorResponse("Token required", 400);
+//     if (!serialNumber) return errorResponse("Serial number required", 400);
+//     if (!purchaseDate) return errorResponse("Purchase date required", 400);
+ 
+//     // Find sticker
+//     const sticker = await WarrantySticker.findOne({ token }).lean() as any;
+//     if (!sticker) return errorResponse("Invalid QR code — sticker not found", 404);
+ 
+//     // Validations
+//     if (sticker.status === "activated") {
+//       return errorResponse("This warranty has already been activated", 400);
+//     }
+//     if (sticker.status === "voided") {
+//       return errorResponse("This sticker has been voided", 400);
+//     }
+//     if (sticker.expiresAt && new Date() > new Date(sticker.expiresAt)) {
+//       return errorResponse("This sticker has expired — contact support", 400);
+//     }
+ 
+//     // Check duplicate serial number for same product
+//     const dupSerial = await Warranty.findOne({
+//       tenantId:     sticker.tenantId,
+//       serialNumber: serialNumber.trim().toUpperCase(),
+//     });
+//     if (dupSerial) {
+//       return errorResponse("This serial number is already registered", 400);
+//     }
+ 
+//     // Calculate warranty dates
+//     const purchaseDateObj  = new Date(purchaseDate);
+//     const warrantyStart    = new Date(purchaseDateObj);
+//     const warrantyEnd      = new Date(purchaseDateObj);
+//     warrantyEnd.setMonth(warrantyEnd.getMonth() + sticker.warrantyPeriod);
+ 
+//     // Create Warranty record
+//     const warranty: any = await Warranty.create({
+//       productName:       sticker.productName,
+//       serialNumber:      serialNumber.trim().toUpperCase(),
+//       tenantId:          sticker.tenantId,
+//       customerId:        new Types.ObjectId(user.userId),
+//       purchaseDate:      purchaseDateObj,
+//       warrantyStartDate: warrantyStart,
+//       warrantyEndDate:   warrantyEnd,
+//       warrantyType:      "standard",
+//       coverage:          ["Manufacturing defects", "Parts & labour"],
+//       status:            "active",
+//       claims:            [],
+//       documents:         [],
+//       // Extra fields
+//     //   productId:         sticker.productId,
+//     //   categoryId:        sticker.categoryId,
+//     //   stickerId:         sticker._id,
+//     });
+ 
+//     // Update sticker
+//     await WarrantySticker.findByIdAndUpdate(sticker._id, {
+//       status:           "activated",
+//       warrantyId:       warranty._id,
+//       activatedBy:      new Types.ObjectId(user.userId),
+//       activatedAt:      new Date(),
+//       serialNumber:     serialNumber.trim().toUpperCase(),
+//       purchaseDate:     purchaseDateObj,
+//       purchaseLocation: purchaseLocation?.trim(),
+//     });
+ 
+//     return successResponse({
+//       warranty: {
+//         _id:               warranty._id,
+//         productName:       warranty.productName,
+//         serialNumber:      warranty.serialNumber,
+//         warrantyStartDate: warranty.warrantyStartDate,
+//         warrantyEndDate:   warranty.warrantyEndDate,
+//         status:            warranty.status,
+//         warrantyPeriod:    sticker.warrantyPeriod,
+//       },
+//       message: `Warranty activated successfully! Valid until ${warrantyEnd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}`,
+//     }, "Warranty activated!", 201);
+ 
+//   } catch (error) {
+//     console.error("Activate warranty error:", error);
+//     return errorResponse("An error occurred", 500);
+//   }
+// }
+ 
+
 import { NextRequest } from "next/server";
 import { getAuthUser } from "@/lib/auth-helper";
 import { successResponse, errorResponse } from "@/utils/apiResponse";
@@ -8,101 +114,210 @@ import WarrantySticker from "@/models/WarrantySticker";
 import Warranty from "@/models/Warranty";
 import connectDB from "@/lib/db";
 import { Types } from "mongoose";
- 
-export async function POST(request: NextRequest) {
+
+// ═══════════════════════════════════════════════════════════════
+// Customer activates warranty by scanning QR
+// ═══════════════════════════════════════════════════════════════
+
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    // Must be logged in to activate
+    const { id } = await context.params;
+
+    // Must be logged in
     const user = getAuthUser(request);
-    if (!user) return errorResponse("Please login to activate warranty", 401);
-    if (user.role !== "customer" && user.role !== "admin") {
-      return errorResponse("Only customers can activate warranties", 403);
+
+    if (!user) {
+      return errorResponse(
+        "Please login to activate warranty",
+        401
+      );
     }
- 
+
+    if (user.role !== "customer" && user.role !== "admin") {
+      return errorResponse(
+        "Only customers can activate warranties",
+        403
+      );
+    }
+
     await connectDB();
+
     const body = await request.json();
-    const { token, serialNumber, purchaseDate, purchaseLocation } = body;
- 
-    if (!token)        return errorResponse("Token required", 400);
-    if (!serialNumber) return errorResponse("Serial number required", 400);
-    if (!purchaseDate) return errorResponse("Purchase date required", 400);
- 
-    // Find sticker
-    const sticker = await WarrantySticker.findOne({ token }).lean() as any;
-    if (!sticker) return errorResponse("Invalid QR code — sticker not found", 404);
- 
+
+    const {
+      serialNumber,
+      purchaseDate,
+      purchaseLocation,
+    } = body;
+
+    if (!id) {
+      return errorResponse("Token required", 400);
+    }
+
+    if (!serialNumber) {
+      return errorResponse("Serial number required", 400);
+    }
+
+    if (!purchaseDate) {
+      return errorResponse("Purchase date required", 400);
+    }
+
+    // Find sticker using route param id
+    const sticker = await WarrantySticker.findOne({
+      token: id,
+    }).lean() as any;
+
+    if (!sticker) {
+      return errorResponse(
+        "Invalid QR code — sticker not found",
+        404
+      );
+    }
+
     // Validations
     if (sticker.status === "activated") {
-      return errorResponse("This warranty has already been activated", 400);
+      return errorResponse(
+        "This warranty has already been activated",
+        400
+      );
     }
+
     if (sticker.status === "voided") {
-      return errorResponse("This sticker has been voided", 400);
+      return errorResponse(
+        "This sticker has been voided",
+        400
+      );
     }
-    if (sticker.expiresAt && new Date() > new Date(sticker.expiresAt)) {
-      return errorResponse("This sticker has expired — contact support", 400);
+
+    if (
+      sticker.expiresAt &&
+      new Date() > new Date(sticker.expiresAt)
+    ) {
+      return errorResponse(
+        "This sticker has expired — contact support",
+        400
+      );
     }
- 
-    // Check duplicate serial number for same product
+
+    // Duplicate serial check
     const dupSerial = await Warranty.findOne({
-      tenantId:     sticker.tenantId,
+      tenantId: sticker.tenantId,
       serialNumber: serialNumber.trim().toUpperCase(),
     });
+
     if (dupSerial) {
-      return errorResponse("This serial number is already registered", 400);
+      return errorResponse(
+        "This serial number is already registered",
+        400
+      );
     }
- 
-    // Calculate warranty dates
-    const purchaseDateObj  = new Date(purchaseDate);
-    const warrantyStart    = new Date(purchaseDateObj);
-    const warrantyEnd      = new Date(purchaseDateObj);
-    warrantyEnd.setMonth(warrantyEnd.getMonth() + sticker.warrantyPeriod);
- 
-    // Create Warranty record
+
+    // Warranty dates
+    const purchaseDateObj = new Date(purchaseDate);
+
+    const warrantyStart = new Date(purchaseDateObj);
+
+    const warrantyEnd = new Date(purchaseDateObj);
+
+    warrantyEnd.setMonth(
+      warrantyEnd.getMonth() + sticker.warrantyPeriod
+    );
+
+    // Create warranty
     const warranty: any = await Warranty.create({
-      productName:       sticker.productName,
-      serialNumber:      serialNumber.trim().toUpperCase(),
-      tenantId:          sticker.tenantId,
-      customerId:        new Types.ObjectId(user.userId),
-      purchaseDate:      purchaseDateObj,
+      productName: sticker.productName,
+      serialNumber: serialNumber.trim().toUpperCase(),
+      tenantId: sticker.tenantId,
+      customerId: new Types.ObjectId(user.userId),
+
+      purchaseDate: purchaseDateObj,
+
       warrantyStartDate: warrantyStart,
-      warrantyEndDate:   warrantyEnd,
-      warrantyType:      "standard",
-      coverage:          ["Manufacturing defects", "Parts & labour"],
-      status:            "active",
-      claims:            [],
-      documents:         [],
-      // Extra fields
-    //   productId:         sticker.productId,
-    //   categoryId:        sticker.categoryId,
-    //   stickerId:         sticker._id,
+      warrantyEndDate: warrantyEnd,
+
+      warrantyType: "standard",
+
+      coverage: [
+        "Manufacturing defects",
+        "Parts & labour",
+      ],
+
+      status: "active",
+
+      claims: [],
+      documents: [],
     });
- 
+
     // Update sticker
-    await WarrantySticker.findByIdAndUpdate(sticker._id, {
-      status:           "activated",
-      warrantyId:       warranty._id,
-      activatedBy:      new Types.ObjectId(user.userId),
-      activatedAt:      new Date(),
-      serialNumber:     serialNumber.trim().toUpperCase(),
-      purchaseDate:     purchaseDateObj,
-      purchaseLocation: purchaseLocation?.trim(),
-    });
- 
-    return successResponse({
-      warranty: {
-        _id:               warranty._id,
-        productName:       warranty.productName,
-        serialNumber:      warranty.serialNumber,
-        warrantyStartDate: warranty.warrantyStartDate,
-        warrantyEndDate:   warranty.warrantyEndDate,
-        status:            warranty.status,
-        warrantyPeriod:    sticker.warrantyPeriod,
+    await WarrantySticker.findByIdAndUpdate(
+      sticker._id,
+      {
+        status: "activated",
+
+        warrantyId: warranty._id,
+
+        activatedBy: new Types.ObjectId(
+          user.userId
+        ),
+
+        activatedAt: new Date(),
+
+        serialNumber: serialNumber
+          .trim()
+          .toUpperCase(),
+
+        purchaseDate: purchaseDateObj,
+
+        purchaseLocation:
+          purchaseLocation?.trim(),
+      }
+    );
+
+    return successResponse(
+      {
+        warranty: {
+          _id: warranty._id,
+
+          productName: warranty.productName,
+
+          serialNumber: warranty.serialNumber,
+
+          warrantyStartDate:
+            warranty.warrantyStartDate,
+
+          warrantyEndDate:
+            warranty.warrantyEndDate,
+
+          status: warranty.status,
+
+          warrantyPeriod:
+            sticker.warrantyPeriod,
+        },
+
+        message: `Warranty activated successfully! Valid until ${warrantyEnd.toLocaleDateString(
+          "en-IN",
+          {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }
+        )}`,
       },
-      message: `Warranty activated successfully! Valid until ${warrantyEnd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}`,
-    }, "Warranty activated!", 201);
- 
+      "Warranty activated!",
+      201
+    );
   } catch (error) {
-    console.error("Activate warranty error:", error);
-    return errorResponse("An error occurred", 500);
+    console.error(
+      "Activate warranty error:",
+      error
+    );
+
+    return errorResponse(
+      "An error occurred",
+      500
+    );
   }
 }
- 
