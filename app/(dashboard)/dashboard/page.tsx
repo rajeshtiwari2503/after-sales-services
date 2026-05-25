@@ -257,9 +257,7 @@
 // }
 
 "use client";
-// app/(dashboard)/dashboard/page.tsx  — REPLACE existing
-// Super Admin dashboard: all brands, all metrics, live activity, quick actions, charts
-
+ 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {

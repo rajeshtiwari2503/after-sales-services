@@ -455,6 +455,7 @@ export default function LoginPage() {
             bg-gradient-to-r
             from-cyan-500
             via-blue-500
+            cursor-pointer 
             to-fuchsia-500
             hover:scale-[1.01]
             active:scale-[0.99]
