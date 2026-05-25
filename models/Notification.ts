@@ -8,6 +8,7 @@ export type NotificationEvent =
   | 'ticket_status_changed'
   | 'ticket_resolved'
   | 'ticket_commented'
+  |'ticket_escalated'
   | 'sla_warning'
   | 'sla_breached'
   | 'technician_assigned'
