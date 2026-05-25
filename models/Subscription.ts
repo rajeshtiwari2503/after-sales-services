@@ -90,7 +90,7 @@ InvoiceSchema.pre('save', async function (next) {
     const count = await mongoose.models.Invoice.countDocuments({ tenantId: this.tenantId });
     this.invoiceNumber = `INV-${String(count + 1).padStart(6, '0')}`;
   }
-  next();
+  // next();
 });
 
 const Invoice: Model<InvoiceDocument> =
