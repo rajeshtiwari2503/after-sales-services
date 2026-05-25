@@ -8,7 +8,7 @@ export type NotificationEvent =
   | 'ticket_status_changed'
   | 'ticket_resolved'
   | 'ticket_commented'
-  |'ticket_escalated'
+  | 'ticket_escalated'
   | 'sla_warning'
   | 'sla_breached'
   | 'technician_assigned'
@@ -48,7 +48,7 @@ const NotificationSchema = new Schema<NotificationDocument>(
       type: String,
       enum: [
         'ticket_created', 'ticket_assigned', 'ticket_status_changed',
-        'ticket_resolved', 'ticket_commented', 'sla_warning', 'sla_breached',
+        'ticket_resolved', 'ticket_commented', 'ticket_escalated', 'sla_warning', 'sla_breached',
         'technician_assigned', 'sc_assigned', 'system',
       ],
       default: 'system',

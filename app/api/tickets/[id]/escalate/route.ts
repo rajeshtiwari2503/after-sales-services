@@ -60,7 +60,7 @@ export async function POST(
         await NotificationService.createBulk({
           userIds: targets,
           tenantId: user.tenantId,
-          type: 'ticket_escalated',
+          type: 'warning',
           title: `🚨 Ticket Escalated: ${(ticket as any).ticketNumber}`,
           message: `Ticket "${(ticket as any).title}" has been escalated. Reason: ${reason ?? 'SLA at risk'}`,
           link: `/dashboard/tickets/${id}`,
