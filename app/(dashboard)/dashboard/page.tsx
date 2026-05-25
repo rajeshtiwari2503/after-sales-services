@@ -436,7 +436,7 @@ function StatCard({
 }
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
-export default function AdminDashboard() {
+export default function DashboardPage() {
   const { user } = useUser();
   const [stats,        setStats]        = useState<DashStats | null>(null);
   const [tickets,      setTickets]      = useState<RecentTicket[]>([]);
