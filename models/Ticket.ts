@@ -47,7 +47,7 @@
 //     },
 //      ticketId: {
 //       type: String,
-     
+
 //       // unique: true,
 //     },
 //     title: {
@@ -95,7 +95,7 @@
 //       index: true,
 //     },
 //     attachments: [AttachmentSchema],
-     
+
 //     notes: [NoteSchema],
 //     timeline: [TimelineEventSchema],
 //     sla: SLAInfoSchema,
@@ -186,6 +186,67 @@ const SLAInfoSchema = new Schema({
   isResolutionBreached: { type: Boolean, default: false },
 });
 
+
+const PartsUsedSchema = new Schema(
+  {
+    partId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Part',
+    },
+
+    inventoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Inventory',
+    },
+
+    partName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    partNumber: {
+      type: String,
+    },
+
+    sku: {
+      type: String,
+    },
+
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    unitPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    total: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    loggedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+
+    loggedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    notes: {
+      type: String,
+    },
+  },
+  { _id: false }
+);
 const TicketSchema = new Schema<TicketDocument>(
   {
     ticketNumber: { type: String, required: true, unique: true },
@@ -218,23 +279,27 @@ const TicketSchema = new Schema<TicketDocument>(
     },
     // ── NEW fields ──────────────────────────────────────────────────────────
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', index: true },
-    productId:  { type: Schema.Types.ObjectId, ref: 'Product',  index: true },
-    faultId:    { type: Schema.Types.ObjectId },     // fault subdoc _id from Category
-    faultName:  { type: String },                    // denormalized for display
+    productId: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
+    faultId: { type: Schema.Types.ObjectId },     // fault subdoc _id from Category
+    faultName: { type: String },                    // denormalized for display
     // ─── Parts used on this ticket ──────────────────────────────────────────────
-    partsUsed: [{
-      partId:      { type: Schema.Types.ObjectId, ref: 'Part' },
-      inventoryId: { type: Schema.Types.ObjectId, ref: 'Inventory' },
-      partName:    { type: String, required: true },
-      partNumber:  { type: String },
-      sku:         { type: String },
-      quantity:    { type: Number, required: true, min: 1 },
-      unitPrice:   { type: Number, required: true, min: 0 },
-      total:       { type: Number, required: true, min: 0 },
-      loggedBy:    { type: Schema.Types.ObjectId, ref: 'User' },
-      loggedAt:    { type: Date, default: Date.now },
-      notes:       { type: String },
-    }],
+    // partsUsed: [{
+    //   partId:      { type: Schema.Types.ObjectId, ref: 'Part' },
+    //   inventoryId: { type: Schema.Types.ObjectId, ref: 'Inventory' },
+    //   partName:    { type: String, required: true },
+    //   partNumber:  { type: String },
+    //   sku:         { type: String },
+    //   quantity:    { type: Number, required: true, min: 1 },
+    //   unitPrice:   { type: Number, required: true, min: 0 },
+    //   total:       { type: Number, required: true, min: 0 },
+    //   loggedBy:    { type: Schema.Types.ObjectId, ref: 'User' },
+    //   loggedAt:    { type: Date, default: Date.now },
+    //   notes:       { type: String },
+    // }],
+    partsUsed: {
+      type: [PartsUsedSchema],
+      default: [],
+    },
     // ────────────────────────────────────────────────────────────────────────
     customerId: {
       type: Schema.Types.ObjectId,
@@ -270,6 +335,7 @@ TicketSchema.pre('save', async function () {
       this.ticketId = `TID-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
   }
+
 });
 
 const Ticket: Model<TicketDocument> =

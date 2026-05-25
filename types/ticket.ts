@@ -20,6 +20,24 @@ export type TicketCategory =
   | 'consultation' 
   | 'other';
 
+export interface PartUsed {
+  partId?: Types.ObjectId;
+  inventoryId?: Types.ObjectId;
+
+  partName: string;
+  partNumber?: string;
+  sku?: string;
+
+  quantity: number;
+  unitPrice: number;
+  total: number;
+
+  loggedBy?: Types.ObjectId;
+  loggedAt?: Date;
+
+  notes?: string;
+}
+
 export interface Ticket {
   _id: string;
   ticketNumber: string;
@@ -37,6 +55,7 @@ export interface Ticket {
   attachments: Attachment[];
   notes: Note[];
   timeline: TimelineEvent[];
+  partsUsed: PartUsed[];
   sla: SLAInfo;
   estimatedCompletionDate?: Date;
   actualCompletionDate?: Date;
