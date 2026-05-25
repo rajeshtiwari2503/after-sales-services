@@ -30,7 +30,9 @@ import "./globals.css";
 import Providers from "@/providers/theme-provider";
 import ToasterProvider from "@/components/ui/toaster-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = {
+  className: "font-sans",
+};
 
 export const metadata: Metadata = {
   title: "SaaS Techify — After Sales Platform",
