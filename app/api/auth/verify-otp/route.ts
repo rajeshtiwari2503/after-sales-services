@@ -1,71 +1,180 @@
-// // app/api/auth/verify-otp/route.ts  — NEW FILE
-// // Verifies the OTP entered by user, returns confirmed=true if valid
+ 
 
-// import { NextRequest } from 'next/server';
-// import { successResponse, errorResponse } from '@/utils/apiResponse';
-// import User from '@/models/User';
-// import connectDB from '@/lib/db';
-// import bcrypt from 'bcryptjs';
+// import { NextRequest } from "next/server";
 
-// export async function POST(request: NextRequest) {
+// import {
+//   successResponse,
+//   errorResponse,
+// } from "@/utils/apiResponse";
+
+// import User from "@/models/User";
+
+// import connectDB from "@/lib/db";
+
+// import bcrypt from "bcryptjs";
+
+// export async function POST(
+//   request: NextRequest
+// ) {
 //   try {
-//     const body = await request.json();
-//     const { token, otp } = body;
+//     const body =
+//       await request.json();
+
+//     const { token, otp } =
+//       body;
 
 //     if (!token || !otp) {
-//       return errorResponse('Token and OTP are required', 400);
+//       return errorResponse(
+//         "Token and OTP are required",
+//         400
+//       );
 //     }
 
 //     await connectDB();
 
-//     const user = await User.findOne({ resetPasswordToken: token })
-//       .select('+resetPasswordOTP +resetPasswordToken +resetPasswordExpiry');
+//     const user =
+//       await User.findOne({
+//         resetPasswordToken:
+//           token,
+//       }).select(
+//         "+resetPasswordOTP +resetPasswordToken +resetPasswordExpiry"
+//       );
+
+//     console.log(
+//       "Found user:",
+//       user
+//     );
+
+//     // ======================
+//     // User Not Found
+//     // ======================
 
 //     if (!user) {
-//       return errorResponse('Invalid or expired reset link. Please request a new one.', 400);
+//       return errorResponse(
+//         "Invalid or expired reset link. Please request a new one.",
+//         400
+//       );
 //     }
 
-//     // Check expiry
-//     if (!user.resetPasswordExpiry || user.resetPasswordExpiry < new Date()) {
-//       // Clear expired token
-//       await User.findByIdAndUpdate(user._id, {
-//         $unset: { resetPasswordOTP: 1, resetPasswordToken: 1, resetPasswordExpiry: 1 },
-//       });
-//       return errorResponse('OTP has expired. Please request a new password reset.', 400);
+//     // ======================
+//     // Expiry Check
+//     // ======================
+
+//   const expiry = new Date(
+//   (user as any).resetPasswordExpiry
+// ).getTime();
+
+// console.log("Expiry:", expiry);
+// console.log("Current:", Date.now());
+
+// if (
+//   Number.isNaN(expiry) ||
+//   Date.now() >= expiry
+// ) {
+//   await User.findByIdAndUpdate(
+//     user._id,
+//     {
+//       $unset: {
+//         resetPasswordOTP: 1,
+//         resetPasswordToken: 1,
+//         resetPasswordExpiry: 1,
+//       },
+//     }
+//   );
+
+//   return errorResponse(
+//     "OTP has expired. Please request a new password reset.",
+//     400
+//   );
+// }
+
+//     // ======================
+//     // OTP Exists
+//     // ======================
+
+//     if (
+//       !user.resetPasswordOTP
+//     ) {
+//       return errorResponse(
+//         "OTP not found. Please request a new password reset.",
+//         400
+//       );
 //     }
 
-//     if (!user.resetPasswordOTP) {
-//       return errorResponse('No OTP found. Please request a new password reset.', 400);
-//     }
-
+//     // ======================
 //     // Verify OTP
-//     const isValid = await bcrypt.compare(String(otp).trim(), user.resetPasswordOTP);
+//     // ======================
+
+//     const isValid =
+//       await bcrypt.compare(
+//         String(otp).trim(),
+//         user.resetPasswordOTP
+//       );
+
 //     if (!isValid) {
-//       return errorResponse('Incorrect OTP. Please try again.', 400);
+//       return errorResponse(
+//         "Incorrect OTP. Please try again.",
+//         400
+//       );
 //     }
+
+//     // ======================
+//     // Success
+//     // ======================
 
 //     return successResponse(
-//       { verified: true, token },
-//       'OTP verified successfully.'
+//       {
+//         verified: true,
+//         token,
+//       },
+//       "OTP verified successfully."
 //     );
 //   } catch (error) {
-//     console.error('Verify OTP error:', error);
-//     return errorResponse('An error occurred', 500);
+//     console.error(
+//       "Verify OTP error:",
+//       error
+//     );
+
+//     return errorResponse(
+//       "An error occurred",
+//       500
+//     );
 //   }
 // }
 
-import { NextRequest } from "next/server";
+// app/api/auth/verify-reset-otp/route.ts
+
+import { NextRequest } from 'next/server';
 
 import {
   successResponse,
   errorResponse,
-} from "@/utils/apiResponse";
+} from '@/utils/apiResponse';
 
-import User from "@/models/User";
+import connectDB from '@/lib/db';
 
-import connectDB from "@/lib/db";
+import mongoose from 'mongoose';
 
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
+
+const COLLECTIONS = [
+  {
+    role: 'customer',
+    collection: 'users',
+  },
+  {
+    role: 'serviceCenter',
+    collection: 'servicecenters',
+  },
+  {
+    role: 'technician',
+    collection: 'technicians',
+  },
+  {
+    role: 'brand',
+    collection: 'brands',
+  },
+];
 
 export async function POST(
   request: NextRequest
@@ -77,80 +186,119 @@ export async function POST(
     const { token, otp } =
       body;
 
+    // ======================
+    // Validation
+    // ======================
+
     if (!token || !otp) {
       return errorResponse(
-        "Token and OTP are required",
+        'Token and OTP are required',
         400
       );
     }
 
     await connectDB();
 
-    const user =
-      await User.findOne({
-        resetPasswordToken:
-          token,
-      }).select(
-        "+resetPasswordOTP +resetPasswordToken +resetPasswordExpiry"
-      );
+    const db = mongoose.connection.db;
 
-    console.log(
-      "Found user:",
-      user
-    );
+    if (!db) {
+      throw new Error(
+        'Database connection not established'
+      );
+    }
+
+    let foundUser: any = null;
+    let foundCollection: any = null;
+
+    // ======================
+    // Find User In All Collections
+    // ======================
+
+    for (const item of COLLECTIONS) {
+      const collection =
+        db.collection(item.collection);
+
+      const user =
+        await collection.findOne({
+          resetPasswordToken:
+            token,
+        });
+
+      if (user) {
+        foundUser = user;
+        foundCollection = item;
+        break;
+      }
+    }
 
     // ======================
     // User Not Found
     // ======================
 
-    if (!user) {
+    if (
+      !foundUser ||
+      !foundCollection
+    ) {
       return errorResponse(
-        "Invalid or expired reset link. Please request a new one.",
+        'Invalid or expired reset token.',
         400
       );
     }
+
+    const collection =
+      db.collection(
+        foundCollection.collection
+      );
 
     // ======================
     // Expiry Check
     // ======================
 
-  const expiry = new Date(
-  (user as any).resetPasswordExpiry
-).getTime();
+    const expiry = new Date(
+      foundUser.resetPasswordExpiry
+    ).getTime();
 
-console.log("Expiry:", expiry);
-console.log("Current:", Date.now());
+    console.log(
+      'Expiry:',
+      expiry
+    );
 
-if (
-  Number.isNaN(expiry) ||
-  Date.now() >= expiry
-) {
-  await User.findByIdAndUpdate(
-    user._id,
-    {
-      $unset: {
-        resetPasswordOTP: 1,
-        resetPasswordToken: 1,
-        resetPasswordExpiry: 1,
-      },
+    console.log(
+      'Current:',
+      Date.now()
+    );
+
+    if (
+      Number.isNaN(expiry) ||
+      Date.now() >= expiry
+    ) {
+      // Remove expired data
+      await collection.updateOne(
+        { _id: foundUser._id },
+        {
+          $unset: {
+            resetPasswordOTP: 1,
+            resetPasswordToken: 1,
+            resetPasswordExpiry: 1,
+          },
+        }
+      );
+
+      return errorResponse(
+        'OTP has expired. Please request a new password reset.',
+        400
+      );
     }
-  );
-
-  return errorResponse(
-    "OTP has expired. Please request a new password reset.",
-    400
-  );
-}
 
     // ======================
     // OTP Exists
     // ======================
 
     if (
-      !user.resetPasswordOTP
+      !foundUser.resetPasswordOTP
     ) {
       return errorResponse(
-        "OTP not found. Please request a new password reset.",
+        'OTP not found. Please request a new reset.',
         400
       );
     }
@@ -162,12 +310,12 @@ if (
     const isValid =
       await bcrypt.compare(
         String(otp).trim(),
-        user.resetPasswordOTP
+        foundUser.resetPasswordOTP
       );
 
     if (!isValid) {
       return errorResponse(
-        "Incorrect OTP. Please try again.",
+        'Incorrect OTP. Please try again.',
         400
       );
     }
@@ -180,17 +328,19 @@ if (
       {
         verified: true,
         token,
+        role:
+          foundCollection.role,
       },
-      "OTP verified successfully."
+      'OTP verified successfully.'
     );
   } catch (error) {
     console.error(
-      "Verify OTP error:",
+      'Verify OTP error:',
       error
     );
 
     return errorResponse(
-      "An error occurred",
+      'An error occurred',
       500
     );
   }

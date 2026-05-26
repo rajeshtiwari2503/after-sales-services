@@ -1313,6 +1313,7 @@ import {
   Award, Play, ChevronRight, Package, Tag, RefreshCw,
   Plus,
   Minus,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import FloatingContact from "@/components/landing/FloatingContact";
@@ -1458,6 +1459,25 @@ const ROLES = [
   },
 ];
 
+
+const socials = [
+  {
+    icon: <MessageSquare size={18} />,
+    href: "#",
+  },
+  {
+    icon: <User size={18} />,
+    href: "#",
+  },
+  {
+    icon: <Play size={18} />,
+    href: "#",
+  },
+  {
+    icon: <Mail size={18} />,
+    href: "#",
+  },
+];
 /* ─── Main page ──────────────────────────────────────────────────────────── */
 export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
@@ -1670,1669 +1690,1651 @@ export default function LandingPage() {
       </nav>
 
       <main id="main-content">
-      {/* ══ HERO ═════════════════════════════════════════════════════ */}
+        {/* ══ HERO ═════════════════════════════════════════════════════ */}
 
-      <section className="relative pt-24 sm:pt-28 md:pt-32 pb-10 sm:pb-12 overflow-hidden" aria-label="Introduction">
-        {/* Background */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-[-120px] left-[10%] w-[520px] h-[520px] bg-blue-400/10 rounded-full blur-[120px]" />
-          <div className="absolute top-[40%] right-[-120px] w-[480px] h-[480px] bg-indigo-300/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-120px] left-[30%] w-[500px] h-[500px] bg-cyan-300/10 rounded-full blur-[120px]" />
+        <section className="relative pt-24 sm:pt-28 md:pt-32 pb-10 sm:pb-12 overflow-hidden" aria-label="Introduction">
+          {/* Background */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-[-120px] left-[10%] w-[520px] h-[520px] bg-blue-400/10 rounded-full blur-[120px]" />
+            <div className="absolute top-[40%] right-[-120px] w-[480px] h-[480px] bg-indigo-300/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-120px] left-[30%] w-[500px] h-[500px] bg-cyan-300/10 rounded-full blur-[120px]" />
 
-          {/* Grid */}
-          <div
-            className="absolute inset-0 opacity-[0.35]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px)",
-              backgroundSize: "64px 64px",
-            }}
-          />
-        </div>
+            {/* Grid */}
+            <div
+              className="absolute inset-0 opacity-[0.35]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px)",
+                backgroundSize: "64px 64px",
+              }}
+            />
+          </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="relative rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/95 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="relative rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/95 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] overflow-hidden">
 
-            {/* Top glow */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+              {/* Top glow */}
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
-            <div className="relative z-10 px-4 sm:px-10 lg:px-16 py-8 sm:py-12">
+              <div className="relative z-10 px-4 sm:px-10 lg:px-16 py-8 sm:py-12">
 
-              {/* Badge */}
-              <Reveal>
-                <div className="flex justify-center px-1">
-                  <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 sm:px-4 py-2 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide shadow-sm text-center max-w-full">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shrink-0" />
-                    <span className="leading-snug">Now serving 500+ service brands across India</span>
+                {/* Badge */}
+                <Reveal>
+                  <div className="flex justify-center px-1">
+                    <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 sm:px-4 py-2 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide shadow-sm text-center max-w-full">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shrink-0" />
+                      <span className="leading-snug">Now serving 500+ service brands across India</span>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
+                </Reveal>
+
+                {/* Heading */}
+                <Reveal delay={100}>
+                  <div className="text-center mt-6 sm:mt-8">
+                    <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900">
+                      After-Sales Service,
+                      <br />
+                      <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                        Built for Scale
+                      </span>
+                    </h1>
+                  </div>
+                </Reveal>
+
+                {/* Description */}
+                <Reveal delay={200}>
+                  <p className="text-lg sm:text-xl text-slate-500 max-w-3xl mx-auto mt-8 text-center leading-relaxed font-light">
+                    After-sales service management software for brands, service centers, and technicians —
+                    ticket routing by pincode, warranty, spare parts inventory, SLA tracking, and customer portal.
+                  </p>
+                </Reveal>
+
+                {/* Buttons */}
+                <Reveal delay={300}>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+                    <Link
+                      href="/login"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold text-base shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all"
+                    >
+                      Start free 14-day trial
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+
+                    <a
+                      href="#contact"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-slate-200 bg-white/80 hover:bg-white text-slate-700 font-semibold text-base transition-all shadow-sm"
+                    >
+                      <Play className="w-4 h-4" />
+                      Request a demo
+                    </a>
+                  </div>
+
+                  <p className="text-xs text-slate-400 mt-4 text-center">
+                    No credit card required · Setup in 30 minutes
+                  </p>
+                </Reveal>
+
+                {/* Stats */}
+                <Reveal delay={400}>
+                  <div className="mt-10 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+                    {[
+                      { end: 50000, suffix: "+", label: "Tickets resolved" },
+                      { end: 2400, suffix: "+", label: "Service centers" },
+                      { end: 18000, suffix: "+", label: "Technicians" },
+                      { end: 99, suffix: ".9%", label: "Uptime SLA" },
+                    ].map(({ end, suffix, label }) => (
+                      <div
+                        key={label}
+                        className="rounded-xl sm:rounded-2xl border border-slate-200/70 bg-white/80 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_10px_40px_rgba(15,23,42,0.04)]"
+                      >
+                        <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-900 mb-1">
+                          <Counter end={end} suffix={suffix} />
+                        </div>
+
+                        <p className="text-[11px] sm:text-sm text-slate-500 leading-snug">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Reveal>
+
+                {/* Dashboard Preview */}
+                <Reveal delay={500}>
+                  <div className="mt-16 rounded-[28px] overflow-hidden border border-slate-200 bg-[#f8fbff] shadow-[0_30px_100px_rgba(37,99,235,0.12)] max-w-5xl mx-auto">
+
+                    {/* Topbar */}
+                    <div className="bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-3">
+                      <div className="flex gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-red-400" />
+                        <div className="w-3 h-3 rounded-full bg-amber-400" />
+                        <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                      </div>
+
+                      <div className="flex-1 text-center text-xs text-slate-400 font-mono">
+                        https://www.saastechify.com/dashboard
+                      </div>
+
+                      <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                        <span className="text-[10px] text-emerald-700 font-semibold">
+                          Live
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Dashboard Body */}
+                    <div className="p-6 bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/40">
+
+                      {/* Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {[
+                          {
+                            n: "247",
+                            label: "Active Tickets",
+                            pill: "↑ 12%",
+                            pillCls: "bg-blue-100 text-blue-700",
+                            icon: "🎫",
+                          },
+                          {
+                            n: "94%",
+                            label: "Resolution Rate",
+                            pill: "↑ 3%",
+                            pillCls: "bg-emerald-100 text-emerald-700",
+                            icon: "✅",
+                          },
+                          {
+                            n: "18",
+                            label: "Technicians",
+                            pill: "Online",
+                            pillCls: "bg-cyan-100 text-cyan-700",
+                            icon: "🔧",
+                          },
+                          {
+                            n: "4.8★",
+                            label: "Avg Rating",
+                            pill: "Great",
+                            pillCls: "bg-amber-100 text-amber-700",
+                            icon: "⭐",
+                          },
+                        ].map((c) => (
+                          <div
+                            key={c.label}
+                            className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm"
+                          >
+                            <div className="text-xl mb-2">{c.icon}</div>
+
+                            <div className="text-2xl font-black text-slate-900">
+                              {c.n}
+                            </div>
+
+                            <div className="text-xs text-slate-500 mt-1">
+                              {c.label}
+                            </div>
+
+                            <span
+                              className={`text-[10px] font-bold px-2 py-1 rounded-full mt-3 inline-block ${c.pillCls}`}
+                            >
+                              {c.pill}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Chart */}
+                      <div className="mt-5 rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-5 shadow-sm overflow-x-auto">
+                        <p className="text-xs text-slate-500 mb-4">
+                          Ticket volume — last 12 months
+                        </p>
+
+                        <div className="flex items-end gap-1.5 sm:gap-2 h-28 min-w-[260px]">
+                          {[40, 65, 50, 80, 55, 90, 70, 85, 60, 95, 75, 88].map(
+                            (h, i) => (
+                              <div
+                                key={i}
+                                className="flex-1 rounded-t-xl transition-all duration-500"
+                                style={{
+                                  height: `${h}%`,
+                                  background:
+                                    "linear-gradient(180deg, #2563eb 0%, rgba(37,99,235,0.18) 100%)",
+                                }}
+                              />
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ TRUSTED BY ═══════════════════════════════════════════════ */}
+        <section className="py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-2xl shadow-[0_10px_60px_rgba(15,23,42,0.05)] px-4 sm:px-8 py-8 sm:py-10">
+
+              {/* Soft background glow */}
+              <div className="absolute inset-0 -z-10">
+                <div className="absolute top-[-80px] left-[10%] w-[260px] h-[260px] bg-blue-300/10 rounded-full blur-[80px]" />
+                <div className="absolute bottom-[-80px] right-[10%] w-[240px] h-[240px] bg-cyan-300/10 rounded-full blur-[80px]" />
+              </div>
 
               {/* Heading */}
-              <Reveal delay={100}>
-                <div className="text-center mt-6 sm:mt-8">
-                  <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900">
-                    After-Sales Service,
-                    <br />
-                    <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
-                      Built for Scale
+              <div className="text-center mb-10">
+                <p className="text-xs font-bold tracking-[0.25em] uppercase text-slate-400">
+                  Trusted by leading service brands
+                </p>
+
+                <h3 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+                  Powering modern after-sales operations
+                </h3>
+
+                <p className="mt-3 text-sm text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                  Hundreds of appliance, electronics, HVAC, and home service brands
+                  manage tickets, technicians, and service centers with Techify.
+                </p>
+              </div>
+
+              {/* Brands */}
+              {/* <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-5">
+                {[
+                  "Samsung",
+                  "LG",
+                  "Daikin",
+                  "Voltas",
+                  "Havells",
+                  "Whirlpool",
+                  "Bosch",
+                ].map((brand) => (
+                  <div
+                    key={brand}
+                    className="group px-6 py-3 rounded-2xl border border-slate-200/70 bg-white/80 hover:bg-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
+                  >
+                    <span className="text-base sm:text-lg font-black tracking-tight text-slate-400 group-hover:text-blue-600 transition-colors">
+                      {brand}
                     </span>
-                  </h1>
-                </div>
-              </Reveal>
-
-              {/* Description */}
-              <Reveal delay={200}>
-                <p className="text-lg sm:text-xl text-slate-500 max-w-3xl mx-auto mt-8 text-center leading-relaxed font-light">
-                  After-sales service management software for brands, service centers, and technicians —
-                  ticket routing by pincode, warranty, spare parts inventory, SLA tracking, and customer portal.
-                </p>
-              </Reveal>
-
-              {/* Buttons */}
-              <Reveal delay={300}>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-                  <Link
-                    href="/login"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold text-base shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all"
-                  >
-                    Start free 14-day trial
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-
-                  <a
-                    href="#contact"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-slate-200 bg-white/80 hover:bg-white text-slate-700 font-semibold text-base transition-all shadow-sm"
-                  >
-                    <Play className="w-4 h-4" />
-                    Request a demo
-                  </a>
-                </div>
-
-                <p className="text-xs text-slate-400 mt-4 text-center">
-                  No credit card required · Setup in 30 minutes
-                </p>
-              </Reveal>
-
-              {/* Stats */}
-              <Reveal delay={400}>
-                <div className="mt-10 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
-                  {[
-                    { end: 50000, suffix: "+", label: "Tickets resolved" },
-                    { end: 2400, suffix: "+", label: "Service centers" },
-                    { end: 18000, suffix: "+", label: "Technicians" },
-                    { end: 99, suffix: ".9%", label: "Uptime SLA" },
-                  ].map(({ end, suffix, label }) => (
-                    <div
-                      key={label}
-                      className="rounded-xl sm:rounded-2xl border border-slate-200/70 bg-white/80 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_10px_40px_rgba(15,23,42,0.04)]"
-                    >
-                      <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-900 mb-1">
-                        <Counter end={end} suffix={suffix} />
-                      </div>
-
-                      <p className="text-[11px] sm:text-sm text-slate-500 leading-snug">{label}</p>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-
-              {/* Dashboard Preview */}
-              <Reveal delay={500}>
-                <div className="mt-16 rounded-[28px] overflow-hidden border border-slate-200 bg-[#f8fbff] shadow-[0_30px_100px_rgba(37,99,235,0.12)] max-w-5xl mx-auto">
-
-                  {/* Topbar */}
-                  <div className="bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-3">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400" />
-                      <div className="w-3 h-3 rounded-full bg-amber-400" />
-                      <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                    </div>
-
-                    <div className="flex-1 text-center text-xs text-slate-400 font-mono">
-                      techify.in/dashboard
-                    </div>
-
-                    <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full" />
-                      <span className="text-[10px] text-emerald-700 font-semibold">
-                        Live
-                      </span>
-                    </div>
                   </div>
+                ))}
+              </div> */}
 
-                  {/* Dashboard Body */}
-                  <div className="p-6 bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/40">
-
-                    {/* Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {[
-                        {
-                          n: "247",
-                          label: "Active Tickets",
-                          pill: "↑ 12%",
-                          pillCls: "bg-blue-100 text-blue-700",
-                          icon: "🎫",
-                        },
-                        {
-                          n: "94%",
-                          label: "Resolution Rate",
-                          pill: "↑ 3%",
-                          pillCls: "bg-emerald-100 text-emerald-700",
-                          icon: "✅",
-                        },
-                        {
-                          n: "18",
-                          label: "Technicians",
-                          pill: "Online",
-                          pillCls: "bg-cyan-100 text-cyan-700",
-                          icon: "🔧",
-                        },
-                        {
-                          n: "4.8★",
-                          label: "Avg Rating",
-                          pill: "Great",
-                          pillCls: "bg-amber-100 text-amber-700",
-                          icon: "⭐",
-                        },
-                      ].map((c) => (
-                        <div
-                          key={c.label}
-                          className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm"
-                        >
-                          <div className="text-xl mb-2">{c.icon}</div>
-
-                          <div className="text-2xl font-black text-slate-900">
-                            {c.n}
-                          </div>
-
-                          <div className="text-xs text-slate-500 mt-1">
-                            {c.label}
-                          </div>
-
-                          <span
-                            className={`text-[10px] font-bold px-2 py-1 rounded-full mt-3 inline-block ${c.pillCls}`}
-                          >
-                            {c.pill}
-                          </span>
-                        </div>
-                      ))}
+              {/* Bottom stats */}
+              <div className="mt-10 pt-8 border-t border-slate-200/70 grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {[
+                  { value: "500+", label: "Brands onboarded" },
+                  { value: "2.4K+", label: "Service centers" },
+                  { value: "18K+", label: "Technicians" },
+                  { value: "99.9%", label: "Platform uptime" },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900">
+                      {item.value}
                     </div>
 
-                    {/* Chart */}
-                    <div className="mt-5 rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-5 shadow-sm overflow-x-auto">
-                      <p className="text-xs text-slate-500 mb-4">
-                        Ticket volume — last 12 months
-                      </p>
-
-                      <div className="flex items-end gap-1.5 sm:gap-2 h-28 min-w-[260px]">
-                        {[40, 65, 50, 80, 55, 90, 70, 85, 60, 95, 75, 88].map(
-                          (h, i) => (
-                            <div
-                              key={i}
-                              className="flex-1 rounded-t-xl transition-all duration-500"
-                              style={{
-                                height: `${h}%`,
-                                background:
-                                  "linear-gradient(180deg, #2563eb 0%, rgba(37,99,235,0.18) 100%)",
-                              }}
-                            />
-                          )
-                        )}
-                      </div>
-                    </div>
+                    <p className="mt-1 text-xs sm:text-sm text-slate-500">
+                      {item.label}
+                    </p>
                   </div>
-                </div>
-              </Reveal>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══ TRUSTED BY ═══════════════════════════════════════════════ */}
-      <section className="py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-2xl shadow-[0_10px_60px_rgba(15,23,42,0.05)] px-4 sm:px-8 py-8 sm:py-10">
+        {/* ══ FEATURES ═════════════════════════════════════════════════ */}
+        <section className="relative py-12 overflow-hidden" id="features">
 
-            {/* Soft background glow */}
-            <div className="absolute inset-0 -z-10">
-              <div className="absolute top-[-80px] left-[10%] w-[260px] h-[260px] bg-blue-300/10 rounded-full blur-[80px]" />
-              <div className="absolute bottom-[-80px] right-[10%] w-[240px] h-[240px] bg-cyan-300/10 rounded-full blur-[80px]" />
-            </div>
+          {/* Background Glow */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-20 left-[8%] w-[420px] h-[420px] bg-blue-300/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-[10%] w-[420px] h-[420px] bg-cyan-300/10 rounded-full blur-[120px]" />
+
+            <div
+              className="absolute inset-0 opacity-[0.35]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.06) 1px, transparent 1px)",
+                backgroundSize: "72px 72px",
+              }}
+            />
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
             {/* Heading */}
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold tracking-[0.25em] uppercase text-slate-400">
-                Trusted by leading service brands
-              </p>
+            <Reveal>
+              <div className="text-center mb-20">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold tracking-[0.2em] uppercase shadow-sm">
+                  Complete platform
+                </span>
 
-              <h3 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-                Powering modern after-sales operations
-              </h3>
-
-              <p className="mt-3 text-sm text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                Hundreds of appliance, electronics, HVAC, and home service brands
-                manage tickets, technicians, and service centers with Techify.
-              </p>
-            </div>
-
-            {/* Brands */}
-            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-5">
-              {[
-                "Samsung",
-                "LG",
-                "Daikin",
-                "Voltas",
-                "Havells",
-                "Whirlpool",
-                "Bosch",
-              ].map((brand) => (
-                <div
-                  key={brand}
-                  className="group px-6 py-3 rounded-2xl border border-slate-200/70 bg-white/80 hover:bg-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
-                >
-                  <span className="text-base sm:text-lg font-black tracking-tight text-slate-400 group-hover:text-blue-600 transition-colors">
-                    {brand}
+                <h2 className="mt-7 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.05]">
+                  Everything your service
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                    operation needs
                   </span>
-                </div>
-              ))}
-            </div>
+                </h2>
 
-            {/* Bottom stats */}
-            <div className="mt-10 pt-8 border-t border-slate-200/70 grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <p className="mt-6 text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed font-light">
+                  From first ticket to final payment — every workflow covered,
+                  every role connected, every assignment tracked in real time.
+                </p>
+              </div>
+            </Reveal>
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
               {[
-                { value: "500+", label: "Brands onboarded" },
-                { value: "2.4K+", label: "Service centers" },
-                { value: "18K+", label: "Technicians" },
-                { value: "99.9%", label: "Platform uptime" },
-              ].map((item) => (
-                <div key={item.label} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-slate-900">
-                    {item.value}
-                  </div>
+                {
+                  icon: <Ticket className="w-5 h-5" />,
+                  color: "text-blue-600",
+                  bg: "bg-blue-100",
+                  title: "Smart Ticket Management",
+                  desc: "Category → Product → Fault → Priority. Auto-route every ticket to the correct service center with full activity timeline.",
+                },
+                {
+                  icon: <Shield className="w-5 h-5" />,
+                  color: "text-emerald-600",
+                  bg: "bg-emerald-100",
+                  title: "Multi-Brand Isolation",
+                  desc: "Every brand operates in a completely isolated tenant. No cross-brand access to tickets, service centers, or technicians.",
+                },
+                {
+                  icon: <Zap className="w-5 h-5" />,
+                  color: "text-amber-600",
+                  bg: "bg-amber-100",
+                  title: "Real-Time RBAC Assignment",
+                  desc: "Role-based assignment system for admins, brands, service centers, and technicians with secure API-level access control.",
+                },
+                {
+                  icon: <MessageSquare className="w-5 h-5" />,
+                  color: "text-cyan-600",
+                  bg: "bg-cyan-100",
+                  title: "Built-in Ticket Chat",
+                  desc: "Real-time customer and technician communication with read receipts, reactions, attachments, and live updates.",
+                },
+                {
+                  icon: <Wallet className="w-5 h-5" />,
+                  color: "text-violet-600",
+                  bg: "bg-violet-100",
+                  title: "Auto Wallet & Payouts",
+                  desc: "Automatically credit service center wallets after resolution with approval-based withdrawal workflows.",
+                },
+                {
+                  icon: <BarChart3 className="w-5 h-5" />,
+                  color: "text-pink-600",
+                  bg: "bg-pink-100",
+                  title: "Deep Analytics & Reports",
+                  desc: "Track SLA performance, technician productivity, top faults, ticket volume, and export reports instantly.",
+                },
+                {
+                  icon: <Bell className="w-5 h-5" />,
+                  color: "text-orange-600",
+                  bg: "bg-orange-100",
+                  title: "Real-Time Notifications",
+                  desc: "Instant alerts for assignments, ticket updates, status changes, payouts, and escalations.",
+                },
+                {
+                  icon: <Tag className="w-5 h-5" />,
+                  color: "text-indigo-600",
+                  bg: "bg-indigo-100",
+                  title: "Products & Fault Catalog",
+                  desc: "Manage categories, products, models, and fault types with intelligent ticket linking and filtering.",
+                },
+                {
+                  icon: <Globe className="w-5 h-5" />,
+                  color: "text-teal-600",
+                  bg: "bg-teal-100",
+                  title: "Fully Responsive",
+                  desc: "Optimized for desktop, tablet, and mobile so technicians can manage tickets directly from their phones.",
+                },
+              ].map((f, i) => (
+                <Reveal key={f.title} delay={i * 60}>
+                  <div className="group relative overflow-hidden rounded-[28px] border border-white/70 bg-white/75 backdrop-blur-2xl p-7 shadow-[0_10px_50px_rgba(15,23,42,0.05)] hover:shadow-[0_20px_70px_rgba(37,99,235,0.12)] hover:-translate-y-1 transition-all duration-300 h-full">
 
-                  <p className="mt-1 text-xs sm:text-sm text-slate-500">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+                    {/* Top Glow */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
 
-      {/* ══ FEATURES ═════════════════════════════════════════════════ */}
-      <section className="relative py-12 overflow-hidden" id="features">
+                    {/* Hover Glow */}
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Background Glow */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-[8%] w-[420px] h-[420px] bg-blue-300/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-[10%] w-[420px] h-[420px] bg-cyan-300/10 rounded-full blur-[120px]" />
-
-          <div
-            className="absolute inset-0 opacity-[0.35]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.06) 1px, transparent 1px)",
-              backgroundSize: "72px 72px",
-            }}
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-
-          {/* Heading */}
-          <Reveal>
-            <div className="text-center mb-20">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold tracking-[0.2em] uppercase shadow-sm">
-                Complete platform
-              </span>
-
-              <h2 className="mt-7 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.05]">
-                Everything your service
-                <br />
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
-                  operation needs
-                </span>
-              </h2>
-
-              <p className="mt-6 text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed font-light">
-                From first ticket to final payment — every workflow covered,
-                every role connected, every assignment tracked in real time.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            {[
-              {
-                icon: <Ticket className="w-5 h-5" />,
-                color: "text-blue-600",
-                bg: "bg-blue-100",
-                title: "Smart Ticket Management",
-                desc: "Category → Product → Fault → Priority. Auto-route every ticket to the correct service center with full activity timeline.",
-              },
-              {
-                icon: <Shield className="w-5 h-5" />,
-                color: "text-emerald-600",
-                bg: "bg-emerald-100",
-                title: "Multi-Brand Isolation",
-                desc: "Every brand operates in a completely isolated tenant. No cross-brand access to tickets, service centers, or technicians.",
-              },
-              {
-                icon: <Zap className="w-5 h-5" />,
-                color: "text-amber-600",
-                bg: "bg-amber-100",
-                title: "Real-Time RBAC Assignment",
-                desc: "Role-based assignment system for admins, brands, service centers, and technicians with secure API-level access control.",
-              },
-              {
-                icon: <MessageSquare className="w-5 h-5" />,
-                color: "text-cyan-600",
-                bg: "bg-cyan-100",
-                title: "Built-in Ticket Chat",
-                desc: "Real-time customer and technician communication with read receipts, reactions, attachments, and live updates.",
-              },
-              {
-                icon: <Wallet className="w-5 h-5" />,
-                color: "text-violet-600",
-                bg: "bg-violet-100",
-                title: "Auto Wallet & Payouts",
-                desc: "Automatically credit service center wallets after resolution with approval-based withdrawal workflows.",
-              },
-              {
-                icon: <BarChart3 className="w-5 h-5" />,
-                color: "text-pink-600",
-                bg: "bg-pink-100",
-                title: "Deep Analytics & Reports",
-                desc: "Track SLA performance, technician productivity, top faults, ticket volume, and export reports instantly.",
-              },
-              {
-                icon: <Bell className="w-5 h-5" />,
-                color: "text-orange-600",
-                bg: "bg-orange-100",
-                title: "Real-Time Notifications",
-                desc: "Instant alerts for assignments, ticket updates, status changes, payouts, and escalations.",
-              },
-              {
-                icon: <Tag className="w-5 h-5" />,
-                color: "text-indigo-600",
-                bg: "bg-indigo-100",
-                title: "Products & Fault Catalog",
-                desc: "Manage categories, products, models, and fault types with intelligent ticket linking and filtering.",
-              },
-              {
-                icon: <Globe className="w-5 h-5" />,
-                color: "text-teal-600",
-                bg: "bg-teal-100",
-                title: "Fully Responsive",
-                desc: "Optimized for desktop, tablet, and mobile so technicians can manage tickets directly from their phones.",
-              },
-            ].map((f, i) => (
-              <Reveal key={f.title} delay={i * 60}>
-                <div className="group relative overflow-hidden rounded-[28px] border border-white/70 bg-white/75 backdrop-blur-2xl p-7 shadow-[0_10px_50px_rgba(15,23,42,0.05)] hover:shadow-[0_20px_70px_rgba(37,99,235,0.12)] hover:-translate-y-1 transition-all duration-300 h-full">
-
-                  {/* Top Glow */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
-
-                  {/* Hover Glow */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  {/* Icon */}
-                  <div
-                    className={`relative w-14 h-14 ${f.bg} rounded-2xl flex items-center justify-center ${f.color} mb-6 shadow-sm`}
-                  >
-                    {f.icon}
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="relative text-xl font-black text-slate-900 mb-3 tracking-tight">
-                    {f.title}
-                  </h3>
-
-                  <p className="relative text-sm text-slate-500 leading-relaxed">
-                    {f.desc}
-                  </p>
-
-                  {/* Bottom Line */}
-                  <div className="relative mt-6 flex items-center gap-2 text-sm font-semibold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Learn more
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
-      <section
-        className="relative py-12 bg-gradient-to-b from-[#F8FBFF] via-white to-[#F4F8FF]"
-        id="how"
-      >
-        {/* Background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-[420px] h-[420px] bg-blue-200/30 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[380px] h-[380px] bg-indigo-200/25 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-          <Reveal>
-            <div className="text-center mb-16">
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                Simple process
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-5 leading-tight">
-                Up and running
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  in 4 simple steps
-                </span>
-              </h2>
-
-              <p className="text-slate-500 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
-                Your complete service operation setup in a few hours —
-                from onboarding brands to managing live tickets.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                n: "01",
-                icon: "🏢",
-                color: "from-indigo-500 to-violet-500",
-                title: "Create brand",
-                desc: "Set up your company workspace, assign managers, configure ticket rules and secure tenant isolation.",
-              },
-              {
-                n: "02",
-                icon: "🏪",
-                color: "from-blue-500 to-cyan-500",
-                title: "Add service centers",
-                desc: "Onboard service centers city-wise, assign operators and technicians with role-based access.",
-              },
-              {
-                n: "03",
-                icon: "🛍️",
-                color: "from-emerald-500 to-teal-500",
-                title: "Define catalog",
-                desc: "Create product categories, models and fault types for smooth ticket automation.",
-              },
-              {
-                n: "04",
-                icon: "🎫",
-                color: "from-orange-500 to-amber-500",
-                title: "Manage tickets",
-                desc: "Tickets auto-route to technicians with real-time tracking, updates and wallet payouts.",
-              },
-            ].map((s, i) => (
-              <Reveal key={s.n} delay={i * 100}>
-                <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-7 hover:-translate-y-1.5 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] h-full overflow-hidden">
-
-                  {/* top glow */}
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  {/* Step number */}
-                  <div className="flex items-center justify-between mb-6">
+                    {/* Icon */}
                     <div
-                      className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-2xl shadow-lg shadow-blue-200/40`}
+                      className={`relative w-14 h-14 ${f.bg} rounded-2xl flex items-center justify-center ${f.color} mb-6 shadow-sm`}
                     >
-                      {s.icon}
+                      {f.icon}
                     </div>
 
-                    <span className="text-[11px] font-black tracking-[0.25em] text-slate-300">
-                      STEP {s.n}
-                    </span>
+                    {/* Content */}
+                    <h3 className="relative text-xl font-black text-slate-900 mb-3 tracking-tight">
+                      {f.title}
+                    </h3>
+
+                    <p className="relative text-sm text-slate-500 leading-relaxed">
+                      {f.desc}
+                    </p>
+
+                    {/* Bottom Line */}
+                    <div className="relative mt-6 flex items-center gap-2 text-sm font-semibold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      Learn more
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
-
-                  <h3 className="text-lg font-bold text-slate-900 mb-3">
-                    {s.title}
-                  </h3>
-
-                  <p className="text-sm leading-relaxed text-slate-500">
-                    {s.desc}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ══ ROLES ════════════════════════════════════════════════════ */}
-      <section
-        className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF]"
-        id="roles"
-      >
-        {/* Background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-
-          {/* Heading */}
-          <Reveal>
-            <div className="text-center mb-14">
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                Role-based access
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-4">
-                The right view for
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  every team member
-                </span>
-              </h2>
-
-              <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-                Every role gets a clean, focused dashboard with permissions
-                tailored to their responsibilities.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Tabs */}
-          <Reveal>
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-14 px-1">
-              {ROLES.map((r) => (
-                <button
-                  key={r.key}
-                  type="button"
-                  onClick={() => setActiveRole(r.key)}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer border ${activeRole === r.key
-                    ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-transparent shadow-lg shadow-indigo-200"
-                    : "bg-white/80 backdrop-blur-xl border-slate-200 text-slate-600 hover:border-blue-200 hover:text-slate-900 hover:bg-white"
-                    }`}
-                >
-                  <span className="text-base">{r.emoji}</span>
-                  {r.label}
-                </button>
+                </Reveal>
               ))}
             </div>
-          </Reveal>
+          </div>
+        </section>
 
-          {/* Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        {/* ══ HOW IT WORKS ═════════════════════════════════════════════ */}
+        <section
+          className="relative py-12 bg-gradient-to-b from-[#F8FBFF] via-white to-[#F4F8FF]"
+          id="how"
+        >
+          {/* Background glow */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-10 left-1/4 w-[420px] h-[420px] bg-blue-200/30 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[380px] h-[380px] bg-indigo-200/25 rounded-full blur-[120px]" />
+          </div>
 
-            {/* Left perks */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {role.perks.map((p, i) => (
-                <Reveal key={p.title} delay={i * 80}>
-                  <div className="group bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-6 hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] h-full">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+            <Reveal>
+              <div className="text-center mb-16">
+                <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
+                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                  Simple process
+                </span>
 
-                    <div className="text-3xl mb-4">{p.icon}</div>
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-5 leading-tight">
+                  Up and running
+                  <br />
+                  <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                    in 4 simple steps
+                  </span>
+                </h2>
 
-                    <h4 className="text-base font-bold text-slate-900 mb-2">
-                      {p.title}
-                    </h4>
+                <p className="text-slate-500 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
+                  Your complete service operation setup in a few hours —
+                  from onboarding brands to managing live tickets.
+                </p>
+              </div>
+            </Reveal>
 
-                    <p className="text-sm text-slate-500 leading-relaxed">
-                      {p.desc}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  n: "01",
+                  icon: "🏢",
+                  color: "from-indigo-500 to-violet-500",
+                  title: "Create brand",
+                  desc: "Set up your company workspace, assign managers, configure ticket rules and secure tenant isolation.",
+                },
+                {
+                  n: "02",
+                  icon: "🏪",
+                  color: "from-blue-500 to-cyan-500",
+                  title: "Add service centers",
+                  desc: "Onboard service centers city-wise, assign operators and technicians with role-based access.",
+                },
+                {
+                  n: "03",
+                  icon: "🛍️",
+                  color: "from-emerald-500 to-teal-500",
+                  title: "Define catalog",
+                  desc: "Create product categories, models and fault types for smooth ticket automation.",
+                },
+                {
+                  n: "04",
+                  icon: "🎫",
+                  color: "from-orange-500 to-amber-500",
+                  title: "Manage tickets",
+                  desc: "Tickets auto-route to technicians with real-time tracking, updates and wallet payouts.",
+                },
+              ].map((s, i) => (
+                <Reveal key={s.n} delay={i * 100}>
+                  <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-7 hover:-translate-y-1.5 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] h-full overflow-hidden">
+
+                    {/* top glow */}
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    {/* Step number */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div
+                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-2xl shadow-lg shadow-blue-200/40`}
+                      >
+                        {s.icon}
+                      </div>
+
+                      <span className="text-[11px] font-black tracking-[0.25em] text-slate-300">
+                        STEP {s.n}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-slate-900 mb-3">
+                      {s.title}
+                    </h3>
+
+                    <p className="text-sm leading-relaxed text-slate-500">
+                      {s.desc}
                     </p>
                   </div>
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+        {/* ══ ROLES ════════════════════════════════════════════════════ */}
+        <section
+          className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF]"
+          id="roles"
+        >
+          {/* Background glow */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
+          </div>
 
-            {/* Right preview */}
-            <Reveal delay={200}>
-              <div
-                className={`rounded-[32px] bg-gradient-to-br ${role.color} p-[1px] shadow-[0_20px_80px_rgba(59,130,246,0.18)]`}
-              >
-                <div className="relative overflow-hidden rounded-[31px] bg-white/90 backdrop-blur-2xl border border-white/60 p-6 sm:p-10 lg:p-12 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[360px] text-center">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
-                  {/* Glow */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[120px] bg-blue-200/30 rounded-full blur-[80px]" />
+            {/* Heading */}
+            <Reveal>
+              <div className="text-center mb-14">
+                <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
+                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                  Role-based access
+                </span>
 
-                  <div className="relative z-10">
-                    <div className="text-6xl sm:text-8xl mb-4 sm:mb-6 drop-shadow-sm">
-                      {role.emoji}
-                    </div>
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-4">
+                  The right view for
+                  <br />
+                  <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                    every team member
+                  </span>
+                </h2>
 
-                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
-                      {role.label}
-                    </h3>
-
-                    <p className="text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
-                      {role.perks.length} powerful capabilities with secure,
-                      precisely scoped permissions for your workflow.
-                    </p>
-
-                    <Link
-                      href="/login"
-                      className="mt-8 inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-indigo-200"
-                    >
-                      Get {role.label} access →
-                    </Link>
-                  </div>
-                </div>
+                <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+                  Every role gets a clean, focused dashboard with permissions
+                  tailored to their responsibilities.
+                </p>
               </div>
             </Reveal>
-          </div>
-        </div>
-      </section>
 
-      {/* ══ METRICS ══════════════════════════════════════════════════ */}
-      <section className="relative py-12 bg-gradient-to-b from-[#F4F8FF] via-white to-[#F8FBFF] overflow-hidden">
-
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-
-          {/* Heading */}
-          <Reveal>
-            <div className="text-center mb-14">
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                Platform metrics
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-4">
-                Trusted by growing
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  service operations
-                </span>
-              </h2>
-
-              <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-                Real numbers from brands, service centers and technicians
-                actively managing after-sales operations on Techify.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Metrics cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              {
-                end: 500,
-                suffix: "+",
-                label: "Active brands",
-                icon: "🏢",
-              },
-              {
-                end: 2400,
-                suffix: "+",
-                label: "Service centers",
-                icon: "🏪",
-              },
-              {
-                end: 18000,
-                suffix: "+",
-                label: "Daily technicians",
-                icon: "🔧",
-              },
-              {
-                end: 98,
-                suffix: ".2%",
-                label: "Satisfaction score",
-                icon: "⭐",
-              },
-            ].map(({ end, suffix, label, icon }, i) => (
-              <Reveal key={label} delay={i * 80}>
-                <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-8 text-center hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] overflow-hidden">
-
-                  {/* Hover glow */}
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  {/* Icon */}
-                  <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center text-2xl shadow-lg shadow-blue-200/40">
-                    {icon}
-                  </div>
-
-                  {/* Number */}
-                  <div className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-3">
-                    <Counter end={end} suffix={suffix} />
-                  </div>
-
-                  {/* Label */}
-                  <p className="text-sm font-medium text-slate-500">
-                    {label}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ══ TESTIMONIALS ═════════════════════════════════════════════ */}
-      <section className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF] overflow-hidden">
-
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-10 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-
-          {/* Heading */}
-          <Reveal>
-            <div className="text-center mb-16">
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                Customer stories
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-5">
-                Loved by service teams
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  across the country
-                </span>
-              </h2>
-
-              <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-                Real feedback from brands, service centers and technicians
-                using Techify every day to manage operations at scale.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Rajesh Kumar",
-                role: "Head of Service, CoolBreeze AC",
-                avatar: "RK",
-                color: "from-indigo-500 to-blue-500",
-                stars: 5,
-                text:
-                  "We manage 14 service centers across 3 states. Techify gave us one clean view of tickets, technicians and earnings. We onboarded our entire team in just 2 days.",
-              },
-              {
-                name: "Priya Sharma",
-                role: "Brand Manager, FreshHome Appliances",
-                avatar: "PS",
-                color: "from-emerald-500 to-teal-500",
-                stars: 5,
-                text:
-                  "The wallet system completely changed our payout workflow. Service centers now track earnings in real time and request withdrawals instantly.",
-              },
-              {
-                name: "Arjun Mehta",
-                role: "SC Owner, Delhi North",
-                avatar: "AM",
-                color: "from-orange-500 to-amber-500",
-                stars: 5,
-                text:
-                  "Our technicians previously worked on WhatsApp. Now they manage jobs, chats, photos and updates in one platform. Resolution time improved massively.",
-              },
-            ].map((t, i) => (
-              <Reveal key={t.name} delay={i * 100}>
-                <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-7 hover:-translate-y-1.5 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] flex flex-col h-full overflow-hidden">
-
-                  {/* Top glow */}
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  {/* Stars */}
-                  <div className="flex gap-1 mb-5">
-                    {Array(t.stars)
-                      .fill(0)
-                      .map((_, j) => (
-                        <Star
-                          key={j}
-                          className="w-4 h-4 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                  </div>
-
-                  {/* Quote */}
-                  <p className="text-[15px] text-slate-600 leading-relaxed italic flex-1">
-                    “{t.text}”
-                  </p>
-
-                  {/* User */}
-                  <div className="flex items-center gap-4 mt-7 pt-6 border-t border-slate-200/70">
-                    <div
-                      className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${t.color} flex items-center justify-center text-sm font-bold text-white shadow-lg`}
-                    >
-                      {t.avatar}
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">
-                        {t.name}
-                      </p>
-
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {t.role}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ══ PRICING ══════════════════════════════════════════════════ */}
-      <section
-        className="relative py-12 overflow-hidden bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc]"
-        id="pricing"
-      >
-        {/* Background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/3 w-[420px] h-[420px] bg-indigo-100/50 blur-3xl rounded-full" />
-          <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-violet-100/40 blur-3xl rounded-full" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <Reveal>
-            <div className="text-center mb-20">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
-                Transparent Pricing
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight mb-5">
-                Simple plans,
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
-                  built for growth
-                </span>
-              </h2>
-
-              <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
-                Start free for 14 days. Scale from a single service center
-                to a nationwide multi-brand support operation.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-            {[
-              {
-                name: "Starter",
-                price: "₹2,999",
-                period: "/month",
-                popular: false,
-                desc: "Perfect for startups and growing local service operations.",
-                features: [
-                  "1 Brand / Tenant",
-                  "Up to 5 Service Centers",
-                  "25 Technicians Included",
-                  "Unlimited Tickets",
-                  "Basic Analytics Dashboard",
-                  "Wallet & Payout Support",
-                ],
-                missing: [
-                  "Multi-brand management",
-                  "Advanced SLA reports",
-                  "Dedicated account manager",
-                ],
-              },
-              {
-                name: "Growth",
-                price: "₹7,999",
-                period: "/month",
-                popular: true,
-                desc: "Designed for brands scaling across multiple cities.",
-                features: [
-                  "Up to 5 Brands",
-                  "Unlimited Service Centers",
-                  "Unlimited Technicians",
-                  "Advanced Analytics + CSV Export",
-                  "Wallet + Automated Payouts",
-                  "Custom Ticket Rates",
-                  "Priority Support",
-                ],
-                missing: ["Dedicated account manager"],
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                period: "/volume",
-                popular: false,
-                desc: "Tailored infrastructure and workflows for large enterprises.",
-                features: [
-                  "Unlimited Brands",
-                  "Unlimited Everything",
-                  "White-label Platform",
-                  "Custom Integrations",
-                  "Enterprise SLA Management",
-                  "Audit Logs & Compliance",
-                  "Dedicated Success Manager",
-                ],
-                missing: [],
-              },
-            ].map((p, i) => (
-              <Reveal key={p.name} delay={i * 100}>
-                <div
-                  className={`relative h-full rounded-[32px] p-[1px] transition-all duration-500 hover:-translate-y-2 ${p.popular
-                    ? "bg-gradient-to-b from-indigo-500 via-violet-500 to-cyan-500 shadow-[0_25px_80px_rgba(99,102,241,0.28)]"
-                    : "bg-slate-200 hover:bg-indigo-200"
-                    }`}
-                >
-                  <div
-                    className={`h-full rounded-[31px] backdrop-blur-xl p-6 sm:p-8 lg:p-9 flex flex-col ${p.popular
-                      ? "bg-gradient-to-b from-[#111827] to-[#0f172a] pt-8 sm:pt-10"
-                      : "bg-white/95"
+            {/* Tabs */}
+            <Reveal>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-14 px-1">
+                {ROLES.map((r) => (
+                  <button
+                    key={r.key}
+                    type="button"
+                    onClick={() => setActiveRole(r.key)}
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer border ${activeRole === r.key
+                      ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-transparent shadow-lg shadow-indigo-200"
+                      : "bg-white/80 backdrop-blur-xl border-slate-200 text-slate-600 hover:border-blue-200 hover:text-slate-900 hover:bg-white"
                       }`}
                   >
-                    {/* Popular Badge */}
-                    {p.popular && (
-                      <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 z-10">
-                        <div className="px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-[11px] font-bold tracking-wider uppercase shadow-xl">
-                          Most Popular
-                        </div>
-                      </div>
-                    )}
+                    <span className="text-base">{r.emoji}</span>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </Reveal>
 
-                    {/* Plan */}
-                    <div className="mb-7">
-                      <h3
-                        className={`text-2xl font-black mb-2 ${p.popular ? "text-white" : "text-slate-900"
-                          }`}
-                      >
-                        {p.name}
-                      </h3>
+            {/* Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-                      <p
-                        className={`text-sm leading-relaxed ${p.popular ? "text-slate-400" : "text-slate-500"
-                          }`}
-                      >
+              {/* Left perks */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {role.perks.map((p, i) => (
+                  <Reveal key={p.title} delay={i * 80}>
+                    <div className="group bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-6 hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] h-full">
+
+                      <div className="text-3xl mb-4">{p.icon}</div>
+
+                      <h4 className="text-base font-bold text-slate-900 mb-2">
+                        {p.title}
+                      </h4>
+
+                      <p className="text-sm text-slate-500 leading-relaxed">
                         {p.desc}
                       </p>
                     </div>
+                  </Reveal>
+                ))}
+              </div>
 
-                    {/* Price */}
-                    <div
-                      className={`pb-7 mb-7 border-b ${p.popular
-                        ? "border-white/10"
-                        : "border-slate-200"
-                        }`}
-                    >
-                      <div className="flex items-end gap-2">
-                        <span
-                          className={`text-5xl font-black tracking-tight ${p.popular ? "text-white" : "text-slate-900"
-                            }`}
-                        >
-                          {p.price}
-                        </span>
+              {/* Right preview */}
+              <Reveal delay={200}>
+                <div
+                  className={`rounded-[32px] bg-gradient-to-br ${role.color} p-[1px] shadow-[0_20px_80px_rgba(59,130,246,0.18)]`}
+                >
+                  <div className="relative overflow-hidden rounded-[31px] bg-white/90 backdrop-blur-2xl border border-white/60 p-6 sm:p-10 lg:p-12 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[360px] text-center">
 
-                        <span
-                          className={`text-sm mb-1 ${p.popular ? "text-slate-400" : "text-slate-500"
-                            }`}
-                        >
-                          {p.period}
-                        </span>
+                    {/* Glow */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[120px] bg-blue-200/30 rounded-full blur-[80px]" />
+
+                    <div className="relative z-10">
+                      <div className="text-6xl sm:text-8xl mb-4 sm:mb-6 drop-shadow-sm">
+                        {role.emoji}
                       </div>
+
+                      <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
+                        {role.label}
+                      </h3>
+
+                      <p className="text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
+                        {role.perks.length} powerful capabilities with secure,
+                        precisely scoped permissions for your workflow.
+                      </p>
+
+                      <Link
+                        href="/login"
+                        className="mt-8 inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-indigo-200"
+                      >
+                        Get {role.label} access →
+                      </Link>
                     </div>
-
-                    {/* Features */}
-                    <ul className="space-y-4 flex-1 mb-8">
-                      {p.features.map((f) => (
-                        <li
-                          key={f}
-                          className={`flex items-start gap-3 text-sm ${p.popular ? "text-slate-200" : "text-slate-700"
-                            }`}
-                        >
-                          <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                          </div>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-
-                      {p.missing.map((f) => (
-                        <li
-                          key={f}
-                          className={`flex items-start gap-3 text-sm ${p.popular ? "text-slate-500" : "text-slate-400"
-                            }`}
-                        >
-                          <div className="w-5 h-5 rounded-full bg-slate-200/70 flex items-center justify-center shrink-0 mt-0.5">
-                            <X className="w-3.5 h-3.5" />
-                          </div>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTA */}
-                    <Link
-                      href={p.name === "Enterprise" ? "#contact" : "/login"}
-                      className={`group relative overflow-hidden text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 ${p.popular
-                        ? "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-500/20"
-                        : "bg-slate-100 hover:bg-slate-900 text-slate-900 hover:text-white border border-slate-200"
-                        }`}
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {p.name === "Enterprise"
-                          ? "Contact Sales"
-                          : "Get Started"}
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </Link>
                   </div>
                 </div>
               </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ FAQ ══════════════════════════════════════════════════════ */}
-      <section
-        className="relative py-12 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white"
-        id="faq"
-      >
-        {/* Background Blur */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/3 w-[420px] h-[420px] bg-indigo-100/40 blur-3xl rounded-full" />
-          <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-cyan-100/40 blur-3xl rounded-full" />
-        </div>
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
-          <Reveal>
-            <div className="text-center mb-16">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
-                FAQ
-              </span>
-
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-5">
-                Frequently asked
-                <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
-                  questions
-                </span>
-              </h2>
-
-              <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
-                Everything you need to know about Techify, onboarding,
-                security, pricing, and operations.
-              </p>
             </div>
-          </Reveal>
+          </div>
+        </section>
 
-          <Reveal>
-            <div className="space-y-5">
+        {/* ══ METRICS ══════════════════════════════════════════════════ */}
+        <section className="relative py-12 bg-gradient-to-b from-[#F4F8FF] via-white to-[#F8FBFF] overflow-hidden">
+
+          {/* Background glow */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-0 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
+          </div>
+
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+
+            {/* Heading */}
+            <Reveal>
+              <div className="text-center mb-14">
+                <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
+                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                  Platform metrics
+                </span>
+
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-4">
+                  Trusted by growing
+                  <br />
+                  <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                    service operations
+                  </span>
+                </h2>
+
+                <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+                  Real numbers from brands, service centers and technicians
+                  actively managing after-sales operations on Techify.
+                </p>
+              </div>
+            </Reveal>
+
+            {/* Metrics cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
               {[
                 {
-                  q: "Can one admin manage multiple brands?",
-                  a: "Yes. Super Admins can manage multiple brands, service centers, technicians, and reports from a single dashboard while maintaining complete tenant isolation between brands.",
+                  end: 500,
+                  suffix: "+",
+                  label: "Active brands",
+                  icon: "🏢",
                 },
                 {
-                  q: "How does the auto-wallet crediting work?",
-                  a: "Whenever a ticket is marked as resolved, the configured payout amount is automatically credited to the service center wallet. Operators can monitor balances and request bank or UPI withdrawals instantly.",
+                  end: 2400,
+                  suffix: "+",
+                  label: "Service centers",
+                  icon: "🏪",
                 },
                 {
-                  q: "Is data isolated between brands?",
-                  a: "Absolutely. Every brand runs in a fully isolated tenant architecture with secure database-level filtering to ensure complete separation of tickets, technicians, and analytics.",
+                  end: 18000,
+                  suffix: "+",
+                  label: "Daily technicians",
+                  icon: "🔧",
                 },
                 {
-                  q: "Can we migrate our existing ticket data?",
-                  a: "Yes. We support CSV imports and custom migration APIs. Our onboarding team can help migrate your legacy data from spreadsheets or existing software systems.",
+                  end: 98,
+                  suffix: ".2%",
+                  label: "Satisfaction score",
+                  icon: "⭐",
                 },
-                {
-                  q: "Is there a mobile app for technicians?",
-                  a: "Techify is fully responsive and optimized for mobile browsers. Technicians can manage tickets, upload photos, chat, and update statuses directly from their phones without installing an app.",
-                },
-                {
-                  q: "What happens if we exceed our plan limits?",
-                  a: "We notify you before you reach your limits. Your service continues uninterrupted while you upgrade your subscription with prorated billing support.",
-                },
-              ].map((faq, i) => (
-                <Reveal key={faq.q} delay={i * 70}>
-                  <div className="group rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-xl shadow-[0_10px_40px_rgba(15,23,42,0.05)] hover:shadow-[0_20px_60px_rgba(99,102,241,0.08)] hover:border-indigo-200 transition-all duration-300 overflow-hidden">
+              ].map(({ end, suffix, label, icon }, i) => (
+                <Reveal key={label} delay={i * 80}>
+                  <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-8 text-center hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] overflow-hidden">
 
-                    <details className="group">
-                      <summary className="list-none cursor-pointer px-4 sm:px-7 py-5 sm:py-6 flex items-center justify-between gap-3">
-                        <div className="pr-2 sm:pr-6 flex-1 min-w-0 text-left">
-                          <h3 className="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {faq.q}
-                          </h3>
-                        </div>
+                    {/* Hover glow */}
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                        <div className="w-10 h-10 rounded-2xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center shrink-0 transition-all duration-300">
-                          <Plus className="w-5 h-5 text-slate-500 group-open:hidden" />
-                          <Minus className="w-5 h-5 text-indigo-600 hidden group-open:block" />
-                        </div>
-                      </summary>
+                    {/* Icon */}
+                    <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center text-2xl shadow-lg shadow-blue-200/40">
+                      {icon}
+                    </div>
 
-                      <div className="px-7 pb-7">
-                        <div className="h-px bg-gradient-to-r from-slate-200 via-indigo-100 to-transparent mb-5" />
+                    {/* Number */}
+                    <div className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-3">
+                      <Counter end={end} suffix={suffix} />
+                    </div>
 
-                        <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                          {faq.a}
-                        </p>
-                      </div>
-                    </details>
+                    {/* Label */}
+                    <p className="text-sm font-medium text-slate-500">
+                      {label}
+                    </p>
                   </div>
                 </Reveal>
               ))}
             </div>
-          </Reveal>
+          </div>
+        </section>
+        {/* ══ TESTIMONIALS ═════════════════════════════════════════════ */}
+        <section className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF] overflow-hidden">
 
-          {/* Bottom CTA */}
-          <Reveal delay={500}>
-            <div className="mt-16 text-center rounded-[32px] border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-10 shadow-[0_20px_60px_rgba(99,102,241,0.08)]">
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
-                Still have questions?
-              </h3>
+          {/* Background glow */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-10 left-1/4 w-[420px] h-[420px] bg-blue-200/25 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
+          </div>
 
-              <p className="text-slate-600 max-w-xl mx-auto leading-relaxed mb-7">
-                Our onboarding and support team is here to help you set up
-                your entire after-sales workflow smoothly.
-              </p>
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  href="/login"
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-bold shadow-xl shadow-indigo-500/20 transition-all duration-300"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all duration-300"
-                >
-                  Contact Support
-                </a>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ══ CONTACT ══════════════════════════════════════════════════ */}
-      <section
-        className="relative py-12 sm:py-12 overflow-hidden"
-        id="contact"
-      >
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#f8fbff] via-white to-[#eef4ff]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-indigo-500/10 blur-3xl rounded-full" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-400/10 blur-3xl rounded-full" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 items-start">
-
-            {/* Left */}
+            {/* Heading */}
             <Reveal>
-              <div>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-[0.18em] uppercase mb-6">
-                  Get in touch
+              <div className="text-center mb-16">
+                <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
+                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                  Customer stories
                 </span>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 mb-6">
-                  Let’s scale your
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-5">
+                  Loved by service teams
                   <br />
-                  <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-                    service network
+                  <span className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                    across the country
                   </span>
                 </h2>
 
-                <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mb-10">
-                  Tell us about your team size, number of brands, and service centers.
-                  We’ll schedule a personalized demo within 24 hours.
+                <p className="text-slate-500 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+                  Real feedback from brands, service centers and technicians
+                  using Techify every day to manage operations at scale.
                 </p>
-
-                {/* Contact cards */}
-                <div className="space-y-4">
-                  {[
-                    {
-                      icon: <Mail className="w-5 h-5 text-indigo-600" />,
-                      label: "Email us",
-                      value: "hello@techify.in",
-                    },
-                    {
-                      icon: <Phone className="w-5 h-5 text-indigo-600" />,
-                      label: "Call us",
-                      value: "+91 98765 43210",
-                    },
-                    {
-                      icon: <MapPin className="w-5 h-5 text-indigo-600" />,
-                      label: "Office",
-                      value: "Sector 44, Gurugram, Haryana 122003",
-                    },
-                    {
-                      icon: <Clock className="w-5 h-5 text-indigo-600" />,
-                      label: "Support hours",
-                      value: "Mon – Sat · 9am – 7pm IST",
-                    },
-                  ].map(({ icon, label, value }) => (
-                    <div
-                      key={label}
-                      className="group flex items-start gap-4 bg-white/80 backdrop-blur-xl border border-slate-200/70 rounded-2xl p-5 hover:border-indigo-200 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_10px_35px_rgba(15,23,42,0.04)]"
-                    >
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                        {icon}
-                      </div>
-
-                      <div>
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
-                          {label}
-                        </p>
-                        <p className="text-sm sm:text-base font-semibold text-slate-800">
-                          {value}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </Reveal>
 
-            {/* Right — Contact Form */}
-            <Reveal delay={150}>
-              <div className="relative rounded-[32px] border border-white/70 bg-white/80 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] p-7 sm:p-9">
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  name: "Rajesh Kumar",
+                  role: "Head of Service, CoolBreeze AC",
+                  avatar: "RK",
+                  color: "from-indigo-500 to-blue-500",
+                  stars: 5,
+                  text:
+                    "We manage 14 service centers across 3 states. Techify gave us one clean view of tickets, technicians and earnings. We onboarded our entire team in just 2 days.",
+                },
+                {
+                  name: "Priya Sharma",
+                  role: "Brand Manager, FreshHome Appliances",
+                  avatar: "PS",
+                  color: "from-emerald-500 to-teal-500",
+                  stars: 5,
+                  text:
+                    "The wallet system completely changed our payout workflow. Service centers now track earnings in real time and request withdrawals instantly.",
+                },
+                {
+                  name: "Arjun Mehta",
+                  role: "SC Owner, Delhi North",
+                  avatar: "AM",
+                  color: "from-orange-500 to-amber-500",
+                  stars: 5,
+                  text:
+                    "Our technicians previously worked on WhatsApp. Now they manage jobs, chats, photos and updates in one platform. Resolution time improved massively.",
+                },
+              ].map((t, i) => (
+                <Reveal key={t.name} delay={i * 100}>
+                  <div className="group relative bg-white/80 backdrop-blur-2xl border border-slate-200/70 rounded-3xl p-7 hover:-translate-y-1.5 hover:border-blue-200 transition-all duration-300 shadow-[0_10px_40px_rgba(15,23,42,0.05)] flex flex-col h-full overflow-hidden">
 
-                {/* Glow */}
-                <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-indigo-500/[0.05] via-transparent to-cyan-500/[0.05] pointer-events-none" />
+                    {/* Top glow */}
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-blue-400/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                {formSuccess ? (
-                  <div className="relative text-center py-8">
-                    <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
-                      <CheckCheck className="w-10 h-10 text-emerald-500" />
+                    {/* Stars */}
+                    <div className="flex gap-1 mb-5">
+                      {Array(t.stars)
+                        .fill(0)
+                        .map((_, j) => (
+                          <Star
+                            key={j}
+                            className="w-4 h-4 fill-amber-400 text-amber-400"
+                          />
+                        ))}
                     </div>
 
-                    <h3 className="text-2xl font-black text-slate-900 mb-2">
-                      Message received!
-                    </h3>
-
-                    <p className="text-sm text-slate-500 mb-6">
-                      Our team will get back to you within 24 hours.
+                    {/* Quote */}
+                    <p className="text-[15px] text-slate-600 leading-relaxed italic flex-1">
+                      “{t.text}”
                     </p>
 
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm inline-flex items-center gap-2">
-                      <span className="text-slate-500">Reference ID:</span>
-                      <span className="font-mono font-bold text-indigo-600">
-                        {formSuccess}
-                      </span>
-                    </div>
+                    {/* User */}
+                    <div className="flex items-center gap-4 mt-7 pt-6 border-t border-slate-200/70">
+                      <div
+                        className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${t.color} flex items-center justify-center text-sm font-bold text-white shadow-lg`}
+                      >
+                        {t.avatar}
+                      </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setFormSuccess("")}
-                      className="mt-6 text-sm font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
-                    >
-                      Send another message
-                    </button>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">
+                          {t.name}
+                        </p>
+
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {t.role}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="relative space-y-5">
-
-                    <div>
-                      <h3 className="text-2xl font-black text-slate-900 mb-2">
-                        Send us a message
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        Fill out the form and we’ll contact you shortly.
-                      </p>
-                    </div>
-
-                    {/* Name + Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Full name *
-                        </label>
-
-                        <input
-                          className={inputCls}
-                          placeholder="Rajesh Kumar"
-                          value={formState.name}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              name: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Email *
-                        </label>
-
-                        <input
-                          type="email"
-                          className={inputCls}
-                          placeholder="rajesh@brand.com"
-                          value={formState.email}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              email: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Phone + Company */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Phone
-                        </label>
-
-                        <input
-                          className={inputCls}
-                          placeholder="+91 98765 43210"
-                          value={formState.phone}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              phone: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Company *
-                        </label>
-
-                        <input
-                          className={inputCls}
-                          placeholder="CoolBreeze AC"
-                          value={formState.company}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              company: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Team + Inquiry */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Team size
-                        </label>
-
-                        <select
-                          className={inputCls}
-                          value={formState.teamSize}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              teamSize: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">Select size</option>
-                          <option>1–10 technicians</option>
-                          <option>11–50 technicians</option>
-                          <option>51–200 technicians</option>
-                          <option>200+ technicians</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-500 mb-2">
-                          Inquiry type
-                        </label>
-
-                        <select
-                          className={inputCls}
-                          value={formState.inquiryType}
-                          onChange={(e) =>
-                            setFormState((p) => ({
-                              ...p,
-                              inquiryType: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">Select type</option>
-                          <option>Product demo</option>
-                          <option>Pricing & plans</option>
-                          <option>Technical support</option>
-                          <option>Partnership</option>
-                          <option>Other</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Message */}
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-500 mb-2">
-                        Message *
-                      </label>
-
-                      <textarea
-                        className={`${inputCls} h-auto resize-none`}
-                        rows={5}
-                        placeholder="Tell us about your challenges, brands, service centers, or technician workflows..."
-                        value={formState.message}
-                        onChange={(e) =>
-                          setFormState((p) => ({
-                            ...p,
-                            message: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    {/* Error */}
-                    {formError && (
-                      <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
-                        <X className="w-4 h-4 shrink-0" />
-                        {formError}
-                      </div>
-                    )}
-
-                    {/* Button */}
-                    <button
-                      type="submit"
-                      disabled={formLoading}
-                      className="w-full py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
-    hover:scale-105
-    transition-all duration-300
-    shadow-[0_0_20px_rgba(168,85,247,0.45)] disabled:opacity-60 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_12px_40px_rgba(99,102,241,0.35)] cursor-pointer"
-                    >
-                      {formLoading ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          Send message
-                        </>
-                      )}
-                    </button>
-
-                    <p className="text-xs text-slate-400 text-center leading-relaxed">
-                      By submitting this form, you agree to our Privacy Policy.
-                      We never share your information.
-                    </p>
-                  </form>
-                )}
-              </div>
-            </Reveal>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+        {/* ══ PRICING ══════════════════════════════════════════════════ */}
+        <section
+          className="relative py-12 overflow-hidden bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc]"
+          id="pricing"
+        >
+          {/* Background */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/3 w-[420px] h-[420px] bg-indigo-100/50 blur-3xl rounded-full" />
+            <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-violet-100/40 blur-3xl rounded-full" />
+          </div>
 
-      {/* ══ CTA BANNER ═══════════════════════════════════════════════ */}
-      <section className="relative py-12 sm:py-12 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-[#f8fbff] to-[#eef4ff]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-violet-500/10 rounded-full blur-3xl" />
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+            <Reveal>
+              <div className="text-center mb-20">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
+                  Transparent Pricing
+                </span>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-          <Reveal>
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/75 backdrop-blur-2xl shadow-[0_25px_80px_rgba(15,23,42,0.08)]">
-
-              {/* Decorative Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.06] via-transparent to-violet-500/[0.08]" />
-
-              {/* Floating circles */}
-              <div className="absolute -top-20 -left-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl" />
-              <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-violet-500/10 rounded-full blur-3xl" />
-
-              <div className="relative z-10 px-8 py-12 sm:px-14 sm:py-12 text-center">
-
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-[0.18em] uppercase mb-8">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Trusted by 500+ service brands
-                </div>
-
-                {/* Heading */}
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 mb-6">
-                  Ready to transform your
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight mb-5">
+                  Simple plans,
                   <br />
-                  <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-                    after-sales operations?
+                  <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
+                    built for growth
                   </span>
                 </h2>
 
-                {/* Description */}
-                <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed mb-10">
-                  Join hundreds of brands managing tickets, technicians, service centers,
-                  analytics, and payouts — all from one unified platform.
+                <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
+                  Start free for 14 days. Scale from a single service center
+                  to a nationwide multi-brand support operation.
+                </p>
+              </div>
+            </Reveal>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+              {[
+                {
+                  name: "Starter",
+                  price: "₹2,999",
+                  period: "/month",
+                  popular: false,
+                  desc: "Perfect for startups and growing local service operations.",
+                  features: [
+                    "1 Brand / Tenant",
+                    "Up to 5 Service Centers",
+                    "25 Technicians Included",
+                    "Unlimited Tickets",
+                    "Basic Analytics Dashboard",
+                    "Wallet & Payout Support",
+                  ],
+                  missing: [
+                    "Multi-brand management",
+                    "Advanced SLA reports",
+                    "Dedicated account manager",
+                  ],
+                },
+                {
+                  name: "Growth",
+                  price: "₹7,999",
+                  period: "/month",
+                  popular: true,
+                  desc: "Designed for brands scaling across multiple cities.",
+                  features: [
+                    "Up to 5 Brands",
+                    "Unlimited Service Centers",
+                    "Unlimited Technicians",
+                    "Advanced Analytics + CSV Export",
+                    "Wallet + Automated Payouts",
+                    "Custom Ticket Rates",
+                    "Priority Support",
+                  ],
+                  missing: ["Dedicated account manager"],
+                },
+                {
+                  name: "Enterprise",
+                  price: "Custom",
+                  period: "/volume",
+                  popular: false,
+                  desc: "Tailored infrastructure and workflows for large enterprises.",
+                  features: [
+                    "Unlimited Brands",
+                    "Unlimited Everything",
+                    "White-label Platform",
+                    "Custom Integrations",
+                    "Enterprise SLA Management",
+                    "Audit Logs & Compliance",
+                    "Dedicated Success Manager",
+                  ],
+                  missing: [],
+                },
+              ].map((p, i) => (
+                <Reveal key={p.name} delay={i * 100}>
+                  <div
+                    className={`relative h-full rounded-[32px] p-[1px] transition-all duration-500 hover:-translate-y-2 ${p.popular
+                      ? "bg-gradient-to-b from-indigo-500 via-violet-500 to-cyan-500 shadow-[0_25px_80px_rgba(99,102,241,0.28)]"
+                      : "bg-slate-200 hover:bg-indigo-200"
+                      }`}
+                  >
+                    <div
+                      className={`h-full rounded-[31px] backdrop-blur-xl p-6 sm:p-8 lg:p-9 flex flex-col ${p.popular
+                        ? "bg-gradient-to-b from-[#111827] to-[#0f172a] pt-8 sm:pt-10"
+                        : "bg-white/95"
+                        }`}
+                    >
+                      {/* Popular Badge */}
+                      {p.popular && (
+                        <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 z-10">
+                          <div className="px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-[11px] font-bold tracking-wider uppercase shadow-xl">
+                            Most Popular
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Plan */}
+                      <div className="mb-7">
+                        <h3
+                          className={`text-2xl font-black mb-2 ${p.popular ? "text-white" : "text-slate-900"
+                            }`}
+                        >
+                          {p.name}
+                        </h3>
+
+                        <p
+                          className={`text-sm leading-relaxed ${p.popular ? "text-slate-400" : "text-slate-500"
+                            }`}
+                        >
+                          {p.desc}
+                        </p>
+                      </div>
+
+                      {/* Price */}
+                      <div
+                        className={`pb-7 mb-7 border-b ${p.popular
+                          ? "border-white/10"
+                          : "border-slate-200"
+                          }`}
+                      >
+                        <div className="flex items-end gap-2">
+                          <span
+                            className={`text-5xl font-black tracking-tight ${p.popular ? "text-white" : "text-slate-900"
+                              }`}
+                          >
+                            {p.price}
+                          </span>
+
+                          <span
+                            className={`text-sm mb-1 ${p.popular ? "text-slate-400" : "text-slate-500"
+                              }`}
+                          >
+                            {p.period}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Features */}
+                      <ul className="space-y-4 flex-1 mb-8">
+                        {p.features.map((f) => (
+                          <li
+                            key={f}
+                            className={`flex items-start gap-3 text-sm ${p.popular ? "text-slate-200" : "text-slate-700"
+                              }`}
+                          >
+                            <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
+                              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                            </div>
+                            <span>{f}</span>
+                          </li>
+                        ))}
+
+                        {p.missing.map((f) => (
+                          <li
+                            key={f}
+                            className={`flex items-start gap-3 text-sm ${p.popular ? "text-slate-500" : "text-slate-400"
+                              }`}
+                          >
+                            <div className="w-5 h-5 rounded-full bg-slate-200/70 flex items-center justify-center shrink-0 mt-0.5">
+                              <X className="w-3.5 h-3.5" />
+                            </div>
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* CTA */}
+                      <Link
+                        href={p.name === "Enterprise" ? "#contact" : "/login"}
+                        className={`group relative overflow-hidden text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 ${p.popular
+                          ? "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xl shadow-indigo-500/20"
+                          : "bg-slate-100 hover:bg-slate-900 text-slate-900 hover:text-white border border-slate-200"
+                          }`}
+                      >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          {p.name === "Enterprise"
+                            ? "Contact Sales"
+                            : "Get Started"}
+                          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══ FAQ ══════════════════════════════════════════════════════ */}
+        <section
+          className="relative py-12 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white"
+          id="faq"
+        >
+          {/* Background Blur */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/3 w-[420px] h-[420px] bg-indigo-100/40 blur-3xl rounded-full" />
+            <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-cyan-100/40 blur-3xl rounded-full" />
+          </div>
+
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
+            <Reveal>
+              <div className="text-center mb-16">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
+                  FAQ
+                </span>
+
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight mb-5">
+                  Frequently asked
+                  <br />
+                  <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent">
+                    questions
+                  </span>
+                </h2>
+
+                <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed">
+                  Everything you need to know about Techify, onboarding,
+                  security, pricing, and operations.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <div className="space-y-5">
+                {[
+                  {
+                    q: "Can one admin manage multiple brands?",
+                    a: "Yes. Super Admins can manage multiple brands, service centers, technicians, and reports from a single dashboard while maintaining complete tenant isolation between brands.",
+                  },
+                  {
+                    q: "How does the auto-wallet crediting work?",
+                    a: "Whenever a ticket is marked as resolved, the configured payout amount is automatically credited to the service center wallet. Operators can monitor balances and request bank or UPI withdrawals instantly.",
+                  },
+                  {
+                    q: "Is data isolated between brands?",
+                    a: "Absolutely. Every brand runs in a fully isolated tenant architecture with secure database-level filtering to ensure complete separation of tickets, technicians, and analytics.",
+                  },
+                  {
+                    q: "Can we migrate our existing ticket data?",
+                    a: "Yes. We support CSV imports and custom migration APIs. Our onboarding team can help migrate your legacy data from spreadsheets or existing software systems.",
+                  },
+                  {
+                    q: "Is there a mobile app for technicians?",
+                    a: "Techify is fully responsive and optimized for mobile browsers. Technicians can manage tickets, upload photos, chat, and update statuses directly from their phones without installing an app.",
+                  },
+                  {
+                    q: "What happens if we exceed our plan limits?",
+                    a: "We notify you before you reach your limits. Your service continues uninterrupted while you upgrade your subscription with prorated billing support.",
+                  },
+                ].map((faq, i) => (
+                  <Reveal key={faq.q} delay={i * 70}>
+                    <div className="group rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-xl shadow-[0_10px_40px_rgba(15,23,42,0.05)] hover:shadow-[0_20px_60px_rgba(99,102,241,0.08)] hover:border-indigo-200 transition-all duration-300 overflow-hidden">
+
+                      <details className="group">
+                        <summary className="list-none cursor-pointer px-4 sm:px-7 py-5 sm:py-6 flex items-center justify-between gap-3">
+                          <div className="pr-2 sm:pr-6 flex-1 min-w-0 text-left">
+                            <h3 className="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                              {faq.q}
+                            </h3>
+                          </div>
+
+                          <div className="w-10 h-10 rounded-2xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center shrink-0 transition-all duration-300">
+                            <Plus className="w-5 h-5 text-slate-500 group-open:hidden" />
+                            <Minus className="w-5 h-5 text-indigo-600 hidden group-open:block" />
+                          </div>
+                        </summary>
+
+                        <div className="px-7 pb-7">
+                          <div className="h-px bg-gradient-to-r from-slate-200 via-indigo-100 to-transparent mb-5" />
+
+                          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                            {faq.a}
+                          </p>
+                        </div>
+                      </details>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Bottom CTA */}
+            <Reveal delay={500}>
+              <div className="mt-16 text-center rounded-[32px] border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-10 shadow-[0_20px_60px_rgba(99,102,241,0.08)]">
+                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
+                  Still have questions?
+                </h3>
+
+                <p className="text-slate-600 max-w-xl mx-auto leading-relaxed mb-7">
+                  Our onboarding and support team is here to help you set up
+                  your entire after-sales workflow smoothly.
                 </p>
 
-                {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-
                   <Link
                     href="/login"
-                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
-    hover:scale-105
-    transition-all duration-300
-    shadow-[0_0_20px_rgba(168,85,247,0.45)] text-white font-semibold transition-all duration-300 shadow-[0_15px_45px_rgba(99,102,241,0.35)] hover:shadow-[0_20px_55px_rgba(99,102,241,0.45)]"
+                    className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-bold shadow-xl shadow-indigo-500/20 transition-all duration-300"
                   >
-                    Start free 14-day trial
-                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    Start Free Trial
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </Link>
 
                   <a
                     href="#contact"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-slate-200 bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300 shadow-sm"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all duration-300"
                   >
-                    Talk to sales
+                    Contact Support
                   </a>
                 </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
 
-                {/* Small trust text */}
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500">
-                  <span>No credit card required</span>
-                  <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300" />
-                  <span>Setup in under 30 minutes</span>
-                  <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300" />
-                  <span>Cancel anytime</span>
-                </div>
+        {/* ══ CONTACT ══════════════════════════════════════════════════ */}
+        <section
+          className="relative py-12 sm:py-12 overflow-hidden"
+          id="contact"
+        >
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#f8fbff] via-white to-[#eef4ff]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-indigo-500/10 blur-3xl rounded-full" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-400/10 blur-3xl rounded-full" />
 
-                {/* Mini stats */}
-                <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                  {[
-                    { value: "50K+", label: "Tickets resolved" },
-                    { value: "2.4K+", label: "Service centers" },
-                    { value: "18K+", label: "Technicians" },
-                    { value: "99.9%", label: "Platform uptime" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-2xl border border-slate-200/70 bg-white/70 backdrop-blur-xl px-4 py-5"
-                    >
-                      <div className="text-2xl font-black text-slate-900 mb-1">
-                        {item.value}
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 items-start">
+
+              {/* Left */}
+              <Reveal>
+                <div>
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-[0.18em] uppercase mb-6">
+                    Get in touch
+                  </span>
+
+                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 mb-6">
+                    Let’s scale your
+                    <br />
+                    <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
+                      service network
+                    </span>
+                  </h2>
+
+                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mb-10">
+                    Tell us about your team size, number of brands, and service centers.
+                    We’ll schedule a personalized demo within 24 hours.
+                  </p>
+
+                  {/* Contact cards */}
+                  <div className="space-y-4">
+                    {[
+                      {
+                        icon: <Mail className="w-5 h-5 text-indigo-600" />,
+                        label: "Email us",
+                        value: "help.saastechify@gmail.com",
+                      },
+                      {
+                        icon: <Phone className="w-5 h-5 text-indigo-600" />,
+                        label: "Call us",
+                        value: "+91 9565892772",
+                      },
+                      {
+                        icon: <MapPin className="w-5 h-5 text-indigo-600" />,
+                        label: "Office",
+                        value: "FF-29, Gali No. 16 Mangal Bazar, Laxmi Nagar, East Delhi, 110092",
+                      },
+                      {
+                        icon: <Clock className="w-5 h-5 text-indigo-600" />,
+                        label: "Support hours",
+                        value: "Mon – Sat · 9am – 7pm IST",
+                      },
+                    ].map(({ icon, label, value }) => (
+                      <div
+                        key={label}
+                        className="group flex items-start gap-4 bg-white/80 backdrop-blur-xl border border-slate-200/70 rounded-2xl p-5 hover:border-indigo-200 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_10px_35px_rgba(15,23,42,0.04)]"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                          {icon}
+                        </div>
+
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
+                            {label}
+                          </p>
+                          <p className="text-sm sm:text-base font-semibold text-slate-800">
+                            {value}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-500 font-medium">
-                        {item.label}
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+
+              {/* Right — Contact Form */}
+              <Reveal delay={150}>
+                <div className="relative rounded-[32px] border border-white/70 bg-white/80 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] p-7 sm:p-9">
+
+                  {/* Glow */}
+                  <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-indigo-500/[0.05] via-transparent to-cyan-500/[0.05] pointer-events-none" />
+
+                  {formSuccess ? (
+                    <div className="relative text-center py-8">
+                      <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <CheckCheck className="w-10 h-10 text-emerald-500" />
+                      </div>
+
+                      <h3 className="text-2xl font-black text-slate-900 mb-2">
+                        Message received!
+                      </h3>
+
+                      <p className="text-sm text-slate-500 mb-6">
+                        Our team will get back to you within 24 hours.
                       </p>
+
+                      <div className="bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm inline-flex items-center gap-2">
+                        <span className="text-slate-500">Reference ID:</span>
+                        <span className="font-mono font-bold text-indigo-600">
+                          {formSuccess}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setFormSuccess("")}
+                        className="mt-6 text-sm font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
+                      >
+                        Send another message
+                      </button>
                     </div>
-                  ))}
+                  ) : (
+                    <form onSubmit={handleSubmit} className="relative space-y-5">
+
+                      <div>
+                        <h3 className="text-2xl font-black text-slate-900 mb-2">
+                          Send us a message
+                        </h3>
+
+                        <p className="text-sm text-slate-500">
+                          Fill out the form and we’ll contact you shortly.
+                        </p>
+                      </div>
+
+                      {/* Name + Email */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Full name *
+                          </label>
+
+                          <input
+                            className={inputCls}
+                            placeholder="Rajesh Kumar"
+                            value={formState.name}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                name: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Email *
+                          </label>
+
+                          <input
+                            type="email"
+                            className={inputCls}
+                            placeholder="rajesh@brand.com"
+                            value={formState.email}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                email: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* Phone + Company */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Phone
+                          </label>
+
+                          <input
+                            className={inputCls}
+                            placeholder="+91 98765 43210"
+                            value={formState.phone}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                phone: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Company *
+                          </label>
+
+                          <input
+                            className={inputCls}
+                            placeholder="CoolBreeze AC"
+                            value={formState.company}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                company: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* Team + Inquiry */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Team size
+                          </label>
+
+                          <select
+                            className={inputCls}
+                            value={formState.teamSize}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                teamSize: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">Select size</option>
+                            <option>1–10 technicians</option>
+                            <option>11–50 technicians</option>
+                            <option>51–200 technicians</option>
+                            <option>200+ technicians</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-2">
+                            Inquiry type
+                          </label>
+
+                          <select
+                            className={inputCls}
+                            value={formState.inquiryType}
+                            onChange={(e) =>
+                              setFormState((p) => ({
+                                ...p,
+                                inquiryType: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">Select type</option>
+                            <option>Product demo</option>
+                            <option>Pricing & plans</option>
+                            <option>Technical support</option>
+                            <option>Partnership</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Message */}
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-2">
+                          Message *
+                        </label>
+
+                        <textarea
+                          className={`${inputCls} h-auto resize-none`}
+                          rows={5}
+                          placeholder="Tell us about your challenges, brands, service centers, or technician workflows..."
+                          value={formState.message}
+                          onChange={(e) =>
+                            setFormState((p) => ({
+                              ...p,
+                              message: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      {/* Error */}
+                      {formError && (
+                        <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+                          <X className="w-4 h-4 shrink-0" />
+                          {formError}
+                        </div>
+                      )}
+
+                      {/* Button */}
+                      <button
+                        type="submit"
+                        disabled={formLoading}
+                        className="w-full py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)] disabled:opacity-60 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_12px_40px_rgba(99,102,241,0.35)] cursor-pointer"
+                      >
+                        {formLoading ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            Send message
+                          </>
+                        )}
+                      </button>
+
+                      <p className="text-xs text-slate-400 text-center leading-relaxed">
+                        By submitting this form, you agree to our Privacy Policy.
+                        We never share your information.
+                      </p>
+                    </form>
+                  )}
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ CTA BANNER ═══════════════════════════════════════════════ */}
+        <section className="relative py-12 sm:py-12 overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-[#f8fbff] to-[#eef4ff]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-violet-500/10 rounded-full blur-3xl" />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+            <Reveal>
+              <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/75 backdrop-blur-2xl shadow-[0_25px_80px_rgba(15,23,42,0.08)]">
+
+                {/* Decorative Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.06] via-transparent to-violet-500/[0.08]" />
+
+                {/* Floating circles */}
+                <div className="absolute -top-20 -left-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-violet-500/10 rounded-full blur-3xl" />
+
+                <div className="relative z-10 px-8 py-12 sm:px-14 sm:py-12 text-center">
+
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-[0.18em] uppercase mb-8">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Trusted by 500+ service brands
+                  </div>
+
+                  {/* Heading */}
+                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 mb-6">
+                    Ready to transform your
+                    <br />
+                    <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
+                      after-sales operations?
+                    </span>
+                  </h2>
+
+                  {/* Description */}
+                  <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed mb-10">
+                    Join hundreds of brands managing tickets, technicians, service centers,
+                    analytics, and payouts — all from one unified platform.
+                  </p>
+
+                  {/* CTA Buttons */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+
+                    <Link
+                      href="/login"
+                      className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl  bg-gradient-to-r from-cyan-500 to-fuchsia-600
+    hover:scale-105
+    transition-all duration-300
+    shadow-[0_0_20px_rgba(168,85,247,0.45)] text-white font-semibold transition-all duration-300 shadow-[0_15px_45px_rgba(99,102,241,0.35)] hover:shadow-[0_20px_55px_rgba(99,102,241,0.45)]"
+                    >
+                      Start free 14-day trial
+                      <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
+
+                    <a
+                      href="#contact"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-slate-200 bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300 shadow-sm"
+                    >
+                      Talk to sales
+                    </a>
+                  </div>
+
+                  {/* Small trust text */}
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500">
+                    <span>No credit card required</span>
+                    <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300" />
+                    <span>Setup in under 30 minutes</span>
+                    <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300" />
+                    <span>Cancel anytime</span>
+                  </div>
+
+                  {/* Mini stats */}
+                  <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    {[
+                      { value: "50K+", label: "Tickets resolved" },
+                      { value: "2.4K+", label: "Service centers" },
+                      { value: "18K+", label: "Technicians" },
+                      { value: "99.9%", label: "Platform uptime" },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-slate-200/70 bg-white/70 backdrop-blur-xl px-4 py-5"
+                      >
+                        <div className="text-2xl font-black text-slate-900 mb-1">
+                          {item.value}
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">
+                          {item.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            </Reveal>
+          </div>
+        </section>
       </main>
 
       {/* ══ FOOTER ═══════════════════════════════════════════════════ */}
-      <footer className="relative overflow-hidden border-t border-slate-200/70 bg-gradient-to-b from-white via-[#f8fbff] to-[#eef4ff]">
+      <footer className="relative overflow-hidden border-t border-slate-200/70  ">
 
         {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-indigo-500/5 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
           {/* Top */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-12 pb-10 sm:pb-14 border-b border-slate-200/70">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-12   border-b border-slate-200/70">
 
 
             {/* Brand */}
             <div className="col-span-2 sm:col-span-4 lg:col-span-2">
 
-              <Link
-                href="/"
-                className="inline-flex items-center shrink-0"
-              >
-                <Image
-                  src="/logo13.png"
-                  alt="SaaSTechify"
-                  width={220}
-                  height={80}
-                  priority
-                  className="h-10 sm:h-12 md:h-14 w-auto max-w-[200px] sm:max-w-none object-contain"
-                />
-              </Link>
+              {/* Logo + Description */}
+              <div className="flex flex-col gap-5 mb-8">
 
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-md mb-7">
-                The complete after-sales service management platform for brands,
-                service centers, technicians, and customer support teams across India.
-              </p>
-
-              {/* Socials */}
-              <div className="flex items-center gap-3">
-                {[
-                  { icon: "𝕏", href: "#" },
-                  { icon: "in", href: "#" },
-                  { icon: "▶", href: "#" },
-                  { icon: "📘", href: "#" },
-                ].map((s, i) => (
-                  <a
-                    key={i}
-                    href={s.href}
-                    className="
-          w-10 h-10 rounded-xl
-          border border-cyan-400/20
-          bg-white/10 backdrop-blur-md
-          hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-fuchsia-500/20
-          hover:border-fuchsia-400/40
-          text-slate-500 hover:text-white
-          flex items-center justify-center
-          text-sm font-semibold
-          transition-all duration-300
-          hover:shadow-[0_0_20px_rgba(168,85,247,0.35)]
-        "
+                <div className="flex justify-center">
+                  <Link
+                    href="/"
+                    className="flex items-center justify-center"
                   >
-                    {s.icon}
-                  </a>
-                ))}
+                    <Image
+                      src="/logo13.png"
+                      alt="SaaSTechify"
+                      width={220}
+                      height={80}
+                      priority
+                      className="h-11 sm:h-12 md:h-24 w-auto object-contain"
+                    />
+                  </Link>
+                </div>
+
+                <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed max-w-md">
+                  The complete after-sales service management platform for brands,
+                  service centers, technicians, and customer support teams across India.
+                </p>
               </div>
+
+
+
+
+
             </div>
 
             {/* Footer Links */}
@@ -3385,7 +3387,85 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          {/* Contact Info */}
+          <div className="py-4 flex flex-col items-start  md:flex-row items-center justify-between border-b border-slate-200/70 gap-5">
 
+            {/* Email */}
+            <div className="flex items-start gap-4">
+              <div className="min-w-[42px] h-[42px] rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                ✉
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
+                  Email us
+                </p>
+
+                <a
+                  href="mailto:help.saastechify@gmail.com"
+                  className="text-sm text-slate-700 hover:text-indigo-600 transition-colors break-all"
+                >
+                  help.saastechify@gmail.com
+                </a>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="flex items-start gap-4">
+              <div className="min-w-[42px] h-[42px] rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                ☎
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
+                  Call us
+                </p>
+
+                <a
+                  href="tel:+919565892772"
+                  className="text-sm text-slate-700 hover:text-indigo-600 transition-colors"
+                >
+                  +91 9565892772
+                </a>
+              </div>
+            </div>
+
+            {/* Office */}
+            <div className="flex items-start gap-4">
+              <div className="min-w-[42px] h-[42px] rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                📍
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
+                  Office
+                </p>
+
+                <p className="text-sm text-slate-700 leading-relaxed max-w-sm">
+                  FF-29, Gali No. 16   Laxmi Nagar,
+                  East Delhi, 110092
+                </p>
+              </div>
+            </div>
+
+            {/* Support Hours */}
+            <div className="flex items-start gap-4">
+              <div className="min-w-[42px] h-[42px] rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                🕘
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-semibold mb-1">
+                  Support hours
+                </p>
+
+                <p className="text-sm text-slate-700">
+                  Mon – Sat · 9am – 7pm IST
+                </p>
+              </div>
+            </div>
+
+          </div>
           {/* Bottom */}
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-5">
 
@@ -3393,7 +3473,30 @@ export default function LandingPage() {
             <p className="text-sm text-slate-500 text-center md:text-left">
               © 2026 SaaS Techify. All rights reserved.
             </p>
-
+            {/* Socials */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {socials.map((s, i) => (
+                <a
+                  key={i}
+                  href={s.href}
+                  className="
+        group
+        w-11 h-11 rounded-2xl
+        bg-gradient-to-r from-cyan-500 to-fuchsia-600
+        hover:from-fuchsia-600 hover:to-cyan-500
+        text-white
+        flex items-center justify-center
+        transition-all duration-300
+        hover:scale-105
+        hover:shadow-[0_10px_25px_rgba(168,85,247,0.35)]
+      "
+                >
+                  <span className="group-hover:scale-110 transition-transform duration-300">
+                    {s.icon}
+                  </span>
+                </a>
+              ))}
+            </div>
             {/* Bottom Links */}
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
               {[
