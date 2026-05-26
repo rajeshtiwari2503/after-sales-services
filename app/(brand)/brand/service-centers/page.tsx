@@ -177,7 +177,7 @@ const emptyForm = {
   name: "", code: "",
   street: "", city: "", state: "", postalCode: "", country: "India",
   phone: "", email: "",
-  capacity: 10, services: "",
+  capacity: 10, services: "", servicePincodes: "",
 };
 
 export default function BrandServiceCentersPage() {
@@ -219,6 +219,10 @@ export default function BrandServiceCentersPage() {
           contact: { phone: form.phone, email: form.email },
           capacity: Number(form.capacity),
           services: form.services.split(",").map(s => s.trim()).filter(Boolean),
+          servicePincodes: form.servicePincodes
+            .split(",")
+            .map((p) => p.trim().replace(/\D/g, "").slice(0, 6))
+            .filter(Boolean),
         }),
       });
       const data = await res.json();
@@ -350,6 +354,12 @@ export default function BrandServiceCentersPage() {
                 <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Services (comma separated)</label>
                 <input className={inputCls} placeholder="AC, Refrigerator, Washing Machine"
                   value={form.services} onChange={e => setForm(p => ({ ...p, services: e.target.value }))} />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Service pincodes (comma separated)</label>
+                <input className={inputCls} placeholder="110001, 110002, 1100"
+                  value={form.servicePincodes} onChange={e => setForm(p => ({ ...p, servicePincodes: e.target.value }))} />
+                <p className="text-[10px] text-slate-400 mt-1">Tickets with matching pincode auto-route to this center.</p>
               </div>
             </div>
             <div className="flex gap-2 pt-2">

@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     const outOfStock      = searchParams.get('outOfStock') === 'true';
     const search          = searchParams.get('search');
     const serviceCenterId = searchParams.get('serviceCenterId');
+    const warehouse       = searchParams.get('warehouse'); // central | sc | all
     const brandId         = searchParams.get('brandId');
     const productId       = searchParams.get('productId');
     const categoryId      = searchParams.get('categoryId');
@@ -49,6 +50,11 @@ export async function GET(request: NextRequest) {
       if (scHeader && Types.ObjectId.isValid(scHeader)) {
         query.serviceCenterId = new Types.ObjectId(scHeader);
       }
+    } else if (user.role === 'manager' && warehouse !== 'all' && !serviceCenterId) {
+      // Brand central warehouse (no SC assigned)
+      query.$or = [{ serviceCenterId: { $exists: false } }, { serviceCenterId: null }];
+    } else if (user.role === 'admin' && warehouse === 'central') {
+      query.$or = [{ serviceCenterId: { $exists: false } }, { serviceCenterId: null }];
     }
 
     if (search) {

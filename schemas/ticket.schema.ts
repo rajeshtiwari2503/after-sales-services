@@ -111,6 +111,15 @@ export const createTicketSchema = z.object({
   serviceCenterId: z.string().optional(),
   technicianId: z.string().optional(),
   estimatedCompletionDate: z.string().optional(),
+  servicePincode: z.string().optional(),
+  serviceAddress: z
+    .object({
+      street: z.string().optional(),
+      city: z.string().optional(),
+      state: z.string().optional(),
+      postalCode: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const updateTicketSchema = z.object({

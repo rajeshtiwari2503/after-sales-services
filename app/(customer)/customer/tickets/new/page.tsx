@@ -24,6 +24,9 @@ export default function NewTicketPage() {
     title: "", description: "", category: "" as typeof CATEGORIES[number] | "",
     priority: "medium" as typeof PRIORITIES[number],
     estimatedCompletionDate: "",
+    servicePincode: "",
+    serviceCity: "",
+    serviceStreet: "",
   });
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -41,6 +44,8 @@ export default function NewTicketPage() {
     if (!form.description.trim()) e.description = "Description is required";
     else if (form.description.length < 10) e.description = "Description must be at least 10 characters";
     if (!form.category) e.category = "Please select a category";
+    const pin = form.servicePincode.replace(/\D/g, "");
+    if (!pin || pin.length < 6) e.servicePincode = "Enter a valid 6-digit service pincode";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -57,14 +62,33 @@ export default function NewTicketPage() {
       let res: Response;
       if (files.length > 0) {
         const fd = new FormData();
-        Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
+        fd.append("title", form.title);
+        fd.append("description", form.description);
+        fd.append("category", form.category);
+        fd.append("priority", form.priority);
+        if (form.estimatedCompletionDate) fd.append("estimatedCompletionDate", form.estimatedCompletionDate);
+        const pin = form.servicePincode.replace(/\D/g, "").slice(0, 6);
+        fd.append("servicePincode", pin);
+        if (form.serviceStreet) fd.append("serviceAddress", JSON.stringify({ street: form.serviceStreet, city: form.serviceCity, postalCode: pin }));
         files.forEach(f => fd.append("attachments", f));
         res = await fetch("/api/tickets", { method: "POST", credentials: "include", body: fd });
       } else {
         res = await fetch("/api/tickets", {
           method: "POST", credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            title: form.title,
+            description: form.description,
+            category: form.category,
+            priority: form.priority,
+            estimatedCompletionDate: form.estimatedCompletionDate || undefined,
+            servicePincode: form.servicePincode.replace(/\D/g, "").slice(0, 6),
+            serviceAddress: {
+              street: form.serviceStreet || undefined,
+              city: form.serviceCity || undefined,
+              postalCode: form.servicePincode.replace(/\D/g, "").slice(0, 6),
+            },
+          }),
         });
       }
       const data = await res.json();
@@ -118,6 +142,42 @@ export default function NewTicketPage() {
             className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 bg-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/10 transition resize-none leading-relaxed" />
           {errors.description && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.description}</p>}
         </div>
+      </div>
+
+      {/* Service location */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-4 space-y-3">
+        <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide">
+          Service location <span className="text-red-400">*</span>
+        </label>
+        <p className="text-xs text-slate-400 -mt-1">We assign the nearest service center using your pincode.</p>
+        <input
+          type="text"
+          inputMode="numeric"
+          maxLength={6}
+          value={form.servicePincode}
+          onChange={(e) => set("servicePincode", e.target.value.replace(/\D/g, "").slice(0, 6))}
+          placeholder="6-digit pincode e.g. 110001"
+          className={inputCls}
+        />
+        {errors.servicePincode && (
+          <p className="text-red-500 text-xs flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />{errors.servicePincode}
+          </p>
+        )}
+        <input
+          type="text"
+          value={form.serviceStreet}
+          onChange={(e) => set("serviceStreet", e.target.value)}
+          placeholder="Street / building (optional)"
+          className={inputCls}
+        />
+        <input
+          type="text"
+          value={form.serviceCity}
+          onChange={(e) => set("serviceCity", e.target.value)}
+          placeholder="City (optional)"
+          className={inputCls}
+        />
       </div>
 
       {/* Category */}

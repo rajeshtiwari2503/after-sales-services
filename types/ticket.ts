@@ -51,6 +51,13 @@ export interface Ticket {
  
   technicianId?: Types.ObjectId;
   serviceCenterId?: Types.ObjectId;
+  servicePincode?: string;
+  serviceAddress?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+  };
   tenantId: string;
   attachments: Attachment[];
   notes: Note[];

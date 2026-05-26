@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Package, Plus, AlertTriangle, Search, RefreshCw, TrendingDown } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Package, Plus, AlertTriangle, Search, RefreshCw, TrendingDown, Truck } from "lucide-react";
 import toast from "react-hot-toast";
+import InventoryTransfersPanel from "@/components/inventory/InventoryTransfersPanel";
 
 interface InventoryItem {
   _id: string;
@@ -16,7 +18,10 @@ interface InventoryItem {
   isActive: boolean;
 }
 
-export default function SCInventoryPage() {
+function SCInventoryContent() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab") === "transfers" ? "transfers" : "stock";
+
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -41,7 +46,9 @@ export default function SCInventoryPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchInventory(); }, [search, showLowStock]);
+  useEffect(() => {
+    if (tab === "stock") fetchInventory();
+  }, [search, showLowStock, tab]);
 
   const lowStockCount = items.filter(i => i.quantity <= i.minQuantity).length;
   const totalValue = items.reduce((s, i) => s + (i.quantity * i.unitPrice), 0);
@@ -86,13 +93,30 @@ export default function SCInventoryPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800">Inventory & Parts</h1>
-          <p className="text-xs text-slate-400 mt-0.5">{items.length} items tracked</p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {tab === "stock" ? `${items.length} items at your center` : "Shipments & part requests"}
+          </p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 h-9 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium cursor-pointer">
-          <Plus className="w-4 h-4" /> Add item
-        </button>
+        {tab === "stock" && (
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 h-9 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium cursor-pointer">
+            <Plus className="w-4 h-4" /> Add item
+          </button>
+        )}
       </div>
 
+      <div className="flex gap-2 border-b border-slate-200">
+        <a href="/service-center/inventory" className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${tab === "stock" ? "border-teal-600 text-teal-600" : "border-transparent text-slate-500"}`}>
+          <Package className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Local stock
+        </a>
+        <a href="/service-center/inventory?tab=transfers" className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${tab === "transfers" ? "border-teal-600 text-teal-600" : "border-transparent text-slate-500"}`}>
+          <Truck className="w-4 h-4 inline mr-1.5 -mt-0.5" /> Transfers
+        </a>
+      </div>
+
+      {tab === "transfers" ? (
+        <InventoryTransfersPanel role="service_center" />
+      ) : (
+        <>
       {/* Alert banner */}
       {lowStockCount > 0 && (
         <div className="flex items-center gap-3 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
@@ -183,7 +207,10 @@ export default function SCInventoryPage() {
         </div>
       </div>
 
-      {showAdd && (
+        </>
+      )}
+
+      {showAdd && tab === "stock" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-base font-bold text-slate-800">Add spare part</h2>
@@ -207,5 +234,13 @@ export default function SCInventoryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SCInventoryPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-slate-400 text-sm">Loading…</div>}>
+      <SCInventoryContent />
+    </Suspense>
   );
 }

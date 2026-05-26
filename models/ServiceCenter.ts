@@ -28,6 +28,8 @@ export interface ServiceCenterDocument extends Document {
     closeTime: string;
   }[];
   services: string[];
+  /** Additional pincodes this SC serves (6-digit or prefixes). */
+  servicePincodes: string[];
   capacity: number;
   isActive: boolean;
   createdAt: Date;
@@ -78,6 +80,7 @@ const ServiceCenterSchema = new Schema<ServiceCenterDocument>(
       closeTime: { type: String, default: '18:00' },
     }],
     services: [{ type: String }],
+    servicePincodes: [{ type: String, trim: true }],
     capacity: {
       type: Number,
       default: 10,

@@ -143,6 +143,7 @@ import Ticket from '@/models/Ticket';
 import User from '@/models/User';
 import connectDB from '@/lib/db';
 import { Types } from 'mongoose';
+import { findServiceCenterByPincode, normalizePincode } from '@/lib/pincode';
 
 export class TicketService {
   static async createTicket(data: any, userId: string, tenantId: string) {
@@ -162,10 +163,19 @@ export class TicketService {
         ? new Types.ObjectId(data.technicianId)
         : undefined;
 
-    const serviceCenterId =
+    let serviceCenterId =
       data.serviceCenterId && Types.ObjectId.isValid(data.serviceCenterId)
         ? new Types.ObjectId(data.serviceCenterId)
         : undefined;
+
+    const servicePincode = normalizePincode(
+      data.servicePincode ?? data.serviceAddress?.postalCode
+    );
+
+    if (!serviceCenterId && servicePincode) {
+      const matched = await findServiceCenterByPincode(tenantId, servicePincode);
+      if (matched) serviceCenterId = matched._id;
+    }
 
     const categoryId =
       data.categoryId && Types.ObjectId.isValid(data.categoryId)
@@ -197,6 +207,8 @@ export class TicketService {
       customerId,
       technicianId,
       serviceCenterId,
+      servicePincode: servicePincode || undefined,
+      serviceAddress: data.serviceAddress || undefined,
       tenantId,
       estimatedCompletionDate: data.estimatedCompletionDate || undefined,
     });

@@ -259,14 +259,10 @@ export default function LoginPage() {
     </div>
   </div>
 
-  {/* ── Footer ── */}
-  <div className="relative z-10 flex items-center justify-between pt-10 text-xs text-slate-500">
-
-    <p>© 2026 SaaS Techify</p>
-
+  <div className="relative z-10 flex items-center justify-end pt-6 text-xs text-slate-500">
     <div className="flex items-center gap-2">
       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-      <span>System Operational</span>
+      <span>System operational</span>
     </div>
   </div>
 </div>
@@ -509,10 +505,6 @@ export default function LoginPage() {
       </div>
     </div>
 
-    {/* Footer */}
-    <p className="lg:hidden text-center text-xs text-slate-400 mt-6">
-      © 2026 SaaS Techify. All rights reserved.
-    </p>
   </div>
 </div>
     </div>

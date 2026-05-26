@@ -308,6 +308,13 @@ const TicketSchema = new Schema<TicketDocument>(
     },
     technicianId: { type: Schema.Types.ObjectId, ref: 'User' },
     serviceCenterId: { type: Schema.Types.ObjectId, ref: 'ServiceCenter' },
+    servicePincode: { type: String, trim: true, index: true },
+    serviceAddress: {
+      street: String,
+      city: String,
+      state: String,
+      postalCode: String,
+    },
     tenantId: { type: String, required: true, index: true },
     attachments: [AttachmentSchema],
     notes: [NoteSchema],

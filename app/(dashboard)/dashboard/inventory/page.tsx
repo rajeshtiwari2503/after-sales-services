@@ -3,8 +3,9 @@ import { useEffect, useState, useCallback } from "react";
 import {
   Package, TrendingDown, AlertTriangle, DollarSign,
   Plus, Search, Filter, RefreshCw, MoreVertical,
-  Pencil, Trash2, ChevronLeft, ChevronRight, X, Save, AlertCircle,
+  Pencil, Trash2, ChevronLeft, ChevronRight, X, Save, AlertCircle, Truck,
 } from "lucide-react";
+import InventoryTransfersPanel from "@/components/inventory/InventoryTransfersPanel";
 
 interface InventoryItem {
   _id: string;
@@ -477,6 +478,17 @@ export default function InventoryPage() {
           </div>
         </div>
       )}
+
+      <div className="pt-8 mt-8 border-t border-slate-200">
+        <div className="flex items-center gap-2 mb-4">
+          <Truck className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-base font-bold text-slate-800">Spare part transfers</h2>
+        </div>
+        <p className="text-xs text-slate-500 mb-4">
+          Dispatch central warehouse stock to service centers or approve their requests.
+        </p>
+        <InventoryTransfersPanel role="admin" />
+      </div>
     </div>
   );
 }

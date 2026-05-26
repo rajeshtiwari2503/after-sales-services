@@ -24,20 +24,25 @@
 // }
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
- 
 import Providers from "@/providers/theme-provider";
 import ToasterProvider from "@/components/ui/toaster-provider";
+import { getPageMetadata, siteConfig } from "@/lib/site-seo";
 
 const inter = {
   className: "font-sans",
 };
 
 export const metadata: Metadata = {
-  title: "SaaS Techify — After Sales Platform",
-  description: "Enterprise after-sales service management platform",
-  icons: { icon: "/favicon.ico" },
+  ...getPageMetadata("home"),
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
+  },
+  icons: { icon: "/favicon.ico", apple: "/logo13.png" },
+  verification: {
+    // google: "your-google-search-console-verification-code",
+  },
 };
 
 export default function RootLayout({

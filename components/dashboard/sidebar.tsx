@@ -209,6 +209,7 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
         { label: "Models",          icon: Package, href: "/brand/models" },
         { label: "Warranty",        icon: Shield,  href: "/brand/warranty" },
         { label: "Stickers",        icon: BadgeCheck, href: "/brand/stickers" },
+        { label: "Inventory",       icon: Boxes,     href: "/brand/inventory" },
       ],
     },
     {

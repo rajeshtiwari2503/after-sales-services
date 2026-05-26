@@ -18,6 +18,7 @@ export type NotificationEvent =
   | 'audit_log'
   | 'new_feedback'
   | 'high_volume'
+  | 'inventory_transfer'
   | 'system';
 
 export interface NotificationDocument extends Document {
@@ -50,7 +51,7 @@ const NotificationSchema = new Schema<NotificationDocument>(
         'ticket_resolved', 'ticket_commented', 'ticket_escalated',
         'sla_warning', 'sla_breached', 'technician_assigned', 'sc_assigned',
         'low_stock', 'warranty_expiry', 'invoice_generated', 'audit_log',
-        'new_feedback', 'high_volume', 'system',
+        'new_feedback', 'high_volume', 'inventory_transfer', 'system',
       ],
       default: 'system',
     },

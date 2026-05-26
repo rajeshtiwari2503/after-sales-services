@@ -191,6 +191,13 @@ export async function POST(request: NextRequest) {
       formData.forEach((value, key) => {
         if (key !== 'attachments') body[key] = value;
       });
+      if (typeof body.serviceAddress === 'string') {
+        try {
+          body.serviceAddress = JSON.parse(body.serviceAddress);
+        } catch {
+          /* ignore */
+        }
+      }
     } else {
       body = await request.json();
     }
@@ -233,6 +240,32 @@ export async function POST(request: NextRequest) {
           ticketNumber:   (ticket as any).ticketNumber,
           title:          (ticket as any).title,
         });
+      }
+
+      const scId = (ticket as { serviceCenterId?: { toString(): string } }).serviceCenterId?.toString?.()
+        ?? (ticket as { serviceCenterId?: string }).serviceCenterId;
+
+      if (scId) {
+        const scUsers = await User.find({
+          tenantId: user.tenantId,
+          role: 'service_center',
+          serviceCenterId: scId,
+          isActive: true,
+        }).select('_id');
+
+        const ServiceCenter = (await import('@/models/ServiceCenter')).default;
+        const sc = await ServiceCenter.findById(scId).select('name').lean();
+
+        if (scUsers.length > 0) {
+          await NotificationService.onTicketRoutedToSC({
+            scOperatorUserIds: scUsers.map((u) => u._id.toString()),
+            tenantId: user.tenantId,
+            ticketId: (ticket as { _id: { toString(): string } })._id.toString(),
+            ticketNumber: (ticket as { ticketNumber: string }).ticketNumber,
+            title: (ticket as { title: string }).title,
+            scName: sc?.name ?? 'Service center',
+          });
+        }
       }
     } catch (notifErr) {
       // Non-critical — don't fail ticket creation if notification fails
