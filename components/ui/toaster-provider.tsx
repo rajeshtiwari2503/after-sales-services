@@ -23,7 +23,7 @@ export default function ToasterProvider() {
       toastOptions={{
         duration: 4000,
         style: {
-          background: "#111827",
+          background: "#f8fafc",
           color: "#fff",
           border: "1px solid rgba(255, 255, 255, 0.08)",
           borderRadius: "12px",
