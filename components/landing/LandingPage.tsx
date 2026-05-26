@@ -1396,18 +1396,18 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 /* ─── Role tab ───────────────────────────────────────────────────────────── */
 const ROLES = [
-  {
-    key: "admin",
-    label: "Super Admin",
-    emoji: "👑",
-    color: "from-violet-500 to-indigo-600",
-    perks: [
-      { icon: "🌐", title: "Cross-brand visibility", desc: "Monitor every brand, SC, technician, and ticket across all tenants in one view." },
-      { icon: "🏷️", title: "Tenant management", desc: "Create brands, set manager accounts, configure per-ticket earning rates instantly." },
-      { icon: "💸", title: "Wallet control", desc: "Approve/reject withdrawals, credit/debit wallets, set custom ticket rates per SC." },
-      { icon: "📊", title: "Platform analytics", desc: "Full platform-wide reports — tickets, revenue, SLA, technician performance across all brands." },
-    ],
-  },
+  // {
+  //   key: "admin",
+  //   label: "Super Admin",
+  //   emoji: "👑",
+  //   color: "from-violet-500 to-indigo-600",
+  //   perks: [
+  //     { icon: "🌐", title: "Cross-brand visibility", desc: "Monitor every brand, SC, technician, and ticket across all tenants in one view." },
+  //     { icon: "🏷️", title: "Tenant management", desc: "Create brands, set manager accounts, configure per-ticket earning rates instantly." },
+  //     { icon: "💸", title: "Wallet control", desc: "Approve/reject withdrawals, credit/debit wallets, set custom ticket rates per SC." },
+  //     { icon: "📊", title: "Platform analytics", desc: "Full platform-wide reports — tickets, revenue, SLA, technician performance across all brands." },
+  //   ],
+  // },
   {
     key: "manager",
     label: "Brand Manager",
@@ -1462,7 +1462,7 @@ const ROLES = [
 export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeRole, setActiveRole] = useState("admin");
+  const [activeRole, setActiveRole] = useState("manager");
   const [formState, setFormState] = useState({
     name: "", email: "", phone: "", company: "",
     teamSize: "", inquiryType: "", message: "",
@@ -3349,7 +3349,7 @@ export default function LandingPage() {
               {
                 title: "For teams",
                 links: [
-                  ["#roles", "Super Admin"],
+                  // ["#roles", "Super Admin"],
                   ["#roles", "Brand Managers"],
                   ["#roles", "Service Centers"],
                   ["#roles", "Technicians"],
