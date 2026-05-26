@@ -1,6 +1,6 @@
 /** Public contact details for marketing / landing (override via env). */
 const digits = (
-  process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "919876543210"
+  process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "919565892772"
 ).replace(/\D/g, "");
 
 export const SITE_PHONE_DIGITS = digits.startsWith("91")
@@ -10,7 +10,7 @@ export const SITE_PHONE_DIGITS = digits.startsWith("91")
     : digits;
 
 export const SITE_PHONE_DISPLAY =
-  process.env.NEXT_PUBLIC_CONTACT_PHONE_DISPLAY ?? "+91 98765 43210";
+  process.env.NEXT_PUBLIC_CONTACT_PHONE_DISPLAY ?? "+91 95658 92772";
 
 export const SITE_PHONE_TEL = `tel:+${SITE_PHONE_DIGITS}`;
 
