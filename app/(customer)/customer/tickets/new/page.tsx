@@ -37,7 +37,9 @@ export default function NewTicketPage() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.title.trim()) e.title = "Title is required";
+    else if (form.title.length < 5) e.title = "Title must be at least 5 characters";
     if (!form.description.trim()) e.description = "Description is required";
+    else if (form.description.length < 10) e.description = "Description must be at least 10 characters";
     if (!form.category) e.category = "Please select a category";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -66,7 +68,15 @@ export default function NewTicketPage() {
         });
       }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create request");
+      if (!res.ok) {
+        const fieldErr = data.errors as Record<string, string[]> | undefined;
+        if (fieldErr) {
+          const mapped: Record<string, string> = {};
+          Object.entries(fieldErr).forEach(([k, v]) => { mapped[k] = Array.isArray(v) ? v[0] : String(v); });
+          setErrors(mapped);
+        }
+        throw new Error(data.message || "Failed to create request");
+      }
       toast.success("Service request created!");
       router.push(`/customer/tickets/${data.data?._id ?? ""}`);
     } catch (e: any) { toast.error(e.message || "Something went wrong"); }

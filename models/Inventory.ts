@@ -4,6 +4,9 @@ export interface InventoryDocument extends Document {
   name: string;
   sku: string;
   tenantId: string;
+  brandId?: mongoose.Types.ObjectId;
+  productId?: mongoose.Types.ObjectId;    // links to Product model
+  categoryId?: mongoose.Types.ObjectId;   // links to Category model
   serviceCenterId?: mongoose.Types.ObjectId;
   category: string;
   description?: string;
@@ -40,6 +43,18 @@ const InventorySchema = new Schema<InventoryDocument>(
       type: String,
       required: true,
       index: true,
+    },
+    brandId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Brand',
+    },
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
     },
     serviceCenterId: {
       type: Schema.Types.ObjectId,
@@ -93,6 +108,9 @@ const InventorySchema = new Schema<InventoryDocument>(
 
 InventorySchema.index({ tenantId: 1, sku: 1 }, { unique: true });
 InventorySchema.index({ quantity: 1, minQuantity: 1 });
+InventorySchema.index({ tenantId: 1, productId: 1 });
+InventorySchema.index({ tenantId: 1, categoryId: 1 });
+InventorySchema.index({ tenantId: 1, serviceCenterId: 1 });
 
 const Inventory: Model<InventoryDocument> =
   mongoose.models.Inventory || mongoose.model<InventoryDocument>('Inventory', InventorySchema);

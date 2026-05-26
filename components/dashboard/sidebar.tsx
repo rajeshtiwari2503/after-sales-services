@@ -197,25 +197,28 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
     {
       section: "Brand",
       items: [
-        { label: "Dashboard", icon: LayoutDashboard, href: "/brand/dashboard" },
-        { label: "Analytics", icon: BarChart2, href: "/brand/analytics" },
-        { label: "Wallet", icon: Wallet, href: "/brand/wallet" },
+        { label: "Dashboard",       icon: LayoutDashboard, href: "/brand/dashboard" },
+        { label: "Analytics",       icon: BarChart2,       href: "/brand/analytics" },
+        { label: "Wallet",          icon: Wallet,          href: "/brand/wallet" },
       ],
     },
     {
       section: "Products",
       items: [
-        { label: "Products", icon: Package, href: "/brand/products" },
-        { label: "Models", icon: Package, href: "/brand/models" },
-        { label: "Warranty", icon: Shield, href: "/brand/warranty" },
+        { label: "Products",        icon: Package, href: "/brand/products" },
+        { label: "Models",          icon: Package, href: "/brand/models" },
+        { label: "Warranty",        icon: Shield,  href: "/brand/warranty" },
+        { label: "Stickers",        icon: BadgeCheck, href: "/brand/stickers" },
       ],
     },
     {
       section: "Network",
       items: [
-        { label: "Service Centers", icon: MapPin, href: "/brand/service-centers" },
-        { label: "Tickets", icon: Ticket, href: "/brand/tickets" },
-        { label: "Reports", icon: FileText, href: "/brand/reports" },
+        { label: "Service Centers", icon: MapPin,  href: "/brand/service-centers" },
+        { label: "Tickets",         icon: Ticket,  href: "/brand/tickets" },
+        { label: "Reports",         icon: FileText, href: "/brand/reports" },
+        { label: "Profile",         icon: Contact,  href: "/brand/profile" },
+        { label: "Settings",        icon: Settings, href: "/dashboard/settings" },
       ],
     },
   ],
@@ -223,24 +226,25 @@ const NAV_CONFIG: Record<string, { section: string; items: { label: string; icon
     {
       section: "Operations",
       items: [
-        { label: "Dashboard", icon: LayoutDashboard, href: "/service-center/dashboard" },
-        { label: "Tickets", icon: Ticket, href: "/service-center/tickets", badge: "5" },
-        { label: "Wallet", icon: Shield, href: "/service-center/wallet" },
+        { label: "Dashboard",  icon: LayoutDashboard, href: "/service-center/dashboard" },
+        { label: "Tickets",    icon: Ticket,          href: "/service-center/tickets", badge: "5" },
+        { label: "Inventory",  icon: Package,         href: "/service-center/inventory" },
       ],
     },
     {
       section: "Team",
       items: [
         { label: "Technicians", icon: Wrench, href: "/service-center/technicians" },
-        { label: "Inventory", icon: Package, href: "/service-center/inventory" },
       ],
     },
     {
       section: "Finance",
       items: [
-        { label: "Wallet", icon: Wallet, href: "/service-center/wallet" },
-        { label: "SLA Monitor", icon: Clock, href: "/service-center/sla" },
-        { label: "Reports", icon: FileText, href: "/service-center/reports" },
+        { label: "Wallet",     icon: Wallet,  href: "/service-center/wallet" },
+        { label: "SLA Monitor", icon: Clock,  href: "/service-center/sla" },
+        { label: "Reports",    icon: FileText, href: "/service-center/reports" },
+        { label: "Profile",    icon: Contact,  href: "/service-center/profile" },
+        { label: "Settings",   icon: Settings, href: "/dashboard/settings" },
       ],
     },
   ],

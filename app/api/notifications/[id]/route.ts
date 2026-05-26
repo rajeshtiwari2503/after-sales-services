@@ -71,8 +71,8 @@ export async function POST(
         type:
           body.type,
 
-        actionUrl:
-          body.actionUrl,
+        link:
+          body.link ?? body.actionUrl ?? null,
 
         metadata:
           body.metadata,

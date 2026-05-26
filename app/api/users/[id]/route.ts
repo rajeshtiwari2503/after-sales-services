@@ -278,6 +278,8 @@ import User from "@/models/User";
 import { successResponse, errorResponse } from "@/utils/apiResponse";
 import { getAuthUser } from "@/lib/auth-helper";
 import bcrypt from "bcryptjs";
+import { audit } from "@/lib/audit-request";
+import { AUDIT_ACTIONS, AUDIT_MODULES } from "@/lib/audit";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -354,6 +356,14 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
     if (!updated) return errorResponse("User not found", 404);
 
+    audit(request, authUser, {
+      action: body.isActive === false ? AUDIT_ACTIONS.TOGGLE_ACTIVE : AUDIT_ACTIONS.UPDATE,
+      module: AUDIT_MODULES.USER,
+      entityId:   id,
+      entityName: updated.name,
+      message:    `User updated: ${updated.email}`,
+    });
+
     return successResponse(updated, "User updated successfully");
   } catch (error: any) {
     console.error("PUT /api/users/[id] error:", error);
@@ -384,6 +394,14 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const deleted = await User.findByIdAndDelete(id).select("-password").lean();
     if (!deleted) return errorResponse("User not found", 404);
+
+    audit(request, authUser, {
+      action: AUDIT_ACTIONS.DELETE,
+      module: AUDIT_MODULES.USER,
+      entityId:   id,
+      entityName: deleted.name,
+      message:    `User deleted: ${deleted.email}`,
+    });
 
     return successResponse({ id }, "User deleted successfully");
   } catch (error) {

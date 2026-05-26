@@ -192,6 +192,8 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { successResponse, errorResponse } from "@/utils/apiResponse";
 import { getAuthUser } from "@/lib/auth-helper";
+import { audit } from "@/lib/audit-request";
+import { AUDIT_ACTIONS, AUDIT_MODULES } from "@/lib/audit";
 
 export async function GET(request: NextRequest) {
   try {
@@ -268,6 +270,15 @@ export async function POST(request: NextRequest) {
     });
 
     const { password: _, ...userWithoutPassword } = user.toObject();
+
+    audit(request, authUser, {
+      action: AUDIT_ACTIONS.CREATE,
+      module: AUDIT_MODULES.USER,
+      entityId:   user._id.toString(),
+      entityName: user.name,
+      message:    `User created: ${user.email}`,
+    });
+
     return successResponse(userWithoutPassword, "User created successfully", 201);
   } catch (error) {
     console.error("POST /api/users error:", error);

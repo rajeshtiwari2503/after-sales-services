@@ -1315,6 +1315,7 @@ import {
   Minus,
 } from "lucide-react";
 import Image from "next/image";
+import FloatingContact from "@/components/landing/FloatingContact";
 
 /* ─── Animated counter ──────────────────────────────────────────────────── */
 function Counter({ end, suffix = "", prefix = "", duration = 2000 }: {
@@ -1477,6 +1478,12 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", h);
   }, []);
 
+  /* lock scroll when mobile nav open */
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   /* form submit */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1543,13 +1550,14 @@ export default function LandingPage() {
           ? "bg-white/80 backdrop-blur-xl border-b border-slate-200/70 shadow-sm"
           : "bg-white/60 backdrop-blur-lg"
           }`}
+        aria-label="Main navigation"
       >
-        <div className="max-w-7xl mx-auto px-6 h-[78px] flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-[72px] flex items-center justify-between gap-2">
 
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center shrink-0 -ml-5 md:-ml-6"
+            className="flex items-center shrink-0 min-w-0 max-w-[60%] sm:max-w-none"
           >
             <Image
               src="/logo13.png"
@@ -1557,14 +1565,7 @@ export default function LandingPage() {
               width={220}
               height={80}
               priority
-              className="
-    h-[58px] md:h-[75px]
-    w-auto object-contain
-    drop-shadow-[0_8px_25px_rgba(59,130,246,0.45)]
-    hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.55)]
-    hover:scale-[1.03]
-    transition-all duration-300
-  "
+              className="h-9 sm:h-11 md:h-[58px] lg:h-[68px] w-auto max-w-full object-contain drop-shadow-[0_8px_25px_rgba(59,130,246,0.35)] hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.45)] hover:scale-[1.02] transition-all duration-300"
             />
           </Link>
 
@@ -1577,6 +1578,7 @@ export default function LandingPage() {
               ["#how", "How it works"],
               ["#roles", "For Teams"],
               ["#pricing", "Pricing"],
+              ["#faq", "FAQ"],
               ["#contact", "Contact"],
             ].map(([href, label]) => (
               <a
@@ -1590,29 +1592,28 @@ export default function LandingPage() {
           </div>
 
           {/* CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 lg:gap-3">
             <Link
               href="/login"
-              className="
-    relative overflow-hidden
-    text-sm font-semibold text-white
-    px-5 py-2 rounded-xl
-    bg-gradient-to-r from-cyan-500 to-fuchsia-600
-    hover:scale-105
-    transition-all duration-300
-    shadow-[0_0_20px_rgba(168,85,247,0.45)]
-  "
+              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-4 py-2 rounded-xl hover:bg-slate-100 transition"
             >
               Sign in
             </Link>
-
-
+            <Link
+              href="/login"
+              className="text-sm font-semibold text-white px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-fuchsia-600 hover:scale-[1.02] transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.35)]"
+            >
+              Start free trial
+            </Link>
           </div>
 
           {/* Mobile menu */}
           <button
+            type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 backdrop-blur text-slate-700 shadow-sm"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 backdrop-blur text-slate-700 shadow-sm shrink-0"
           >
             {mobileOpen ? (
               <X className="w-5 h-5" />
@@ -1624,14 +1625,15 @@ export default function LandingPage() {
 
         {/* Mobile dropdown */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-slate-200/70 bg-white/95 backdrop-blur-2xl shadow-xl">
-            <div className="px-6 py-5 flex flex-col gap-1">
+          <div className="md:hidden border-t border-slate-200/70 bg-white/95 backdrop-blur-2xl shadow-xl max-h-[calc(100dvh-4rem)] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-5 flex flex-col gap-1">
 
               {[
                 ["#features", "Features"],
                 ["#how", "How it works"],
                 ["#roles", "For Teams"],
                 ["#pricing", "Pricing"],
+                ["#faq", "FAQ"],
                 ["#contact", "Contact"],
               ].map(([href, label]) => (
                 <a
@@ -1641,32 +1643,26 @@ export default function LandingPage() {
                   className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
                 >
                   {label}
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </a>
               ))}
 
-              {/* Divider */}
               <div className="border-t border-slate-200 my-2" />
 
-              {/* Auth buttons */}
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="
-  w-full text-center
-  py-3 rounded-xl
-  text-sm font-semibold
-  text-white
-  bg-gradient-to-r from-cyan-500 to-fuchsia-600
-    hover:scale-105
-    transition-all duration-300
-    shadow-[0_0_20px_rgba(168,85,247,0.45)]
-"
+                className="w-full text-center py-3 rounded-xl text-sm font-semibold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition"
               >
                 Sign in
               </Link>
-
-
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="w-full text-center py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-fuchsia-600 shadow-[0_0_20px_rgba(168,85,247,0.35)] transition"
+              >
+                Start free trial
+              </Link>
             </div>
           </div>
         )}
@@ -1675,7 +1671,7 @@ export default function LandingPage() {
 
       {/* ══ HERO ═════════════════════════════════════════════════════ */}
 
-      <section className="relative pt-32 pb-12 overflow-hidden">
+      <section className="relative pt-24 sm:pt-28 md:pt-32 pb-10 sm:pb-12 overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-[-120px] left-[10%] w-[520px] h-[520px] bg-blue-400/10 rounded-full blur-[120px]" />
@@ -1693,28 +1689,28 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="relative rounded-[36px] border border-white/70 bg-white/95 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="relative rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/95 backdrop-blur-2xl shadow-[0_20px_80px_rgba(15,23,42,0.08)] overflow-hidden">
 
             {/* Top glow */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
-            <div className="relative z-10 px-6 sm:px-10 lg:px-16 py-12 sm:py-12">
+            <div className="relative z-10 px-4 sm:px-10 lg:px-16 py-8 sm:py-12">
 
               {/* Badge */}
               <Reveal>
-                <div className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-semibold tracking-wide shadow-sm">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    Now serving 500+ service brands across India
+                <div className="flex justify-center px-1">
+                  <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 sm:px-4 py-2 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide shadow-sm text-center max-w-full">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shrink-0" />
+                    <span className="leading-snug">Now serving 500+ service brands across India</span>
                   </div>
                 </div>
               </Reveal>
 
               {/* Heading */}
               <Reveal delay={100}>
-                <div className="text-center mt-8">
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.02] text-slate-900">
+                <div className="text-center mt-6 sm:mt-8">
+                  <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900">
                     After-Sales Service,
                     <br />
                     <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
@@ -1759,7 +1755,7 @@ export default function LandingPage() {
 
               {/* Stats */}
               <Reveal delay={400}>
-                <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-5">
+                <div className="mt-10 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
                   {[
                     { end: 50000, suffix: "+", label: "Tickets resolved" },
                     { end: 2400, suffix: "+", label: "Service centers" },
@@ -1768,13 +1764,13 @@ export default function LandingPage() {
                   ].map(({ end, suffix, label }) => (
                     <div
                       key={label}
-                      className="rounded-2xl border border-slate-200/70 bg-white/80 backdrop-blur-xl p-6 text-center shadow-[0_10px_40px_rgba(15,23,42,0.04)]"
+                      className="rounded-xl sm:rounded-2xl border border-slate-200/70 bg-white/80 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_10px_40px_rgba(15,23,42,0.04)]"
                     >
-                      <div className="text-3xl font-black tracking-tight text-slate-900 mb-1">
+                      <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-900 mb-1">
                         <Counter end={end} suffix={suffix} />
                       </div>
 
-                      <p className="text-sm text-slate-500">{label}</p>
+                      <p className="text-[11px] sm:text-sm text-slate-500 leading-snug">{label}</p>
                     </div>
                   ))}
                 </div>
@@ -1863,12 +1859,12 @@ export default function LandingPage() {
                     </div>
 
                     {/* Chart */}
-                    <div className="mt-5 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+                    <div className="mt-5 rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-5 shadow-sm overflow-x-auto">
                       <p className="text-xs text-slate-500 mb-4">
                         Ticket volume — last 12 months
                       </p>
 
-                      <div className="flex items-end gap-2 h-28">
+                      <div className="flex items-end gap-1.5 sm:gap-2 h-28 min-w-[260px]">
                         {[40, 65, 50, 80, 55, 90, 70, 85, 60, 95, 75, 88].map(
                           (h, i) => (
                             <div
@@ -1894,8 +1890,8 @@ export default function LandingPage() {
 
       {/* ══ TRUSTED BY ═══════════════════════════════════════════════ */}
       <section className="py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="relative overflow-hidden rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-2xl shadow-[0_10px_60px_rgba(15,23,42,0.05)] px-8 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-2xl shadow-[0_10px_60px_rgba(15,23,42,0.05)] px-4 sm:px-8 py-8 sm:py-10">
 
             {/* Soft background glow */}
             <div className="absolute inset-0 -z-10">
@@ -1982,7 +1978,7 @@ export default function LandingPage() {
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* Heading */}
           <Reveal>
@@ -2122,7 +2118,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[380px] h-[380px] bg-indigo-200/25 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <Reveal>
             <div className="text-center mb-16">
               <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.25em] uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-full mb-5">
@@ -2219,7 +2215,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* Heading */}
           <Reveal>
@@ -2246,12 +2242,13 @@ export default function LandingPage() {
 
           {/* Tabs */}
           <Reveal>
-            <div className="flex flex-wrap justify-center gap-3 mb-14">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-14 px-1">
               {ROLES.map((r) => (
                 <button
                   key={r.key}
+                  type="button"
                   onClick={() => setActiveRole(r.key)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 cursor-pointer border ${activeRole === r.key
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer border ${activeRole === r.key
                     ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-transparent shadow-lg shadow-indigo-200"
                     : "bg-white/80 backdrop-blur-xl border-slate-200 text-slate-600 hover:border-blue-200 hover:text-slate-900 hover:bg-white"
                     }`}
@@ -2291,17 +2288,17 @@ export default function LandingPage() {
               <div
                 className={`rounded-[32px] bg-gradient-to-br ${role.color} p-[1px] shadow-[0_20px_80px_rgba(59,130,246,0.18)]`}
               >
-                <div className="relative overflow-hidden rounded-[31px] bg-white/90 backdrop-blur-2xl border border-white/60 p-12 flex flex-col items-center justify-center min-h-[360px] text-center">
+                <div className="relative overflow-hidden rounded-[31px] bg-white/90 backdrop-blur-2xl border border-white/60 p-6 sm:p-10 lg:p-12 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[360px] text-center">
 
                   {/* Glow */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[120px] bg-blue-200/30 rounded-full blur-[80px]" />
 
                   <div className="relative z-10">
-                    <div className="text-8xl mb-6 drop-shadow-sm">
+                    <div className="text-6xl sm:text-8xl mb-4 sm:mb-6 drop-shadow-sm">
                       {role.emoji}
                     </div>
 
-                    <h3 className="text-3xl font-black text-slate-900 mb-3">
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
                       {role.label}
                     </h3>
 
@@ -2333,7 +2330,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* Heading */}
           <Reveal>
@@ -2421,7 +2418,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-indigo-200/25 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* Heading */}
           <Reveal>
@@ -2535,7 +2532,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-violet-100/40 blur-3xl rounded-full" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <Reveal>
             <div className="text-center mb-20">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
@@ -2622,14 +2619,14 @@ export default function LandingPage() {
                     }`}
                 >
                   <div
-                    className={`h-full rounded-[31px] backdrop-blur-xl p-8 lg:p-9 flex flex-col ${p.popular
-                      ? "bg-gradient-to-b from-[#111827] to-[#0f172a]"
+                    className={`h-full rounded-[31px] backdrop-blur-xl p-6 sm:p-8 lg:p-9 flex flex-col ${p.popular
+                      ? "bg-gradient-to-b from-[#111827] to-[#0f172a] pt-8 sm:pt-10"
                       : "bg-white/95"
                       }`}
                   >
                     {/* Popular Badge */}
                     {p.popular && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 z-10">
                         <div className="px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-[11px] font-bold tracking-wider uppercase shadow-xl">
                           Most Popular
                         </div>
@@ -2740,7 +2737,7 @@ export default function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-[320px] h-[320px] bg-cyan-100/40 blur-3xl rounded-full" />
         </div>
 
-        <div className="relative max-w-4xl mx-auto px-6">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           <Reveal>
             <div className="text-center mb-16">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold tracking-[0.2em] uppercase mb-5">
@@ -2794,9 +2791,9 @@ export default function LandingPage() {
                   <div className="group rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-xl shadow-[0_10px_40px_rgba(15,23,42,0.05)] hover:shadow-[0_20px_60px_rgba(99,102,241,0.08)] hover:border-indigo-200 transition-all duration-300 overflow-hidden">
 
                     <details className="group">
-                      <summary className="list-none cursor-pointer px-7 py-6 flex items-center justify-between">
-                        <div className="pr-6">
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                      <summary className="list-none cursor-pointer px-4 sm:px-7 py-5 sm:py-6 flex items-center justify-between gap-3">
+                        <div className="pr-2 sm:pr-6 flex-1 min-w-0 text-left">
+                          <h3 className="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                             {faq.q}
                           </h3>
                         </div>
@@ -2864,7 +2861,7 @@ export default function LandingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-indigo-500/10 blur-3xl rounded-full" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-400/10 blur-3xl rounded-full" />
 
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 items-start">
 
             {/* Left */}
@@ -2962,11 +2959,9 @@ export default function LandingPage() {
                     </div>
 
                     <button
+                      type="button"
                       onClick={() => setFormSuccess("")}
-                      className="mt-6 text-sm font-medium text-slate-500  bg-gradient-to-r from-cyan-500 to-fuchsia-600
-    hover:scale-105
-    transition-all duration-300
-    shadow-[0_0_20px_rgba(168,85,247,0.45)] cursor-pointer"
+                      className="mt-6 text-sm font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
                     >
                       Send another message
                     </button>
@@ -3182,9 +3177,9 @@ export default function LandingPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-violet-500/10 rounded-full blur-3xl" />
 
-        <div className="relative max-w-6xl mx-auto px-6">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <Reveal>
-            <div className="relative overflow-hidden rounded-[36px] border border-white/70 bg-white/75 backdrop-blur-2xl shadow-[0_25px_80px_rgba(15,23,42,0.08)]">
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl lg:rounded-[36px] border border-white/70 bg-white/75 backdrop-blur-2xl shadow-[0_25px_80px_rgba(15,23,42,0.08)]">
 
               {/* Decorative Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.06] via-transparent to-violet-500/[0.08]" />
@@ -3280,10 +3275,10 @@ export default function LandingPage() {
         {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-indigo-500/5 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
 
           {/* Top */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-12 pb-14 border-b border-slate-200/70">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-12 pb-10 sm:pb-14 border-b border-slate-200/70">
 
 
             {/* Brand */}
@@ -3291,7 +3286,7 @@ export default function LandingPage() {
 
               <Link
                 href="/"
-                className="flex items-center shrink-0 -ml-5 md:-ml-6"
+                className="inline-flex items-center shrink-0"
               >
                 <Image
                   src="/logo13.png"
@@ -3299,14 +3294,7 @@ export default function LandingPage() {
                   width={220}
                   height={80}
                   priority
-                  className="
-    h-[58px] md:h-[75px]
-    w-auto object-contain
-    drop-shadow-[0_8px_25px_rgba(59,130,246,0.45)]
-    hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.55)]
-    hover:scale-[1.03]
-    transition-all duration-300
-  "
+                  className="h-10 sm:h-12 md:h-14 w-auto max-w-[200px] sm:max-w-none object-contain"
                 />
               </Link>
 
@@ -3350,31 +3338,28 @@ export default function LandingPage() {
               {
                 title: "Product",
                 links: [
-                  "Features",
-                  "Pricing",
-                  "How it works",
-                  "Changelog",
-                  "API docs",
+                  ["#features", "Features"],
+                  ["#pricing", "Pricing"],
+                  ["#how", "How it works"],
+                  ["#faq", "FAQ"],
                 ],
               },
               {
                 title: "For teams",
                 links: [
-                  "Super Admin",
-                  "Brand Managers",
-                  "Service Centers",
-                  "Technicians",
-                  "Customers",
+                  ["#roles", "Super Admin"],
+                  ["#roles", "Brand Managers"],
+                  ["#roles", "Service Centers"],
+                  ["#roles", "Technicians"],
+                  ["#roles", "Customers"],
                 ],
               },
               {
                 title: "Company",
                 links: [
-                  "About us",
-                  "Careers",
-                  "Contact",
-                  "Blog",
-                  "Partners",
+                  ["#contact", "Contact"],
+                  ["/login", "Sign in"],
+                  ["/privacy", "Privacy Policy"],
                 ],
               },
             ].map((col) => (
@@ -3384,13 +3369,13 @@ export default function LandingPage() {
                 </h4>
 
                 <ul className="space-y-3">
-                  {col.links.map((l) => (
-                    <li key={l}>
+                  {col.links.map(([href, label]) => (
+                    <li key={label}>
                       <a
-                        href="#"
+                        href={href}
                         className="text-sm text-slate-600 hover:text-indigo-600 transition-colors duration-300 font-medium"
                       >
-                        {l}
+                        {label}
                       </a>
                     </li>
                   ))}
@@ -3408,24 +3393,26 @@ export default function LandingPage() {
             </p>
 
             {/* Bottom Links */}
-            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
               {[
-                "Privacy Policy",
-                "Terms of Service",
-                "Cookie Policy",
-              ].map((l) => (
+                ["Privacy Policy", "/privacy"],
+                ["Terms of Service", "#"],
+                ["Cookie Policy", "#"],
+              ].map(([label, href]) => (
                 <a
-                  key={l}
-                  href="#"
+                  key={label}
+                  href={href}
                   className="text-sm text-slate-500 hover:text-indigo-600 transition-colors duration-300"
                 >
-                  {l}
+                  {label}
                 </a>
               ))}
             </div>
           </div>
         </div>
       </footer>
+
+      <FloatingContact />
     </div>
   );
 }

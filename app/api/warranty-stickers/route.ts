@@ -30,11 +30,19 @@ export async function GET(request: NextRequest) {
     const status  = searchParams.get("status") ?? "";
     const batchId = searchParams.get("batchId") ?? "";
     const productId = searchParams.get("productId") ?? "";
+    const search  = searchParams.get("search") ?? "";
  
     const query: Record<string, any> = { tenantId: user.tenantId };
     if (status)    query.status    = status;
     if (batchId)   query.batchId   = batchId;
     if (productId) query.productId = productId;
+    if (search) {
+      query.$or = [
+        { token:       { $regex: search, $options: 'i' } },
+        { productName: { $regex: search, $options: 'i' } },
+        { modelNumber: { $regex: search, $options: 'i' } },
+      ];
+    }
  
     const [stickers, total] = await Promise.all([
       WarrantySticker.find(query)
@@ -77,30 +85,35 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
  
-    const { productName, modelNumber, categoryName, warrantyPeriod, quantity, productId, categoryId } = body;
+    const productName   = body.productName;
+    const modelNumber   = body.modelNumber ?? productName;
+    const warrantyYears = Number(body.warrantyYears ?? body.warrantyPeriod ?? 1);
+    const warrantyType  = body.warrantyType ?? "standard";
+    const quantity      = Number(body.count ?? body.quantity ?? 1);
  
-    if (!productName || !modelNumber) return errorResponse("Product name and model number required", 400);
-    if (!quantity || quantity < 1 || quantity > 500) return errorResponse("Quantity must be 1–500", 400);
+    if (!productName) return errorResponse("Product name is required", 400);
+    if (quantity < 1 || quantity > 500) return errorResponse("Quantity must be 1–500", 400);
  
     const brand = await Brand.findOne({ tenantId: user.tenantId }).lean() as any;
  
-    // Generate a batch ID
-    const batchId    = `BATCH-${Date.now()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
-    const expiresAt  = new Date(Date.now() + 2 * 365 * 86400000); // 2 years to activate
+    const batchId   = `BATCH-${Date.now()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+    const expiresAt = new Date(Date.now() + 2 * 365 * 86400000);
  
     const stickers = Array.from({ length: quantity }, (_, i) => {
       const token = generateToken();
       return {
         token,
-        activationUrl: `${BASE_URL}/activate-warranty?token=${token}`,
+        activationUrl: `${BASE_URL}/customer/warranty/activate/${token}`,
         tenantId:      user.tenantId,
         brandId:       brand?._id,
-        productId:     productId ?? undefined,
+        productId:     body.productId ?? undefined,
         productName,
         modelNumber,
-        categoryId:    categoryId ?? undefined,
-        categoryName:  categoryName ?? undefined,
-        warrantyPeriod: warrantyPeriod ?? 12,
+        categoryId:    body.categoryId ?? undefined,
+        categoryName:  body.categoryName ?? undefined,
+        warrantyYears,
+        warrantyType,
+        warrantyPeriod: warrantyYears * 12,
         status:        "unactivated",
         batchId,
         batchIndex:    i + 1,
@@ -114,6 +127,7 @@ export async function POST(request: NextRequest) {
  
     return successResponse({
       batchId,
+      created:  created.length,
       count:    created.length,
       stickers: created.map(s => ({
         _id:           s._id,
@@ -125,6 +139,38 @@ export async function POST(request: NextRequest) {
  
   } catch (error) {
     console.error("POST stickers error:", error);
+    return errorResponse("An error occurred", 500);
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) return errorResponse("Unauthorized", 401);
+    if (!["admin", "manager"].includes(user.role)) return errorResponse("Forbidden", 403);
+
+    const id = new URL(request.url).searchParams.get("id");
+    if (!id) return errorResponse("id query param required", 400);
+
+    await connectDB();
+    const mongoose = await import("mongoose");
+    const filter: Record<string, unknown> = { tenantId: user.tenantId, status: "unactivated" };
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      filter._id = id;
+    } else {
+      filter.token = id;
+    }
+
+    const sticker = await WarrantySticker.findOneAndUpdate(
+      filter,
+      { $set: { status: "voided" } },
+      { new: true }
+    );
+    if (!sticker) return errorResponse("Sticker not found or already activated", 404);
+
+    return successResponse(null, "Sticker voided");
+  } catch (error) {
+    console.error("DELETE stickers error:", error);
     return errorResponse("An error occurred", 500);
   }
 }

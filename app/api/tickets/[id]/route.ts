@@ -11,6 +11,8 @@ import Ticket from '@/models/Ticket';
 import Technician from '@/models/Technician';
 import User from '@/models/User';
 import connectDB from '@/lib/db';
+import { audit } from '@/lib/audit-request';
+import { AUDIT_ACTIONS, AUDIT_MODULES } from '@/lib/audit';
 
 export async function GET(
   request: NextRequest,
@@ -58,35 +60,49 @@ export async function PATCH(
 
     // Fire notification only if status actually changed
     if (body.status && oldStatus && oldStatus !== newStatus && existing) {
-      const recipientIds: string[] = [];
+      const performer = await User.findById(user.userId).select('name').lean();
+      const performerName = performer?.name ?? 'System';
+      const isResolved = ['resolved', 'closed'].includes(newStatus);
+      const baseMsg = `${existing.ticketNumber} changed: ${oldStatus.replace(/_/g, ' ')} → ${newStatus.replace(/_/g, ' ')} by ${performerName}`;
 
-      // Find the user behind the technician record
-      if (existing.technicianId) {
-        const techDoc = await Technician.findById(existing.technicianId).select('userId').lean();
-        if (techDoc?.userId) recipientIds.push(techDoc.userId.toString());
-      }
-
-      // Always notify the customer
       if (existing.customerId) {
-        recipientIds.push(existing.customerId.toString());
-      }
-
-      if (recipientIds.length > 0) {
-        const performer = await User.findById(user.userId).select('name').lean();
-        const performerName = performer?.name ?? 'System';
-
-        // Fire and forget — don't block response
         NotificationService.onStatusChange({
-          recipientUserIds: recipientIds,
+          recipientUserIds: [existing.customerId.toString()],
           tenantId:         existing.tenantId,
           ticketId:         id,
           ticketNumber:     existing.ticketNumber,
           fromStatus:       oldStatus,
           toStatus:         newStatus,
           changedByName:    performerName,
+          customerRole:     true,
         }).catch(e => console.error('Notification error:', e));
       }
+
+      if (existing.technicianId) {
+        const techDoc = await Technician.findById(existing.technicianId).select('userId').lean();
+        if (techDoc?.userId) {
+          NotificationService.create({
+            userId:   techDoc.userId.toString(),
+            tenantId: existing.tenantId,
+            title:    isResolved ? 'Ticket Resolved ✓' : 'Ticket Status Updated',
+            message:  baseMsg,
+            type:     isResolved ? 'success' : 'info',
+            event:    isResolved ? 'ticket_resolved' : 'ticket_status_changed',
+            link:     `/technician/jobs/${id}`,
+            metadata: { ticketId: id, ticketNumber: existing.ticketNumber },
+          }).catch(e => console.error('Notification error:', e));
+        }
+      }
     }
+
+    audit(request, user, {
+      action: body.status && oldStatus !== newStatus ? AUDIT_ACTIONS.STATUS_CHANGE : AUDIT_ACTIONS.UPDATE,
+      module: AUDIT_MODULES.TICKET,
+      entityId:   id,
+      entityName: existing?.ticketNumber,
+      message:    body.status ? `Status: ${oldStatus} → ${newStatus}` : 'Ticket updated',
+      changes:    body.status ? [{ field: 'status', oldValue: oldStatus, newValue: newStatus }] : undefined,
+    });
 
     return successResponse(ticket, 'Ticket updated');
   } catch (error) {
@@ -109,6 +125,13 @@ export async function DELETE(
     const { id } = await params;
     const deleted = await TicketService.deleteTicket(id, user.tenantId);
     if (!deleted) return errorResponse('Ticket not found', 404);
+
+    audit(request, user, {
+      action: AUDIT_ACTIONS.DELETE,
+      module: AUDIT_MODULES.TICKET,
+      entityId: id,
+      message: 'Ticket deleted',
+    });
 
     return successResponse(null, 'Ticket deleted');
   } catch (error) {

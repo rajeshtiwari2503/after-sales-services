@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
   try {
     const user = getAuthUser(req);
 
-    if (!user || user.role !== "super_admin") {
+    if (!user || user.role !== "admin") {
       return errorResponse("Forbidden", 403);
     }
 
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = getAuthUser(req);
 
-    if (!user || user.role !== "super_admin") {
+    if (!user || user.role !== "admin") {
       return errorResponse("Forbidden", 403);
     }
 
@@ -210,7 +210,7 @@ export async function PUT(req: NextRequest) {
   try {
     const user = getAuthUser(req);
 
-    if (!user || user.role !== "super_admin") {
+    if (!user || user.role !== "admin") {
       return errorResponse("Forbidden", 403);
     }
 

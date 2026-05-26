@@ -146,6 +146,7 @@ import {
   Shield, Trash2, AlertTriangle, ChevronDown
 } from "lucide-react";
 import toast from "react-hot-toast";
+import QrCodeImage from "@/components/warranty/QrCodeImage";
 
 interface Product { _id: string; name: string; modelNumber: string; warrantyPeriod: number; categoryId?: { name: string }; }
 interface Sticker {
@@ -171,11 +172,9 @@ const STATUS_CFG = {
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
 // ─── Print-ready QR sticker card ────────────────────────────────
-function StickerCard({ sticker, productName, brandName }: { sticker: { token: string; activationUrl: string }; productName: string; brandName?: string }) {
-  // Simple QR representation using token text (real QR needs qrcode.react library)
+function StickerCard({ sticker, productName }: { sticker: { token: string; activationUrl: string }; productName: string; brandName?: string }) {
   return (
     <div className="w-[200px] border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-white">
-      {/* Brand */}
       <div className="flex items-center justify-center gap-1.5 mb-3">
         <div className="w-5 h-5 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-md flex items-center justify-center">
           <span className="text-white text-[8px] font-black">ST</span>
@@ -183,14 +182,8 @@ function StickerCard({ sticker, productName, brandName }: { sticker: { token: st
         <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">SaaS Techify</span>
       </div>
 
-      {/* QR placeholder — replace with qrcode.react in production */}
-      <div className="w-20 h-20 mx-auto bg-slate-100 rounded-lg flex items-center justify-center border-2 border-slate-200 mb-2">
-        <div className="text-center">
-          <QrCode className="w-8 h-8 text-slate-400 mx-auto" />
-          <p className="text-[7px] text-slate-400 mt-0.5 font-mono break-all leading-tight px-1">
-            {sticker.token}
-          </p>
-        </div>
+      <div className="w-20 h-20 mx-auto mb-2 flex items-center justify-center">
+        <QrCodeImage value={sticker.activationUrl} size={80} />
       </div>
 
       <p className="text-[9px] font-bold text-slate-700 leading-tight">{productName}</p>

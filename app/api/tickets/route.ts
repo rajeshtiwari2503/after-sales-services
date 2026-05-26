@@ -115,7 +115,10 @@ import { successResponse, errorResponse, paginatedResponse } from '@/utils/apiRe
 import { getAuthUser } from '@/lib/auth-helper';
 import { NotificationService } from '@/services/notification.service';
 import User from '@/models/User';
+import PlatformSettings from '@/models/PlatformSettings';
 import connectDB from '@/lib/db';
+import { audit } from '@/lib/audit-request';
+import { AUDIT_ACTIONS, AUDIT_MODULES } from '@/lib/audit';
 import "@/models/Category";
 import "@/models/User";
 import "@/models/Product";
@@ -197,7 +200,21 @@ export async function POST(request: NextRequest) {
       return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
     }
 
+    await connectDB();
+    const platform = await PlatformSettings.findOne({ tenantId: user.tenantId }).lean();
+    if (platform?.maintenanceMode && user.role === 'customer') {
+      return errorResponse('New tickets are temporarily disabled for maintenance', 503);
+    }
+
     const ticket = await TicketService.createTicket(validation.data, user.userId, user.tenantId);
+
+    audit(request, user, {
+      action: AUDIT_ACTIONS.CREATE,
+      module: AUDIT_MODULES.TICKET,
+      entityId:   (ticket as { _id: { toString(): string } })._id?.toString?.(),
+      entityName: (ticket as { ticketNumber?: string }).ticketNumber,
+      message:    `Ticket created: ${(ticket as { title?: string }).title}`,
+    });
 
     // Notify brand managers when a new ticket is created
     try {

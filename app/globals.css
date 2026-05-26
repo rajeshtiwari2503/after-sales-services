@@ -135,6 +135,15 @@
     @apply font-sans;
   }
 }
+
+/* react-hot-toast: ensure toasts stay visible above app shells (fixed nav, modals) */
+[data-rht-toaster] {
+  z-index: 99999 !important;
+  pointer-events: none;
+}
+[data-rht-toaster] > div {
+  pointer-events: auto;
+}
 .glass-card {
   background: rgba(255, 255, 255, 0.7);
 

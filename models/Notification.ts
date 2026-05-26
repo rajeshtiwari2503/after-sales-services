@@ -1,4 +1,3 @@
- // models/Notification.ts  — NEW FILE
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export type NotificationType = 'info' | 'warning' | 'success' | 'error';
@@ -13,26 +12,25 @@ export type NotificationEvent =
   | 'sla_breached'
   | 'technician_assigned'
   | 'sc_assigned'
+  | 'low_stock'
+  | 'warranty_expiry'
+  | 'invoice_generated'
+  | 'audit_log'
+  | 'new_feedback'
+  | 'high_volume'
   | 'system';
 
 export interface NotificationDocument extends Document {
-  userId: mongoose.Types.ObjectId;     // recipient
+  userId: mongoose.Types.ObjectId;
   tenantId: string;
   title: string;
   message: string;
-  actionUrl: string;
+  link?: string;
   type: NotificationType;
   event: NotificationEvent;
   isRead: boolean;
   readAt?: Date;
-  metadata?: {
-    ticketId?: string;
-    ticketNumber?: string;
-    technicianId?: string;
-    serviceCenterId?: string;
-    fromStatus?: string;
-    toStatus?: string;
-  };
+  metadata?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,40 +41,28 @@ const NotificationSchema = new Schema<NotificationDocument>(
     tenantId: { type: String, required: true, index: true },
     title:    { type: String, required: true },
     message:  { type: String, required: true },
+    link:     { type: String, default: null },
     type:     { type: String, enum: ['info', 'warning', 'success', 'error'], default: 'info' },
     event:    {
       type: String,
       enum: [
         'ticket_created', 'ticket_assigned', 'ticket_status_changed',
-        'ticket_resolved', 'ticket_commented', 'ticket_escalated', 'sla_warning', 'sla_breached',
-        'technician_assigned', 'sc_assigned', 'system',
+        'ticket_resolved', 'ticket_commented', 'ticket_escalated',
+        'sla_warning', 'sla_breached', 'technician_assigned', 'sc_assigned',
+        'low_stock', 'warranty_expiry', 'invoice_generated', 'audit_log',
+        'new_feedback', 'high_volume', 'system',
       ],
       default: 'system',
     },
     isRead:   { type: Boolean, default: false, index: true },
     readAt:   { type: Date },
-    actionUrl: {
-  type: String,
-  required: false,
-  default: null,
-},
-    metadata: {
-      ticketId:        { type: String },
-      ticketNumber:    { type: String },
-      technicianId:    { type: String },
-      serviceCenterId: { type: String },
-      fromStatus:      { type: String },
-      toStatus:        { type: String },
-    },
+    metadata: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
 );
 
-// Compound indexes for fast per-user queries
 NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
 NotificationSchema.index({ tenantId: 1, createdAt: -1 });
-
-// Auto-delete notifications older than 90 days
 NotificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 3600 });
 
 const Notification: Model<NotificationDocument> =

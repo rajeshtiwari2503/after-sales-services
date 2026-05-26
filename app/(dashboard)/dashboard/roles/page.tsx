@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { Shield, Check, X, Save } from "lucide-react";
+
+import { useState, useEffect, useCallback } from "react";
+import { Shield, Save, RefreshCw, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ROLES = [
@@ -47,32 +48,37 @@ const PERMISSIONS = [
   ]},
 ];
 
-// Default permissions per role
-const DEFAULT_PERMISSIONS: Record<string, string[]> = {
-  admin: ["ALL"],
-  manager: ["VIEW_TICKETS", "EDIT_TICKET", "ASSIGN_TICKETS", "VIEW_ANALYTICS", "EXPORT_REPORTS", "VIEW_SC", "MANAGE_WARRANTY", "MANAGE_BRANDS", "VIEW_USERS"],
-  service_center: ["VIEW_TICKETS", "ASSIGN_TICKETS", "UPDATE_STATUS", "VIEW_SC", "VIEW_INVENTORY", "MANAGE_INVENTORY", "VIEW_WALLET", "VIEW_USERS"],
-  technician: ["VIEW_TICKETS", "UPDATE_STATUS"],
-  customer: ["CREATE_TICKET", "VIEW_TICKETS"],
-};
-
 export default function RolesPage() {
   const [selectedRole, setSelectedRole] = useState("manager");
-  const [permissions, setPermissions] = useState<Record<string, string[]>>({...DEFAULT_PERMISSIONS});
+  const [permissions, setPermissions] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const fetchPermissions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/roles/permissions", { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setPermissions(data.data?.permissions ?? {});
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Failed to load permissions");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchPermissions(); }, [fetchPermissions]);
 
   const isAdmin = selectedRole === "admin";
   const currentPerms = permissions[selectedRole] ?? [];
-
-  const hasPerm = (key: string) => isAdmin || currentPerms.includes(key);
+  const hasPerm = (key: string) => isAdmin || currentPerms.includes(key) || currentPerms.includes("ALL");
 
   const togglePerm = (key: string) => {
     if (isAdmin) return;
     setPermissions(prev => {
       const curr = prev[selectedRole] ?? [];
-      const updated = curr.includes(key)
-        ? curr.filter(p => p !== key)
-        : [...curr, key];
+      const updated = curr.includes(key) ? curr.filter(p => p !== key) : [...curr, key];
       return { ...prev, [selectedRole]: updated };
     });
   };
@@ -80,30 +86,56 @@ export default function RolesPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await new Promise(r => setTimeout(r, 600)); // mock save
+      const res = await fetch("/api/roles/permissions", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: selectedRole, permissions: permissions[selectedRole] ?? [] }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
       toast.success(`Permissions saved for ${ROLES.find(r => r.key === selectedRole)?.label}`);
-    } catch { toast.error("Failed to save permissions"); }
-    finally { setSaving(false); }
+      if (data.data?.permissions) {
+        setPermissions(prev => ({ ...prev, [selectedRole]: data.data.permissions }));
+      }
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Failed to save permissions");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const allPerms = PERMISSIONS.flatMap(s => s.perms.map(p => p.key));
-  const enabledCount = isAdmin ? allPerms.length : currentPerms.length;
+  const enabledCount = isAdmin ? allPerms.length : currentPerms.filter(p => p !== "ALL").length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64 text-slate-400">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading roles...
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800">Role & Permission Management</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Configure access control for each role</p>
+          <p className="text-xs text-slate-400 mt-0.5">Persisted to database — applies on next login</p>
         </div>
-        <button onClick={handleSave} disabled={saving || isAdmin}
-          className="flex items-center gap-2 h-9 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white rounded-lg text-sm font-medium cursor-pointer transition">
-          {saving ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save permissions</>}
-        </button>
+        <div className="flex gap-2">
+          <button onClick={fetchPermissions}
+            className="w-9 h-9 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50 cursor-pointer">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button onClick={handleSave} disabled={saving || isAdmin}
+            className="flex items-center gap-2 h-9 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white rounded-lg text-sm font-medium cursor-pointer transition">
+            {saving ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save permissions</>}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-5">
-        {/* Role selector */}
         <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden h-fit">
           <div className="px-4 py-3 border-b border-slate-100">
             <p className="text-sm font-semibold text-slate-800">Roles</p>
@@ -115,16 +147,14 @@ export default function RolesPage() {
                   ${selectedRole === key ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-50"}`}>
                 <span>{label}</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${color}`}>
-                  {key === "admin" ? "All" : `${(permissions[key] ?? []).length}`}
+                  {key === "admin" ? "All" : `${(permissions[key] ?? []).filter(p => p !== "ALL").length}`}
                 </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Permissions matrix */}
         <div className="space-y-4">
-          {/* Role header */}
           <div className={`flex items-center justify-between p-4 rounded-xl border ${ROLES.find(r => r.key === selectedRole)?.color ?? "border-slate-200 bg-slate-50"}`}>
             <div className="flex items-center gap-2.5">
               <Shield className="w-5 h-5" />
@@ -135,11 +165,6 @@ export default function RolesPage() {
                 </p>
               </div>
             </div>
-            {isAdmin && (
-              <span className="text-xs font-semibold bg-white/80 px-2 py-1 rounded-full">
-                Full access
-              </span>
-            )}
           </div>
 
           {PERMISSIONS.map(({ section, perms }) => (
@@ -162,7 +187,8 @@ export default function RolesPage() {
                         className={`w-10 h-6 rounded-full flex items-center transition-colors cursor-pointer relative
                           ${enabled ? "bg-indigo-600" : "bg-slate-200"}
                           ${isAdmin ? "cursor-not-allowed opacity-75" : ""}`}
-                        role="switch" aria-checked={enabled}
+                        role="switch"
+                        aria-checked={enabled}
                       >
                         <span className={`absolute w-4 h-4 bg-white rounded-full shadow transition-transform ${enabled ? "translate-x-5" : "translate-x-1"}`} />
                       </button>

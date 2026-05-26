@@ -66,10 +66,10 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(user));
 
       toast.success(result.message || 'Login successful!');
-      // ✅ Role-based redirect
-      console.log("user", user?.role);
-
-      router.push(ROLE_REDIRECTS[user?.role] ?? '/dashboard');
+      const dest = ROLE_REDIRECTS[user?.role] ?? '/dashboard';
+      // Brief delay so the toast is visible before navigation unmounts the page
+      await new Promise((r) => setTimeout(r, 400));
+      router.push(dest);
       // router.refresh();
     } catch (error: any) {
       toast.error(error.message || 'Login failed');

@@ -38,19 +38,21 @@ export default function CustomerProfilePage() {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
     setSaving(true);
     try {
-      const res = await fetch(`/api/users/${user._id}`, {
+      const res = await fetch("/api/auth/me", {
         method: "PATCH", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: form.name, phone: form.phone }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed");
       const updated = { ...user, ...form };
       localStorage.setItem("user", JSON.stringify(updated));
       setUser(updated);
       toast.success("Profile updated");
-    } catch { toast.error("Failed to update profile"); }
+    } catch (e: any) { toast.error(e.message || "Failed to update profile"); }
     finally { setSaving(false); }
   };
+
 
   const handleChangePassword = async () => {
     if (!passwords.current || !passwords.newPass) { toast.error("All password fields required"); return; }

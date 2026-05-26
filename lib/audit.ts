@@ -2,6 +2,8 @@
 
 import AuditLog from "@/models/AuditLog";
 import connectDB from "@/lib/db";
+import User from "@/models/User";
+import { NotificationService } from "@/services/notification.service";
 
 export interface AuditParams {
   userId:     string;
@@ -47,6 +49,27 @@ export async function writeAuditLog(params: AuditParams): Promise<void> {
       metadata:   params.metadata,
       duration:   params.duration,
     });
+
+    const status = params.status ?? "success";
+    if (status !== "success") {
+      const admins = await User.find({
+        tenantId: params.tenantId,
+        role: { $in: ["admin", "manager"] },
+        isActive: true,
+      }).select("_id").lean();
+      const adminIds = admins.map(a => a._id.toString());
+      if (adminIds.length) {
+        NotificationService.onAuditLog({
+          adminUserIds: adminIds,
+          tenantId:     params.tenantId,
+          action:       params.action,
+          module:       params.module,
+          status,
+          message:      params.message,
+          entityName:   params.entityName,
+        }).catch(() => {});
+      }
+    }
   } catch (err) {
     // Silent — never break main flow
     console.error("[AuditLog] Write failed:", err);

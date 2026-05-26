@@ -61,6 +61,11 @@ export default function InventoryPage() {
   const [error,   setError]   = useState("");
   const [search,  setSearch]  = useState("");
   const [category, setCategory] = useState("");
+  const [filterCategoryId, setFilterCategoryId] = useState("");
+  const [filterProductId, setFilterProductId] = useState("");
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [products, setProducts] = useState<{ _id: string; name: string; modelNumber?: string }[]>([]);
+  const [filterProducts, setFilterProducts] = useState<{ _id: string; name: string }[]>([]);
   const [filter,   setFilter]   = useState<"all" | "low" | "out">("all");
   const [page,     setPage]     = useState(1);
   const [total,    setTotal]    = useState(0);
@@ -75,6 +80,7 @@ export default function InventoryPage() {
     quantity: 0, minQuantity: 5, maxQuantity: 100,
     unitPrice: 0, costPrice: 0, location: "",
     supplierName: "", supplierContact: "", supplierEmail: "",
+    categoryId: "", productId: "",
   });
 
   const fetch = useCallback(async () => {
@@ -85,6 +91,8 @@ export default function InventoryPage() {
         page: String(page), limit: String(LIMIT),
         ...(search   ? { search }           : {}),
         ...(category ? { category }         : {}),
+        ...(filterCategoryId ? { categoryId: filterCategoryId } : {}),
+        ...(filterProductId ? { productId: filterProductId } : {}),
         ...(filter === "low"  ? { lowStock: "true" }   : {}),
         ...(filter === "out"  ? { outOfStock: "true" } : {}),
       });
@@ -98,12 +106,44 @@ export default function InventoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, category, filter]);
+  }, [page, search, category, filter, filterCategoryId, filterProductId]);
 
   useEffect(() => { fetch(); }, [fetch]);
 
+  useEffect(() => {
+    window.fetch("/api/categories", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        const list = Array.isArray(d.data) ? d.data : [];
+        setCategories(list.map((c: { _id: string; name: string }) => ({ _id: c._id, name: c.name })));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!form.categoryId) { setProducts([]); return; }
+    window.fetch(`/api/products?categoryId=${form.categoryId}`, { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        const list = Array.isArray(d.data) ? d.data : [];
+        setProducts(list.map((p: { _id: string; name: string; modelNumber?: string }) => ({ _id: p._id, name: p.name, modelNumber: p.modelNumber })));
+      })
+      .catch(() => setProducts([]));
+  }, [form.categoryId]);
+
+  useEffect(() => {
+    if (!filterCategoryId) { setFilterProducts([]); return; }
+    window.fetch(`/api/products?categoryId=${filterCategoryId}`, { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        const list = Array.isArray(d.data) ? d.data : [];
+        setFilterProducts(list.map((p: { _id: string; name: string }) => ({ _id: p._id, name: p.name })));
+      })
+      .catch(() => setFilterProducts([]));
+  }, [filterCategoryId]);
+
   const openAdd = () => {
-    setForm({ name: "", sku: "", category: "Spare Parts", description: "", quantity: 0, minQuantity: 5, maxQuantity: 100, unitPrice: 0, costPrice: 0, location: "", supplierName: "", supplierContact: "", supplierEmail: "" });
+    setForm({ name: "", sku: "", category: "Spare Parts", description: "", quantity: 0, minQuantity: 5, maxQuantity: 100, unitPrice: 0, costPrice: 0, location: "", supplierName: "", supplierContact: "", supplierEmail: "", categoryId: "", productId: "" });
     setEditItem(null);
     setShowAdd(true);
   };
@@ -114,6 +154,7 @@ export default function InventoryPage() {
       quantity: item.quantity, minQuantity: item.minQuantity, maxQuantity: item.maxQuantity,
       unitPrice: item.unitPrice, costPrice: item.costPrice, location: item.location ?? "",
       supplierName: item.supplier?.name ?? "", supplierContact: item.supplier?.contact ?? "", supplierEmail: item.supplier?.email ?? "",
+      categoryId: "", productId: "",
     });
     setEditItem(item);
     setShowAdd(true);
@@ -129,6 +170,8 @@ export default function InventoryPage() {
         unitPrice: Number(form.unitPrice), costPrice: Number(form.costPrice),
         location: form.location,
         supplier: form.supplierName ? { name: form.supplierName, contact: form.supplierContact, email: form.supplierEmail } : undefined,
+        ...(form.categoryId ? { categoryId: form.categoryId } : {}),
+        ...(form.productId ? { productId: form.productId } : {}),
       };
       const url    = editItem ? `/api/inventory/${editItem._id}` : "/api/inventory";
       const method = editItem ? "PATCH" : "POST";
@@ -194,9 +237,21 @@ export default function InventoryPage() {
         </div>
         <select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}
           className="h-9 px-3 border border-slate-200 rounded-xl text-sm focus:outline-none bg-white cursor-pointer">
-          <option value="">All Categories</option>
+          <option value="">All Types</option>
           {CATEGORIES.map(c => <option key={c}>{c}</option>)}
         </select>
+        <select value={filterCategoryId} onChange={e => { setFilterCategoryId(e.target.value); setFilterProductId(""); setPage(1); }}
+          className="h-9 px-3 border border-slate-200 rounded-xl text-sm focus:outline-none bg-white cursor-pointer">
+          <option value="">All Brand Categories</option>
+          {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+        </select>
+        {filterCategoryId && (
+          <select value={filterProductId} onChange={e => { setFilterProductId(e.target.value); setPage(1); }}
+            className="h-9 px-3 border border-slate-200 rounded-xl text-sm focus:outline-none bg-white cursor-pointer">
+            <option value="">All Products</option>
+            {filterProducts.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+          </select>
+        )}
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
           {(["all", "low", "out"] as const).map(f => (
             <button key={f} onClick={() => { setFilter(f); setPage(1); }}
@@ -305,6 +360,36 @@ export default function InventoryPage() {
               </button>
             </div>
             <div className="p-6 space-y-4">
+              {categories.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1.5">Brand Category</label>
+                    <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value, productId: "" }))}
+                      className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm bg-white cursor-pointer">
+                      <option value="">— Optional —</option>
+                      {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1.5">Product</label>
+                    <select value={form.productId} disabled={!form.categoryId}
+                      onChange={e => {
+                        const p = products.find(x => x._id === e.target.value);
+                        setForm(f => ({
+                          ...f,
+                          productId: e.target.value,
+                          name: p?.name ?? f.name,
+                          sku: p?.modelNumber ? `SP-${p.modelNumber}` : f.sku,
+                          category: "Spare Parts",
+                        }));
+                      }}
+                      className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm bg-white cursor-pointer disabled:opacity-50">
+                      <option value="">— Select product —</option>
+                      {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-600 block mb-1.5">Item Name *</label>

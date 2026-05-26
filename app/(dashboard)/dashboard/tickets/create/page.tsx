@@ -88,18 +88,20 @@ export default function CreateTicketPage() {
     // Customers fetch karo
     fetch("/api/users?role=customer", { credentials: "include" })
       .then(r => r.json())
-      .then(d => setCustomers(
-        (d.data || d.users || []).map((u: any) => ({ id: u._id, name: u.name }))
-      ))
+      .then(d => {
+        const list = d.data?.users ?? d.data ?? [];
+        setCustomers(Array.isArray(list) ? list.map((u: { _id: string; name: string }) => ({ id: u._id, name: u.name })) : []);
+      })
       .catch(() => { });
 
     // Technicians fetch karo
     fetch("/api/users?role=technician", { credentials: "include" })
       .then(r => r.json())
-      .then(d => setTechnicians([
-        { id: "", name: "Auto-assign" },
-        ...(d.data || d.users || []).map((u: any) => ({ id: u._id, name: u.name }))
-      ]))
+      .then(d => {
+        const list = d.data?.users ?? d.data ?? [];
+        const techs = Array.isArray(list) ? list.map((u: { _id: string; name: string }) => ({ id: u._id, name: u.name })) : [];
+        setTechnicians([{ id: "", name: "Auto-assign" }, ...techs]);
+      })
       .catch(() => { });
   }, []);
 
@@ -113,8 +115,10 @@ export default function CreateTicketPage() {
   const validate = () => {
     const e: typeof errors = {};
     if (!form.title.trim()) e.title = "Title is required";
+    else if (form.title.length < 5) e.title = "Title must be at least 5 characters";
     else if (form.title.length > 200) e.title = "Max 200 characters";
     if (!form.description.trim()) e.description = "Description is required";
+    else if (form.description.length < 10) e.description = "Description must be at least 10 characters";
     else if (form.description.length > 5000) e.description = "Max 5000 characters";
     if (!form.category) e.category = "Category is required";
     if (!form.customerId) e.customerId = "Customer is required";

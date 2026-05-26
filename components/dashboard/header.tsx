@@ -35,6 +35,7 @@ interface Notification {
   type: "info" | "warning" | "success" | "error";
   isRead: boolean;
   createdAt: string;
+  link?: string | null;
 }
 
 /* ─── Breadcrumb map ─────────────────────────────────────────── */
@@ -103,6 +104,7 @@ export default function DashboardHeader() {
 
   /* ── Notification state ── */
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount]     = useState(0);
   const [notifLoading, setNotifLoading]   = useState(false);
 
   /* ── Close on outside click ── */
@@ -172,11 +174,29 @@ export default function DashboardHeader() {
   const fetchNotifications = useCallback(async () => {
     setNotifLoading(true);
     try {
-      const res = await fetch("/api/notifications", { credentials: "include" });
+      const res = await fetch("/api/notifications?limit=20", { credentials: "include" });
       const data = await res.json();
       setNotifications(data.data?.notifications ?? []);
+      setUnreadCount(data.data?.unreadCount ?? 0);
     } catch {} finally { setNotifLoading(false); }
   }, []);
+
+  const handleNotifClick = async (notif: Notification) => {
+    if (!notif.isRead) {
+      try {
+        await fetch("/api/notifications", {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notificationId: notif._id }),
+        });
+        setNotifications(p => p.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+        setUnreadCount(c => Math.max(0, c - 1));
+      } catch {}
+    }
+    setNotifOpen(false);
+    if (notif.link) router.push(notif.link);
+  };
 
   const handleNotifOpen = () => {
     setNotifOpen(p => {
@@ -195,6 +215,7 @@ export default function DashboardHeader() {
         body: JSON.stringify({ markAllRead: true }),
       });
       setNotifications(p => p.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
     } catch {}
   };
 
@@ -207,8 +228,10 @@ export default function DashboardHeader() {
 
   /* ── Profile link by role ── */
   const profileLink = () => {
-    if (user?.role === "customer")   return "/customer/profile";
-    if (user?.role === "technician") return "/technician/profile";
+    if (user?.role === "customer")        return "/customer/profile";
+    if (user?.role === "technician")      return "/technician/profile";
+    if (user?.role === "manager")         return "/brand/profile";
+    if (user?.role === "service_center")  return "/service-center/profile";
     return "/dashboard/settings";
   };
 
@@ -216,7 +239,6 @@ export default function DashboardHeader() {
   const segments = pathname.split("/").filter(Boolean);
 
   /* ── Derived ── */
-  const unreadCount   = notifications.filter(n => !n.isRead).length;
   const hasResults    = results.tickets.length > 0 || results.users.length > 0;
   const showDropdown  = searchOpen && query.length >= 2;
 
@@ -429,6 +451,10 @@ export default function DashboardHeader() {
                   ) : notifications.map(notif => (
                     <div
                       key={notif._id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleNotifClick(notif)}
+                      onKeyDown={e => { if (e.key === "Enter") handleNotifClick(notif); }}
                       className={`px-4 py-3 hover:bg-slate-50 cursor-pointer transition ${!notif.isRead ? "bg-blue-50/30" : ""}`}
                     >
                       <div className="flex items-start gap-2.5">

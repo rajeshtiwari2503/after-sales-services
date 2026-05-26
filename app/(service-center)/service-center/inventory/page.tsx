@@ -21,6 +21,12 @@ export default function SCInventoryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showLowStock, setShowLowStock] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [addForm, setAddForm] = useState({
+    name: "", sku: "", category: "Spare Parts",
+    quantity: 0, minQuantity: 5, maxQuantity: 100, unitPrice: 0, location: "",
+  });
 
   const fetchInventory = async () => {
     setLoading(true);
@@ -40,6 +46,34 @@ export default function SCInventoryPage() {
   const lowStockCount = items.filter(i => i.quantity <= i.minQuantity).length;
   const totalValue = items.reduce((s, i) => s + (i.quantity * i.unitPrice), 0);
 
+  const handleAdd = async () => {
+    if (!addForm.name || !addForm.sku) { toast.error("Name and SKU required"); return; }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/inventory", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...addForm,
+          quantity: Number(addForm.quantity),
+          minQuantity: Number(addForm.minQuantity),
+          maxQuantity: Number(addForm.maxQuantity),
+          unitPrice: Number(addForm.unitPrice),
+          costPrice: Number(addForm.unitPrice) * 0.7,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast.success("Item added");
+      setShowAdd(false);
+      setAddForm({ name: "", sku: "", category: "Spare Parts", quantity: 0, minQuantity: 5, maxQuantity: 100, unitPrice: 0, location: "" });
+      fetchInventory();
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Failed to add item");
+    } finally { setSaving(false); }
+  };
+
   const stockLevel = (item: InventoryItem) => {
     const pct = item.maxQuantity > 0 ? (item.quantity / item.maxQuantity) * 100 : 0;
     if (item.quantity <= item.minQuantity) return { color: "bg-red-500", label: "Low", badge: "bg-red-50 text-red-700 border-red-100" };
@@ -54,7 +88,7 @@ export default function SCInventoryPage() {
           <h1 className="text-xl font-bold text-slate-800">Inventory & Parts</h1>
           <p className="text-xs text-slate-400 mt-0.5">{items.length} items tracked</p>
         </div>
-        <button className="flex items-center gap-2 h-9 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium cursor-pointer">
+        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 h-9 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium cursor-pointer">
           <Plus className="w-4 h-4" /> Add item
         </button>
       </div>
@@ -148,6 +182,30 @@ export default function SCInventoryPage() {
           </table>
         </div>
       </div>
+
+      {showAdd && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-base font-bold text-slate-800">Add spare part</h2>
+            <input placeholder="Item name *" value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
+              className="w-full h-10 border border-slate-200 rounded-lg px-3 text-sm" />
+            <input placeholder="SKU *" value={addForm.sku} onChange={e => setAddForm(f => ({ ...f, sku: e.target.value.toUpperCase() }))}
+              className="w-full h-10 border border-slate-200 rounded-lg px-3 text-sm uppercase" />
+            <div className="grid grid-cols-2 gap-3">
+              <input type="number" placeholder="Qty" value={addForm.quantity} onChange={e => setAddForm(f => ({ ...f, quantity: +e.target.value }))}
+                className="h-10 border border-slate-200 rounded-lg px-3 text-sm" />
+              <input type="number" placeholder="Unit price ₹" value={addForm.unitPrice} onChange={e => setAddForm(f => ({ ...f, unitPrice: +e.target.value }))}
+                className="h-10 border border-slate-200 rounded-lg px-3 text-sm" />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setShowAdd(false)} className="h-9 px-4 border border-slate-200 rounded-lg text-sm cursor-pointer">Cancel</button>
+              <button onClick={handleAdd} disabled={saving} className="h-9 px-4 bg-teal-600 text-white rounded-lg text-sm font-medium cursor-pointer disabled:opacity-60">
+                {saving ? "Saving..." : "Add"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
