@@ -247,10 +247,10 @@ export default function DashboardHeader() {
     <>
       {/* Search overlay backdrop */}
       {searchOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-40" onClick={() => { setSearchOpen(false); setQuery(""); }} />
+        <div className="fixed inset-0 bg-black/20  z-40" onClick={() => { setSearchOpen(false); setQuery(""); }} />
       )}
 
-      <header className="h-16 bg-white border-b border-slate-200/80 px-5 lg:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30">
+      <header className="h-16   bg-gradient-to-r from-blue-200  via-blue-150 to-pink-200  border-b border-slate-200/80 px-5 lg:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30">
 
         {/* ── Left: Breadcrumb ── */}
         <div className="flex flex-col justify-center pl-10 lg:pl-0">

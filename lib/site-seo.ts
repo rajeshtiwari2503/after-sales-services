@@ -25,7 +25,7 @@ export const siteConfig = {
     "after sales CRM India",
     "SaaS Techify",
   ],
-  contactEmail: "hello@techify.in",
+  contactEmail: "help.saastechify@gmail.com",
   twitterHandle: "@saastechify",
 };
 

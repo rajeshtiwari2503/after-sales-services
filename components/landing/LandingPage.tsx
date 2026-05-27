@@ -3362,8 +3362,8 @@ export default function LandingPage() {
                 title: "Company",
                 links: [
                   ["#contact", "Contact"],
-                  ["/login", "Sign in"],
-                  ["/privacy", "Privacy Policy"],
+                  ["/login", "Sign In"],
+                  ["/register", "Sign Up"],
                 ],
               },
             ].map((col) => (

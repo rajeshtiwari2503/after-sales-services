@@ -20,13 +20,13 @@ export default function PublicSiteHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center shrink-0">
           <Image
-            src="/logo13.png"
-            alt="SaaS Techify — after-sales service management"
-            width={180}
-            height={64}
-            className="h-9 sm:h-10 w-auto object-contain"
-            priority
-          />
+                     src="/logo13.png"
+                     alt="SaaS Techify — after-sales service management software"
+                     width={220}
+                     height={80}
+                     priority
+                     className="h-9 sm:h-11 md:h-[58px] lg:h-[68px] w-auto max-w-full object-contain drop-shadow-[0_8px_25px_rgba(59,130,246,0.35)] hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.45)] hover:scale-[1.02] transition-all duration-300"
+                   />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6" aria-label="Site">
