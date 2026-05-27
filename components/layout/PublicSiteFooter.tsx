@@ -12,6 +12,7 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
+import FloatingContact from "../landing/FloatingContact";
 export default function PublicSiteFooter() {
 
 
@@ -34,6 +35,7 @@ export default function PublicSiteFooter() {
   },
 ];
   return (
+    <div>
      <footer className="relative overflow-hidden border-t border-slate-200/70  ">
     
             {/* Background glow */}
@@ -109,7 +111,7 @@ export default function PublicSiteFooter() {
                     ],
                   },
                 ].map((col) => (
-                  <div key={col.title}>
+                  <div key={col.title} className="pb-5">
                     <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-slate-400 mb-5">
                       {col.title}
                     </h4>
@@ -258,5 +260,7 @@ export default function PublicSiteFooter() {
               </div>
             </div>
           </footer>
+             <FloatingContact />
+             </div>
   );
 }

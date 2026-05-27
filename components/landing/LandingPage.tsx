@@ -3367,8 +3367,8 @@ export default function LandingPage() {
                 ],
               },
             ].map((col) => (
-              <div key={col.title}>
-                <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-slate-400 mb-5">
+              <div key={col.title} className="pb-5">
+                <h4 className="text-xs font-bold   tracking-[0.18em] uppercase text-slate-400 mb-5">
                   {col.title}
                 </h4>
 
