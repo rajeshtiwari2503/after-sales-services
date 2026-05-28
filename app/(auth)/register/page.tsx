@@ -381,7 +381,7 @@ export default function RegisterPage() {
             <option value="customer">Customer</option>
             <option value="technician">Technician</option>
             <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
+            {/* <option value="admin">Admin</option> */}
             <option value="support">Support</option>
           </select>
 
