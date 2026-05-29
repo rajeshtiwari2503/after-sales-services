@@ -1,4 +1,4 @@
- "use client";
+"use client";
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 
@@ -40,19 +40,19 @@ const EMPTY_FORM: FormData = {
 };
 
 const PRODUCTS = [
-  { value: "ac",      label: "Air Conditioner" },
-  { value: "fridge",  label: "Refrigerator" },
-  { value: "tv",      label: "Smart TV" },
-  { value: "wm",      label: "Washing Machine" },
-  { value: "mw",      label: "Microwave" },
+  { value: "ac", label: "Air Conditioner" },
+  { value: "fridge", label: "Refrigerator" },
+  { value: "tv", label: "Smart TV" },
+  { value: "wm", label: "Washing Machine" },
+  { value: "mw", label: "Microwave" },
 ];
 
 const CATEGORIES: Record<string, { value: string; label: string }[]> = {
-  ac:     [{ value: "cooling", label: "Not Cooling" }, { value: "noise", label: "Noise Problem" }, { value: "water", label: "Water Leaking" }, { value: "remote", label: "Remote Issue" }],
-  fridge: [{ value: "cooling", label: "Not Cooling" }, { value: "noise", label: "Noise Problem" }, { value: "door",  label: "Door Issue" },   { value: "water", label: "Water Leaking" }],
-  tv:     [{ value: "display", label: "Display Issue" }, { value: "sound", label: "No Sound" },    { value: "wifi",  label: "Wi-Fi Issue" },   { value: "power", label: "No Power" }],
-  wm:     [{ value: "drum",    label: "Drum Not Spinning" }, { value: "water", label: "Water Not Draining" }, { value: "noise", label: "Noise Problem" }, { value: "power", label: "No Power" }],
-  mw:     [{ value: "heat",    label: "Not Heating" }, { value: "display", label: "Display Issue" }, { value: "door", label: "Door Not Closing" }, { value: "noise", label: "Noise Problem" }],
+  ac: [{ value: "cooling", label: "Not Cooling" }, { value: "noise", label: "Noise Problem" }, { value: "water", label: "Water Leaking" }, { value: "remote", label: "Remote Issue" }],
+  fridge: [{ value: "cooling", label: "Not Cooling" }, { value: "noise", label: "Noise Problem" }, { value: "door", label: "Door Issue" }, { value: "water", label: "Water Leaking" }],
+  tv: [{ value: "display", label: "Display Issue" }, { value: "sound", label: "No Sound" }, { value: "wifi", label: "Wi-Fi Issue" }, { value: "power", label: "No Power" }],
+  wm: [{ value: "drum", label: "Drum Not Spinning" }, { value: "water", label: "Water Not Draining" }, { value: "noise", label: "Noise Problem" }, { value: "power", label: "No Power" }],
+  mw: [{ value: "heat", label: "Not Heating" }, { value: "display", label: "Display Issue" }, { value: "door", label: "Door Not Closing" }, { value: "noise", label: "Noise Problem" }],
 };
 
 // ─── Validators ───────────────────────────────────────────────
@@ -119,29 +119,29 @@ export default function CustomerLandingPage() {
 
     try {
       const payload = {
-        name:        formData.name.trim(),
-        email:       formData.email.trim().toLowerCase(),
-        phone:       formData.phone.replace(/\s/g, ""),
-        tenantId:    "TENANT-001",
-        title:       formData.title.trim(),
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.replace(/\s/g, ""),
+        tenantId: "TENANT-001",
+        title: formData.title.trim(),
         description: formData.description.trim(),
-        priority:    formData.priority,
-        productId:   formData.productId,
-        categoryId:  formData.categoryId,
-        faultName:   formData.faultName.trim(),
+        priority: formData.priority,
+        productId: formData.productId,
+        categoryId: formData.categoryId,
+        faultName: formData.faultName.trim(),
         servicePincode: formData.servicePincode.trim(),
         serviceAddress: {
-          street:     formData.street.trim(),
-          city:       formData.city.trim(),
-          state:      formData.state.trim(),
+          street: formData.street.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
           postalCode: formData.servicePincode.trim(),
         },
       };
 
-      const response = await fetch("/api/customer/tickets/create", {
-        method:  "POST",
+      const response = await fetch("/api/tickets/customer", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(payload),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -153,10 +153,10 @@ export default function CustomerLandingPage() {
 
       // Success
       setResult({
-        ticketNumber:     data.ticketNumber,
-        otp:              data.otp,
+        ticketNumber: data.ticketNumber,
+        otp: data.otp,
         slaResolutionDue: data.slaResolutionDue,
-        priority:         data.priority,
+        priority: data.priority,
       });
       setFormData(EMPTY_FORM);
       setErrors({});
@@ -174,10 +174,9 @@ export default function CustomerLandingPage() {
 
   // ─── Input component ──────────────────────────────────────
   const inputCls = (field: string) =>
-    `w-full rounded-2xl border px-5 py-4 outline-none transition text-sm ${
-      errors[field]
-        ? "border-red-400 bg-red-50 focus:border-red-500"
-        : "border-slate-200 bg-white focus:border-pink-400"
+    `w-full rounded-2xl border px-5 py-4 outline-none transition text-sm ${errors[field]
+      ? "border-red-400 bg-red-50 focus:border-red-500"
+      : "border-slate-200 bg-white focus:border-pink-400"
     }`;
 
   const FieldErr = ({ field }: { field: string }) =>
@@ -229,25 +228,40 @@ export default function CustomerLandingPage() {
               </p>
 
               <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                <span className="text-xs text-slate-400">Expected Resolution</span>
+                <span className="text-xs text-slate-400">
+                  Expected Resolution
+                </span>
+
                 <span className="text-xs font-semibold text-slate-200">
-                  {new Date(result.slaResolutionDue).toLocaleString("en-IN", {
+                  {new Date(
+                    result?.slaResolutionDue ||
+                    Date.now() + 24 * 60 * 60 * 1000
+                  ).toLocaleString("en-IN", {
                     timeZone: "Asia/Kolkata",
-                    day: "numeric", month: "short",
-                    hour: "2-digit", minute: "2-digit",
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">Priority</span>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full capitalize ${
-                  result.priority === "critical" ? "bg-red-500/20 text-red-400"
-                  : result.priority === "high"   ? "bg-orange-500/20 text-orange-400"
-                  : result.priority === "medium" ? "bg-yellow-500/20 text-yellow-400"
-                  : "bg-gray-500/20 text-gray-400"
-                }`}>
-                  {result.priority}
+                <span className="text-xs text-slate-400">
+                  Priority
+                </span>
+
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full capitalize ${(result?.priority || "high") === "critical"
+                      ? "bg-red-500/20 text-red-400"
+                      : (result?.priority || "high") === "high"
+                        ? "bg-orange-500/20 text-orange-400"
+                        : (result?.priority || "high") === "medium"
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : "bg-gray-500/20 text-gray-400"
+                    }`}
+                >
+                  {result?.priority || "high"}
                 </span>
               </div>
             </div>
@@ -258,7 +272,7 @@ export default function CustomerLandingPage() {
 
             <button
               onClick={() => setResult(null)}
-              className="mt-8 w-full rounded-2xl bg-gradient-to-r from-pink-500 to-violet-600 py-4 text-sm font-bold text-white shadow-lg shadow-pink-200 hover:scale-[1.01] transition"
+              className="mt-8 w-full rounded-2xl cursor-pointer bg-gradient-to-r from-pink-500 to-violet-600 py-4 text-sm font-bold text-white shadow-lg shadow-pink-200 hover:scale-[1.01] transition"
             >
               Raise Another Request
             </button>
@@ -430,14 +444,13 @@ export default function CustomerLandingPage() {
                       {(["low", "medium", "high", "critical"] as const).map((p) => (
                         <button key={p} type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, priority: p }))}
-                          className={`py-3 rounded-xl text-xs font-bold capitalize border transition-all ${
-                            formData.priority === p
-                              ? p === "critical" ? "border-red-500 bg-red-50 text-red-700 shadow-sm"
-                                : p === "high"   ? "border-orange-500 bg-orange-50 text-orange-700 shadow-sm"
+                          className={`py-3 rounded-xl text-xs font-bold capitalize border transition-all ${formData.priority === p
+                            ? p === "critical" ? "border-red-500 bg-red-50 text-red-700 shadow-sm"
+                              : p === "high" ? "border-orange-500 bg-orange-50 text-orange-700 shadow-sm"
                                 : p === "medium" ? "border-yellow-500 bg-yellow-50 text-yellow-700 shadow-sm"
-                                :                  "border-slate-400 bg-slate-50 text-slate-700 shadow-sm"
-                              : "border-slate-200 text-slate-400 hover:border-slate-300"
-                          }`}>
+                                  : "border-slate-400 bg-slate-50 text-slate-700 shadow-sm"
+                            : "border-slate-200 text-slate-400 hover:border-slate-300"
+                            }`}>
                           {p}
                         </button>
                       ))}
