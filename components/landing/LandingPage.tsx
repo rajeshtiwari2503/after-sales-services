@@ -1779,9 +1779,9 @@ export default function LandingPage() {
                 <Reveal delay={400}>
                   <div className="mt-10 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
                     {[
-                      { end: 50000, suffix: "+", label: "Tickets resolved" },
-                      { end: 2400, suffix: "+", label: "Service centers" },
-                      { end: 18000, suffix: "+", label: "Technicians" },
+                      { end: 5000, suffix: "+", label: "Tickets resolved" },
+                      { end: 600, suffix: "+", label: "Service centers" },
+                      { end: 1200, suffix: "+", label: "Technicians" },
                       { end: 99, suffix: ".9%", label: "Uptime SLA" },
                     ].map(({ end, suffix, label }) => (
                       <div
@@ -1962,9 +1962,9 @@ export default function LandingPage() {
               {/* Bottom stats */}
               <div className="mt-10 pt-8 border-t border-slate-200/70 grid grid-cols-2 sm:grid-cols-4 gap-6">
                 {[
-                  { value: "500+", label: "Brands onboarded" },
-                  { value: "2.4K+", label: "Service centers" },
-                  { value: "18K+", label: "Technicians" },
+                  { value: "10+", label: "Brands onboarded" },
+                  { value: "600+", label: "Service centers" },
+                  { value: "1200+", label: "Technicians" },
                   { value: "99.9%", label: "Platform uptime" },
                 ].map((item) => (
                   <div key={item.label} className="text-center">
