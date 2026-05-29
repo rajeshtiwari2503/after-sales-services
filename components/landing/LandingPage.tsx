@@ -1578,7 +1578,7 @@ export default function LandingPage() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center shrink-0 min-w-0 max-w-[60%] sm:max-w-none"
+            className="flex items-center -ml-3 md:-ml-6 shrink-0 min-w-0 max-w-[60%] sm:max-w-none"
           >
             <Image
               src="/logo13.png"
@@ -1586,7 +1586,7 @@ export default function LandingPage() {
               width={220}
               height={80}
               priority
-              className="h-9 sm:h-11 md:h-[58px] lg:h-[68px] w-auto max-w-full object-contain drop-shadow-[0_8px_25px_rgba(59,130,246,0.35)] hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.45)] hover:scale-[1.02] transition-all duration-300"
+              className="h-9 sm:h-11  md:h-[58px] lg:h-[68px] w-auto max-w-full object-contain drop-shadow-[0_8px_25px_rgba(59,130,246,0.35)] hover:drop-shadow-[0_10px_35px_rgba(168,85,247,0.45)] hover:scale-[1.02] transition-all duration-300"
             />
           </Link>
 
@@ -1724,7 +1724,7 @@ export default function LandingPage() {
                   <div className="flex justify-center px-1">
                     <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 sm:px-4 py-2 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide shadow-sm text-center max-w-full">
                       <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shrink-0" />
-                      <span className="leading-snug">Now serving 500+ service brands across India</span>
+                      <span className="leading-snug">Now serving 10+ service brands across India</span>
                     </div>
                   </div>
                 </Reveal>
@@ -2381,19 +2381,19 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
               {[
                 {
-                  end: 500,
+                  end: 10,
                   suffix: "+",
                   label: "Active brands",
                   icon: "🏢",
                 },
                 {
-                  end: 2400,
+                  end: 600,
                   suffix: "+",
                   label: "Service centers",
                   icon: "🏪",
                 },
                 {
-                  end: 18000,
+                  end: 1200,
                   suffix: "+",
                   label: "Daily technicians",
                   icon: "🔧",

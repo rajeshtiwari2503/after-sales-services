@@ -28,7 +28,7 @@ export default function FloatingContact() {
     >
       <a
         href={SITE_PHONE_TEL}
-        className={`${actionBtn} bg-gradient-to-br from-indigo-600 to-violet-600 focus-visible:ring-indigo-500`}
+        className={`${actionBtn} bg-gradient-to-r from-cyan-500 to-fuchsia-600 focus-visible:ring-indigo-500`}
         aria-label="Call us"
         title="Call us"
       >
