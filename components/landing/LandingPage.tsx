@@ -1317,6 +1317,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import FloatingContact from "@/components/landing/FloatingContact";
+import CustomerLandingPage from "./CustomerSection";
 
 /* ─── Animated counter ──────────────────────────────────────────────────── */
 function Counter({ end, suffix = "", prefix = "", duration = 2000 }: {
@@ -2430,6 +2431,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+
+        <CustomerLandingPage />
         {/* ══ TESTIMONIALS ═════════════════════════════════════════════ */}
         <section className="relative py-12 bg-gradient-to-b from-white via-[#F8FBFF] to-[#F3F7FF] overflow-hidden">
 
