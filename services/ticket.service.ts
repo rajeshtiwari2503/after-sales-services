@@ -1,4 +1,4 @@
- 
+
 // import Ticket from '@/models/Ticket';
 // import User from '@/models/User';
 // import connectDB from '@/lib/db';
@@ -150,9 +150,29 @@ export class TicketService {
     await connectDB();
 
     const count = await Ticket.countDocuments({ tenantId });
-    const ticketNumber = `TKT-${String(count + 1).padStart(6, '0')}`;
-    const ticketId = `TID-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    let ticketNumber = "";
+    let isUnique = false;
 
+    while (!isUnique) {
+      const count = await Ticket.countDocuments();
+
+      const generatedNumber = `TKT-${String(
+        count + 1 + Math.floor(Math.random() * 100)
+      ).padStart(6, "0")}`;
+
+      const existingTicket = await Ticket.findOne({
+        ticketNumber: generatedNumber,
+      });
+
+      if (!existingTicket) {
+        ticketNumber = generatedNumber;
+        isUnique = true;
+      }
+    }
+
+    const ticketId = `TID-${Date.now()}-${Math.floor(
+      1000 + Math.random() * 9000
+    )}`;
     const customerId =
       data.customerId && Types.ObjectId.isValid(data.customerId)
         ? new Types.ObjectId(data.customerId)

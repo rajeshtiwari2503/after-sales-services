@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 // ─── Types ────────────────────────────────────────────────────
 interface FormData {
@@ -145,25 +146,39 @@ export default function CustomerLandingPage() {
       });
 
       const data = await response.json();
-
+console.log("API response:", data);
       if (!response.ok) {
+         toast.error(data.message || "Something went wrong. Please try again.");
         setApiError(data.message || "Something went wrong. Please try again.");
         return;
       }
 
       // Success
+      // setResult({
+      //   ticketNumber: data.ticketNumber,
+      //   otp: data.otp,
+      //   slaResolutionDue: data.slaResolutionDue,
+      //   priority: data.priority,
+      // });
+      // setFormData(EMPTY_FORM);
+      // setErrors({});
+
+      // // Scroll to top to show success
+      // window.scrollTo({ top: 0, behavior: "smooth" });
+      // Success
       setResult({
-        ticketNumber: data.ticketNumber,
-        otp: data.otp,
-        slaResolutionDue: data.slaResolutionDue,
-        priority: data.priority,
+        ticketNumber: data?.data?.ticketNumber,
+        otp: data?.data?.otp,
+        slaResolutionDue: data?.data?.estimatedCompletionDate,
+        priority: data?.data?.priority,
       });
+
       setFormData(EMPTY_FORM);
       setErrors({});
 
-      // Scroll to top to show success
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast.success("Ticket created successfully!");
     } catch (error: unknown) {
+        // toast.error(error.message || "Something went wrong. Please try again.");
       setApiError(
         error instanceof Error ? error.message : "Network error. Please check your connection."
       );
@@ -253,12 +268,12 @@ export default function CustomerLandingPage() {
 
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full capitalize ${(result?.priority || "high") === "critical"
-                      ? "bg-red-500/20 text-red-400"
-                      : (result?.priority || "high") === "high"
-                        ? "bg-orange-500/20 text-orange-400"
-                        : (result?.priority || "high") === "medium"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-gray-500/20 text-gray-400"
+                    ? "bg-red-500/20 text-red-400"
+                    : (result?.priority || "high") === "high"
+                      ? "bg-orange-500/20 text-orange-400"
+                      : (result?.priority || "high") === "medium"
+                        ? "bg-yellow-500/20 text-yellow-400"
+                        : "bg-gray-500/20 text-gray-400"
                     }`}
                 >
                   {result?.priority || "high"}

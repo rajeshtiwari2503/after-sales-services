@@ -69,103 +69,433 @@
    }
  }
  
+//  export async function POST(request: NextRequest) {
+//    try {
+//      const user = getAuthUser(request);
+//      if (!user) return errorResponse('Unauthorized', 401);
+ 
+//      const contentType = request.headers.get('content-type') ?? '';
+//      let body: Record<string, any> = {};
+ 
+//      if (contentType.includes('multipart/form-data')) {
+//        const formData = await request.formData();
+//        formData.forEach((value, key) => {
+//          if (key !== 'attachments') body[key] = value;
+//        });
+//        if (typeof body.serviceAddress === 'string') {
+//          try {
+//            body.serviceAddress = JSON.parse(body.serviceAddress);
+//          } catch {
+//            /* ignore */
+//          }
+//        }
+//      } else {
+//        body = await request.json();
+//      }
+ 
+//      const validation = createTicketSchema.safeParse(body);
+//      if (!validation.success) {
+//        return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
+//      }
+ 
+//      await connectDB();
+//      const platform = await PlatformSettings.findOne({ tenantId: user.tenantId }).lean();
+//      if (platform?.maintenanceMode && user.role === 'customer') {
+//        return errorResponse('New tickets are temporarily disabled for maintenance', 503);
+//      }
+ 
+//      const ticket = await TicketService.createTicket(validation.data, user.userId, user.tenantId);
+ 
+//      audit(request, user, {
+//        action: AUDIT_ACTIONS.CREATE,
+//        module: AUDIT_MODULES.TICKET,
+//        entityId:   (ticket as { _id: { toString(): string } })._id?.toString?.(),
+//        entityName: (ticket as { ticketNumber?: string }).ticketNumber,
+//        message:    `Ticket created: ${(ticket as { title?: string }).title}`,
+//      });
+ 
+//      // Notify brand managers when a new ticket is created
+//      try {
+//        await connectDB();
+//        const managers = await User.find({
+//          tenantId: user.tenantId,
+//          role: 'manager',
+//          isActive: true,
+//        }).select('_id');
+ 
+//        if (managers.length > 0) {
+//          await NotificationService.onTicketCreated({
+//            managerUserIds: managers.map(m => m._id.toString()),
+//            tenantId:       user.tenantId,
+//            ticketId:       (ticket as any)._id.toString(),
+//            ticketNumber:   (ticket as any).ticketNumber,
+//            title:          (ticket as any).title,
+//          });
+//        }
+ 
+//        const scId = (ticket as { serviceCenterId?: { toString(): string } }).serviceCenterId?.toString?.()
+//          ?? (ticket as { serviceCenterId?: string }).serviceCenterId;
+ 
+//        if (scId) {
+//          const scUsers = await User.find({
+//            tenantId: user.tenantId,
+//            role: 'service_center',
+//            serviceCenterId: scId,
+//            isActive: true,
+//          }).select('_id');
+ 
+//          const ServiceCenter = (await import('@/models/ServiceCenter')).default;
+//          const sc = await ServiceCenter.findById(scId).select('name').lean();
+ 
+//          if (scUsers.length > 0) {
+//            await NotificationService.onTicketRoutedToSC({
+//              scOperatorUserIds: scUsers.map((u) => u._id.toString()),
+//              tenantId: user.tenantId,
+//              ticketId: (ticket as { _id: { toString(): string } })._id.toString(),
+//              ticketNumber: (ticket as { ticketNumber: string }).ticketNumber,
+//              title: (ticket as { title: string }).title,
+//              scName: sc?.name ?? 'Service center',
+//            });
+//          }
+//        }
+//      } catch (notifErr) {
+//        // Non-critical — don't fail ticket creation if notification fails
+//        console.error('Notification error (non-critical):', notifErr);
+//      }
+ 
+//      return successResponse(ticket, 'Ticket created successfully', 201);
+//    } catch (error) {
+//      console.error('Create ticket error:', error);
+//      return errorResponse('An error occurred', 500);
+//    }
+//  }
+
+// app/api/tickets/create/route.ts
+
+ // app/api/tickets/create/route.ts
+
  export async function POST(request: NextRequest) {
-   try {
-     const user = getAuthUser(request);
-     if (!user) return errorResponse('Unauthorized', 401);
- 
-     const contentType = request.headers.get('content-type') ?? '';
-     let body: Record<string, any> = {};
- 
-     if (contentType.includes('multipart/form-data')) {
-       const formData = await request.formData();
-       formData.forEach((value, key) => {
-         if (key !== 'attachments') body[key] = value;
-       });
-       if (typeof body.serviceAddress === 'string') {
-         try {
-           body.serviceAddress = JSON.parse(body.serviceAddress);
-         } catch {
-           /* ignore */
-         }
-       }
-     } else {
-       body = await request.json();
-     }
- 
-     const validation = createTicketSchema.safeParse(body);
-     if (!validation.success) {
-       return errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors);
-     }
- 
-     await connectDB();
-     const platform = await PlatformSettings.findOne({ tenantId: user.tenantId }).lean();
-     if (platform?.maintenanceMode && user.role === 'customer') {
-       return errorResponse('New tickets are temporarily disabled for maintenance', 503);
-     }
- 
-     const ticket = await TicketService.createTicket(validation.data, user.userId, user.tenantId);
- 
-     audit(request, user, {
-       action: AUDIT_ACTIONS.CREATE,
-       module: AUDIT_MODULES.TICKET,
-       entityId:   (ticket as { _id: { toString(): string } })._id?.toString?.(),
-       entityName: (ticket as { ticketNumber?: string }).ticketNumber,
-       message:    `Ticket created: ${(ticket as { title?: string }).title}`,
-     });
- 
-     // Notify brand managers when a new ticket is created
-     try {
-       await connectDB();
-       const managers = await User.find({
-         tenantId: user.tenantId,
-         role: 'manager',
-         isActive: true,
-       }).select('_id');
- 
-       if (managers.length > 0) {
-         await NotificationService.onTicketCreated({
-           managerUserIds: managers.map(m => m._id.toString()),
-           tenantId:       user.tenantId,
-           ticketId:       (ticket as any)._id.toString(),
-           ticketNumber:   (ticket as any).ticketNumber,
-           title:          (ticket as any).title,
-         });
-       }
- 
-       const scId = (ticket as { serviceCenterId?: { toString(): string } }).serviceCenterId?.toString?.()
-         ?? (ticket as { serviceCenterId?: string }).serviceCenterId;
- 
-       if (scId) {
-         const scUsers = await User.find({
-           tenantId: user.tenantId,
-           role: 'service_center',
-           serviceCenterId: scId,
-           isActive: true,
-         }).select('_id');
- 
-         const ServiceCenter = (await import('@/models/ServiceCenter')).default;
-         const sc = await ServiceCenter.findById(scId).select('name').lean();
- 
-         if (scUsers.length > 0) {
-           await NotificationService.onTicketRoutedToSC({
-             scOperatorUserIds: scUsers.map((u) => u._id.toString()),
-             tenantId: user.tenantId,
-             ticketId: (ticket as { _id: { toString(): string } })._id.toString(),
-             ticketNumber: (ticket as { ticketNumber: string }).ticketNumber,
-             title: (ticket as { title: string }).title,
-             scName: sc?.name ?? 'Service center',
-           });
-         }
-       }
-     } catch (notifErr) {
-       // Non-critical — don't fail ticket creation if notification fails
-       console.error('Notification error (non-critical):', notifErr);
-     }
- 
-     return successResponse(ticket, 'Ticket created successfully', 201);
-   } catch (error) {
-     console.error('Create ticket error:', error);
-     return errorResponse('An error occurred', 500);
-   }
- }
+  try {
+    // =========================================================
+    // AUTH USER
+    // =========================================================
+
+   let user = getAuthUser(request) as any;
+
+    // =========================================================
+    // PARSE BODY
+    // =========================================================
+
+    const contentType =
+      request.headers.get("content-type") ?? "";
+
+    let body: Record<string, any> = {};
+
+    if (
+      contentType.includes("multipart/form-data")
+    ) {
+      const formData = await request.formData();
+
+      formData.forEach((value, key) => {
+        if (key !== "attachments") {
+          body[key] = value;
+        }
+      });
+
+      if (
+        typeof body.serviceAddress === "string"
+      ) {
+        try {
+          body.serviceAddress = JSON.parse(
+            body.serviceAddress
+          );
+        } catch {
+          /* ignore */
+        }
+      }
+    } else {
+      body = await request.json();
+    }
+
+    // =========================================================
+    // CONNECT DB
+    // =========================================================
+
+    await connectDB();
+
+    // =========================================================
+    // CREATE CUSTOMER IF USER NOT LOGGED IN
+    // =========================================================
+
+    if (!user) {
+      // REQUIRED VALIDATION
+      if (!body.name) {
+        return errorResponse(
+          "Name is required",
+          400
+        );
+      }
+
+      if (!body.phone) {
+        return errorResponse(
+          "Phone number is required",
+          400
+        );
+      }
+
+      if (!body.email) {
+        return errorResponse(
+          "Email is required",
+          400
+        );
+      }
+
+      // =====================================================
+      // FIND EXISTING CUSTOMER
+      // =====================================================
+
+      let customer = await User.findOne({
+        $or: [
+          {
+            email: body.email.toLowerCase(),
+          },
+          {
+            phone: body.phone,
+          },
+        ],
+
+        role: "customer",
+      });
+
+      // =====================================================
+      // CREATE CUSTOMER
+      // =====================================================
+
+      if (!customer) {
+        customer = await User.create({
+          name: body.name,
+
+          email: body.email.toLowerCase(),
+
+          phone: body.phone,
+
+          role: "customer",
+
+          isActive: true,
+        });
+      }
+
+      // =====================================================
+      // CREATE TEMP AUTH USER OBJECT
+      // =====================================================
+
+      user = {
+        userId: customer._id.toString(),
+
+        role: "customer",
+
+        email: customer.email,
+
+        name: customer.name,
+      } as any;
+    }
+
+    // =========================================================
+    // VALIDATION
+    // =========================================================
+
+    const validation =
+      createTicketSchema.safeParse(body);
+
+    if (!validation.success) {
+      return errorResponse(
+        "Validation failed",
+        400,
+        validation.error.flatten().fieldErrors
+      );
+    }
+
+    // =========================================================
+    // MAINTENANCE MODE
+    // =========================================================
+
+    const platform =
+      await PlatformSettings.findOne().lean();
+
+    if (
+      platform?.maintenanceMode &&
+      user.role === "customer"
+    ) {
+      return errorResponse(
+        "New tickets are temporarily disabled for maintenance",
+        503
+      );
+    }
+
+    // =========================================================
+    // CREATE TICKET
+    // =========================================================
+
+    const ticket =
+      await TicketService.createTicket(
+        validation.data,
+        user.userId,
+            user?.tenantId ||  "customer"
+      );
+
+    // =========================================================
+    // AUDIT
+    // =========================================================
+
+    audit(request, user, {
+      action: AUDIT_ACTIONS.CREATE,
+
+      module: AUDIT_MODULES.TICKET,
+
+      entityId: (
+        ticket as {
+          _id: { toString(): string };
+        }
+      )._id?.toString?.(),
+
+      entityName: (
+        ticket as {
+          ticketNumber?: string;
+        }
+      ).ticketNumber,
+
+      message: `Ticket created: ${
+        (ticket as { title?: string }).title
+      }`,
+    });
+
+    // =========================================================
+    // NOTIFICATIONS
+    // =========================================================
+
+    try {
+      // =====================================================
+      // MANAGERS
+      // =====================================================
+
+      const managers = await User.find({
+        role: "manager",
+
+        isActive: true,
+      }).select("_id");
+
+      if (managers.length > 0) {
+        await NotificationService.onTicketCreated({
+          managerUserIds: managers.map((m) =>
+            m._id.toString()
+          ),
+
+          tenantId:
+            (ticket as any).tenantId || "",
+
+          ticketId: (
+            ticket as any
+          )._id.toString(),
+
+          ticketNumber: (ticket as any)
+            .ticketNumber,
+
+          title: (ticket as any).title,
+        });
+      }
+
+      // =====================================================
+      // SERVICE CENTER
+      // =====================================================
+
+      const scId = (
+        ticket as {
+          serviceCenterId?: {
+            toString(): string;
+          };
+        }
+      ).serviceCenterId?.toString?.();
+
+      if (scId) {
+        const scUsers = await User.find({
+          role: "service_center",
+
+          serviceCenterId: scId,
+
+          isActive: true,
+        }).select("_id");
+
+        const ServiceCenter = (
+          await import(
+            "@/models/ServiceCenter"
+          )
+        ).default;
+
+        const sc =
+          await ServiceCenter.findById(scId)
+            .select("name")
+            .lean();
+
+        if (scUsers.length > 0) {
+          await NotificationService.onTicketRoutedToSC({
+            scOperatorUserIds: scUsers.map(
+              (u) => u._id.toString()
+            ),
+
+            tenantId:
+              (ticket as any).tenantId || "",
+
+            ticketId: (
+              ticket as {
+                _id: {
+                  toString(): string;
+                };
+              }
+            )._id.toString(),
+
+            ticketNumber: (
+              ticket as {
+                ticketNumber: string;
+              }
+            ).ticketNumber,
+
+            title: (
+              ticket as {
+                title: string;
+              }
+            ).title,
+
+            scName:
+              (sc as any)?.name ??
+              "Service center",
+          });
+        }
+      }
+    } catch (notifErr) {
+      console.error(
+        "Notification error (non-critical):",
+        notifErr
+      );
+    }
+
+    // =========================================================
+    // RESPONSE
+    // =========================================================
+
+    return successResponse(
+      ticket,
+      "Ticket created successfully",
+      201
+    );
+  } catch (error) {
+    console.error(
+      "Create ticket error:",
+      error
+    );
+
+    return errorResponse(
+      "An error occurred",
+      500
+    );
+  }
+}
